@@ -392,7 +392,7 @@ export default function Hero() {
       {/* Content Layer - Split Layout Design */}
       <div className="relative z-20 min-h-screen flex items-center">
         <div className="container mx-auto px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-screen py-20">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-screen py-20">
             
             {/* Left Side - Content */}
             <motion.div
@@ -504,13 +504,13 @@ export default function Hero() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="relative flex justify-center lg:justify-end"
+              className="relative flex justify-center lg:justify-start lg:pl-8"
             >
               {/* Clean portrait with natural pop-out and floating animation */}
               <motion.img 
                 src={professionalPortrait} 
                 alt="Debanjan Das - Professional Portrait" 
-                className="w-80 h-96 lg:w-96 lg:h-[500px] object-cover object-center relative z-10"
+                className="w-80 h-96 lg:w-[420px] lg:h-[520px] object-cover object-center relative z-10"
                 style={{
                   filter: 'drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3))',
                   background: 'transparent'
