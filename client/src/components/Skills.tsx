@@ -3,8 +3,7 @@ import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
 import { useRef, useState } from "react"
 import { Card } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
 import { Code2, Database, Cloud, Palette, Settings, Globe, ChevronRight } from "lucide-react"
 
 const skillCategories = [
@@ -62,7 +61,7 @@ const skillCategories = [
   }
 ]
 
-const SkillBar = ({ name, level, delay }: { name: string; level: number; delay: number }) => {
+const CircularSkill = ({ name, level, delay }: { name: string; level: number; delay: number }) => {
   const [currentLevel, setCurrentLevel] = useState(0)
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true })
@@ -76,19 +75,61 @@ const SkillBar = ({ name, level, delay }: { name: string; level: number; delay: 
     }
   }, [isInView, level, delay])
 
+  const radius = 35
+  const circumference = 2 * Math.PI * radius
+  const strokeDasharray = circumference
+  const strokeDashoffset = circumference - (currentLevel / 100) * circumference
+
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, x: -20 }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
       transition={{ duration: 0.6, delay: delay / 1000 }}
-      className="space-y-2"
+      className="flex flex-col items-center p-4"
     >
-      <div className="flex justify-between items-center">
-        <span className="font-medium">{name}</span>
-        <span className="text-sm text-muted-foreground">{currentLevel}%</span>
+      <div className="relative w-20 h-20 mb-3">
+        <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
+          {/* Background circle */}
+          <circle
+            cx="40"
+            cy="40"
+            r={radius}
+            stroke="currentColor"
+            strokeWidth="6"
+            fill="transparent"
+            className="text-muted-foreground/20"
+          />
+          {/* Progress circle */}
+          <motion.circle
+            cx="40"
+            cy="40"
+            r={radius}
+            stroke="hsl(var(--primary))"
+            strokeWidth="6"
+            fill="transparent"
+            strokeLinecap="round"
+            strokeDasharray={strokeDasharray}
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: strokeDashoffset }}
+            transition={{ duration: 1.5, delay: delay / 1000, ease: "easeOut" }}
+          />
+        </svg>
+        {/* Percentage text */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <motion.span 
+            className="text-sm font-bold text-primary"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: (delay / 1000) + 0.5 }}
+          >
+            {currentLevel}%
+          </motion.span>
+        </div>
       </div>
-      <Progress value={currentLevel} className="h-2" />
+      <div className="text-center">
+        <span className="font-medium text-sm leading-tight">{name}</span>
+      </div>
     </motion.div>
   )
 }
@@ -96,7 +137,6 @@ const SkillBar = ({ name, level, delay }: { name: string; level: number; delay: 
 export default function Skills() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
-  const [selectedCategory, setSelectedCategory] = useState<typeof skillCategories[0] | null>(null)
 
   return (
     <section id="skills" className="py-20 px-4">
@@ -159,6 +199,9 @@ export default function Skills() {
                       </div>
                       {category.label}
                     </DialogTitle>
+                    <DialogDescription>
+                      View detailed proficiency levels for {category.label.toLowerCase()} skills and technologies.
+                    </DialogDescription>
                   </DialogHeader>
                   
                   <div className="space-y-6 mt-6">
@@ -166,9 +209,9 @@ export default function Skills() {
                       My proficiency levels in {category.label.toLowerCase()} technologies and tools.
                     </p>
                     
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {category.skills.map((skill, skillIndex) => (
-                        <SkillBar
+                        <CircularSkill
                           key={skill.name}
                           name={skill.name}
                           level={skill.level}
