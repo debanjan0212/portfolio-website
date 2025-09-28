@@ -4,9 +4,11 @@ import { useRef, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { ExternalLink, Github, Eye, Calendar, Users, TrendingUp, ChevronLeft, ChevronRight, Building2 } from "lucide-react"
+import kanryoGitOpsImage from "../assets/kanryo-gitops-project.png"
+import serverMigrationImage from "../assets/server-migration-project.png"
 
 const projects = [
   {
@@ -29,7 +31,8 @@ const projects = [
     category: "Migration", 
     status: "Completed",
     impact: "99.8% deployment success rate across 200+ production deployments",
-    company: "TransUnion"
+    company: "TransUnion",
+    image: serverMigrationImage
   },
   {
     id: 3,
@@ -40,7 +43,8 @@ const projects = [
     category: "Platform",
     status: "Completed",
     impact: "56% improvement in build times (45 to 20 minutes)",
-    company: "TCS"
+    company: "TCS",
+    image: kanryoGitOpsImage
   },
   {
     id: 4,
@@ -78,17 +82,25 @@ const ProjectCard = ({ project, onClick }: { project: typeof projects[0], onClic
     >
       <Card className="overflow-hidden hover-elevate transition-all duration-300 group-hover:border-primary/50">
         {/* Project Image */}
-        <div className="relative h-48 bg-gradient-to-br from-primary/10 to-purple-500/10 overflow-hidden">
+        <div className="relative h-48 overflow-hidden">
+          {project.image ? (
+            <img 
+              src={project.image} 
+              alt={project.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary/10 to-purple-500/10 flex items-center justify-center">
+              <div className="text-6xl font-bold text-primary/20">
+                {project.title.split(' ').map(word => word[0]).join('')}
+              </div>
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
           <div className="absolute top-4 right-4">
             <Badge variant={project.status === "Completed" ? "default" : "secondary"}>
               {project.status}
             </Badge>
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-6xl font-bold text-primary/20">
-              {project.title.split(' ').map(word => word[0]).join('')}
-            </div>
           </div>
           
           {/* Hover Overlay */}
@@ -210,14 +222,27 @@ export default function Portfolio() {
               <>
                 <DialogHeader>
                   <DialogTitle className="text-2xl">{selectedProject.title}</DialogTitle>
+                  <DialogDescription>
+                    Detailed view of the {selectedProject.title} project including technologies, impact, and implementation details.
+                  </DialogDescription>
                 </DialogHeader>
                 
                 <div className="space-y-6">
                   {/* Project Image */}
-                  <div className="h-64 bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-lg flex items-center justify-center">
-                    <div className="text-8xl font-bold text-primary/20">
-                      {selectedProject.title.split(' ').map(word => word[0]).join('')}
-                    </div>
+                  <div className="h-64 rounded-lg overflow-hidden">
+                    {selectedProject.image ? (
+                      <img 
+                        src={selectedProject.image} 
+                        alt={selectedProject.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary/10 to-purple-500/10 flex items-center justify-center">
+                        <div className="text-8xl font-bold text-primary/20">
+                          {selectedProject.title.split(' ').map(word => word[0]).join('')}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Project Details */}
