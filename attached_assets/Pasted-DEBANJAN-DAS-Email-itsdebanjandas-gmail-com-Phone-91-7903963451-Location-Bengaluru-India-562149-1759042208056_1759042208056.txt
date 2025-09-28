@@ -1,0 +1,110 @@
+DEBANJAN DAS
+Email: itsdebanjandas@gmail.com
+Phone: +91-7903963451
+Location: Bengaluru, India 562149
+LinkedIn: www.linkedin.com/in/debanjan0212/
+
+PROFESSIONAL SUMMARY
+DevOps & Site Reliability Engineer with 7+ years of expertise in cloud infrastructure, automation, and enterprise-scale system migrations. Proven track record of reducing deployment times by 56%, managing 800+ server migrations, and maintaining 99.8% deployment success rate. Currently leading infrastructure automation and cost optimization initiatives at Signeasy, with previous experience serving Fortune 500 clients including Charter Communications, Comcast, and Oracle. Specialized in AWS, Kubernetes, Infrastructure as Code, and building robust CI/CD pipelines with strong focus on security compliance (SOC2/HIPAA).
+
+TECHNICAL SKILLS
+Cloud & Infrastructure
+
+AWS (EC2, S3, EKS, VPC, IAM, CloudFront, Lambda, SNS/SQS, SES, Route53, ALB/NLB, API Gateway)
+Azure (AKS), Google Cloud Platform
+Kubernetes, Docker, OpenShift, Rancher, Helm Charts
+Terraform, Terragrunt, Pulumi, CloudFormation
+Ansible, Ansible Tower, Kong API Gateway
+
+DevOps & Automation
+
+Jenkins, ArgoCD, GitHub Actions
+GitOps, GitLab, Git, SVN
+CI/CD Pipeline Development
+Configuration Management
+
+Monitoring & Observability
+
+ELK Stack (Elasticsearch, Logstash, Kibana), OpenSearch
+Prometheus, Grafana, Nagios, DataDog, PagerDuty
+Application Performance Monitoring
+Log Analysis & Troubleshooting, Redis Cloud
+
+Programming & Scripting
+
+Bash, Python, Linux Administration
+SQL, MongoDB, MySQL, PostgreSQL, Aurora DB
+Security & Vulnerability Management, SOC2/HIPAA Compliance
+ITIL, ServiceNow, Agile/Scrum, RBAC Implementation
+
+
+PROFESSIONAL EXPERIENCE
+Signeasy | Senior Site Reliability Engineer (Cloud DevOps) | Jan 2025 - Present | Bengaluru, India
+
+Platform Leadership: Managing SRE initiatives for cloud-based digital signature platform serving millions of document workflows globally, supporting both API customers (token-based) and SaaS customers (subscription-based)
+Security & Compliance: Implementing SOC2 & HIPAA compliance framework using Vanta integration with AWS for regulatory compliance across digital document handling and vulnerability management
+Disaster Recovery Excellence: Architected and executed annual DR exercise, successfully migrating complete data flow from us-east-1 to us-west-2, establishing robust backup procedures
+Cost Optimization Leadership: Leading 3-member team analyzing AWS infrastructure costs, targeting 25% reduction through Kong API Gateway migration, S3 optimization, and ALB consolidation
+Infrastructure Automation: Spearheading transformation from manual, scattered infrastructure to robust Terraform/Terragrunt IaC architecture - organization's highest priority initiative
+Kubernetes Modernization: Migrating 30+ services from traditional manifests to Helm charts, creating standardized deployment templates and self-service developer environments
+Multi-Tier Monitoring: Managing Prometheus/Grafana for lower environments and DataDog/PagerDuty for production monitoring, while maintaining Elasticsearch/Logstash for SaaS platform search functionality
+
+TransUnion (Neustar Acquisition) | Developer (Cloud DevOps) | Dec 2022 - Jan 2025 | Bengaluru, India
+
+Orchestrated migration of 800+ servers from on-premises to private EKS clusters, supporting $1B+ revenue telecommunications clients including Charter Communications, Comcast, and Oracle
+Executed 200+ production deployments with 99.8% success rate, managing 50+ weekly releases for Order Management System serving major US carriers
+Implemented comprehensive monitoring for 50+ microservices and 100+ applications using ELK Stack, Prometheus, and Grafana
+Led OS migration from CentOS/RHEL to AlmaLinux across production infrastructure, enhancing security compliance
+Developed Ansible automation playbooks reducing manual configuration tasks by 75%
+Provided 24/7 on-call support for critical OMS applications handling telecom port-in/port-out operations
+
+Tata Consultancy Services | System Engineer (Cloud DevOps) | Dec 2021 - Dec 2022 | Bengaluru, India
+
+Led development of "Kanryo" GitOps-based SAAS platform using Kubernetes, Rancher, OpenShift, GitHub Actions, and ArgoCD
+Managed and mentored 15 fresh graduates while building enterprise-grade DevOps solutions
+Optimized Jenkins CI/CD pipelines, reducing build times from 45 to 20 minutes (56% improvement) through strategic caching and process optimization
+Built Azure AKS clusters and implemented Infrastructure as Code using Terraform
+Enhanced Prometheus and Grafana monitoring systems with custom alerting capabilities
+Automated patching, application upgrades, and routine maintenance through custom scripting
+
+Capgemini | Associate Consultant (DevOps) | Aug 2018 - Nov 2021 | Mumbai, Bangalore, Chennai
+
+Architected enterprise-wide ELK Stack migration from legacy Nagios, reducing operational costs by 40% and improving incident resolution by 60%
+Led 10-member support team managing critical Royal Mail infrastructure with 99.5% SLA compliance
+Designed and implemented big data cluster solution, successfully onboarding 8 enterprise clients within 6 months
+Established robust ITIL processes using ServiceNow for incident, change, and problem management
+Introduced SonarQube and Nexus Repository for code quality and artifact management
+Developed comprehensive automation scripts reducing manual deployment efforts by 70%
+
+
+EDUCATION
+Bachelor of Technology - Electrical and Electronics Engineering
+Vellore Institute of Technology (VIT), Vellore, India | 2014-2018
+CGPA: 8.48/10 (First Class with Distinction)
+
+Published research paper on Emotion Recognition using Machine Learning and Neuroscience
+Completed internships at Schneider Electric, TE Connectivity, and BEML Limited
+
+
+CERTIFICATIONS
+
+Google Cloud Platform (GCP) Associate Cloud Engineer - In Progress (2024)
+
+
+LANGUAGES
+
+English: Proficient (C2)
+Hindi: Upper Intermediate (B2)
+Bengali: Native
+
+
+KEY ACHIEVEMENTS
+
+25% Cost Reduction Target leading AWS infrastructure optimization at Signeasy
+99.8% Deployment Success Rate across 200+ production deployments
+56% Build Time Reduction through CI/CD pipeline optimization
+40% Cost Reduction in operational expenses through infrastructure automation
+800+ Server Migrations from on-premises to cloud environments
+$1B+ Revenue Support for Fortune 500 telecommunications clients
+SOC2 & HIPAA Compliance implementation for digital document platform
+75% Manual Task Reduction through Ansible automation implementation
