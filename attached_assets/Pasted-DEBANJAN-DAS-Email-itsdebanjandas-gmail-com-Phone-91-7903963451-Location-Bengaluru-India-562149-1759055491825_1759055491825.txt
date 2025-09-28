@@ -1,0 +1,108 @@
+DEBANJAN DAS
+Email: itsdebanjandas@gmail.com
+Phone: +91-7903963451
+Location: Bengaluru, India 562149
+LinkedIn: www.linkedin.com/in/debanjan0212/
+Website: debanjanops.online
+
+PROFESSIONAL SUMMARY
+Senior DevOps & Site Reliability Engineer with 7+ years of expertise in cloud infrastructure, automation, and enterprise-scale system migrations. Proven track record of reducing deployment times by 56%, managing 800+ server migrations, and maintaining 99.8% deployment success rate. Currently leading infrastructure automation and cost optimization initiatives at Signeasy, with previous experience serving Fortune 500 clients including Charter Communications, Comcast, and Oracle. Specialized in AWS, Kubernetes, Infrastructure as Code, and building robust CI/CD pipelines with strong focus on security compliance (SOC2/HIPAA).
+
+TECHNICAL SKILLS
+Cloud & Infrastructure
+
+AWS (EC2, S3, EKS, VPC, IAM, CloudFront, Lambda, SNS/SQS, SES, Route53, ALB/NLB, API Gateway)
+Azure (AKS), Google Cloud Platform
+Kubernetes, Docker, OpenShift, Rancher, Helm Charts
+Terraform, Terragrunt, Pulumi, CloudFormation
+Ansible, Ansible Tower, Kong API Gateway
+
+DevOps & Automation
+
+Jenkins, ArgoCD, GitHub Actions
+GitOps, GitLab, Git, SVN
+CI/CD Pipeline Development
+Configuration Management
+
+Monitoring & Observability
+
+ELK Stack (Elasticsearch, Logstash, Kibana), OpenSearch
+Prometheus, Grafana, Nagios, DataDog, PagerDuty
+Application Performance Monitoring
+Log Analysis & Troubleshooting, Redis Cloud
+
+Programming & Scripting
+
+Bash, Python, Linux Administration
+SQL, MongoDB, MySQL, PostgreSQL, Aurora DB
+Security & Vulnerability Management, SOC2/HIPAA Compliance
+ITIL, ServiceNow, Agile/Scrum, RBAC Implementation
+
+
+PROFESSIONAL EXPERIENCE
+Signeasy | Senior Site Reliability Engineer (Cloud DevOps) | Jan 2025 - Present | Bengaluru, India
+
+Platform Leadership: Managing SRE initiatives for cloud-based digital signature platform serving millions of document workflows globally, supporting both API customers (token-based) and SaaS customers (subscription-based)
+Security & Compliance: Implementing SOC2 & HIPAA compliance framework using Vanta integration with AWS for regulatory compliance across digital document handling and vulnerability management
+Disaster Recovery Excellence: Architected and executed annual DR exercise, successfully migrating complete data flow from us-east-1 to us-west-2, establishing robust backup procedures
+Cost Optimization Leadership: Leading 3-member team analyzing AWS infrastructure costs, targeting 25% reduction through Kong API Gateway migration, S3 optimization, and ALB consolidation
+Infrastructure Automation: Spearheading transformation from manual, scattered infrastructure to robust Terraform/Terragrunt IaC architecture - organization's highest priority initiative
+Kubernetes Modernization: Migrating 30+ services from traditional manifests to Helm charts, creating standardized deployment templates and self-service developer environments
+Multi-Tier Monitoring: Managing Prometheus/Grafana for lower environments and DataDog/PagerDuty for production monitoring, while maintaining Elasticsearch/Logstash for SaaS platform search functionality
+
+TransUnion (Neustar Acquisition) | Developer (Cloud DevOps) | Dec 2022 - Jan 2025 | Bengaluru, India
+
+Enterprise Infrastructure: Orchestrated migration of 800+ servers from on-premises to private EKS clusters, supporting $1B+ revenue telecommunications clients including Charter Communications, Comcast, and Oracle
+Deployment Excellence: Executed 200+ production deployments with 99.8% success rate, managing 50+ weekly releases for Order Management System serving major US carriers
+Comprehensive Monitoring: Implemented monitoring for 50+ microservices and 100+ applications using ELK Stack, Prometheus, and Grafana
+System Modernization: Led OS migration from CentOS/RHEL to AlmaLinux across production infrastructure, enhancing security compliance
+Automation Implementation: Developed Ansible automation playbooks reducing manual configuration tasks by 75%
+24/7 Operations: Provided on-call support for critical OMS applications handling telecom port-in/port-out operations (ASR/CSR/LSR)
+Cross-Functional Collaboration: Worked with distributed teams across India and US, supporting containerization of legacy applications with Kubernetes, ConfigMaps, HPA, and Ingress configurations
+
+Tata Consultancy Services | System Engineer (Cloud DevOps) | Dec 2021 - Dec 2022 | Bengaluru, India
+
+Platform Development: Led development of "Kanryo" GitOps-based SAAS platform using Kubernetes, Rancher, OpenShift, GitHub Actions, and ArgoCD
+Team Leadership: Managed and mentored 15 fresh graduates while building enterprise-grade DevOps solutions from scratch
+Performance Optimization: Optimized Jenkins CI/CD pipelines, reducing build times from 45 to 20 minutes (56% improvement) through strategic caching and process optimization
+Cloud Infrastructure: Built Azure AKS clusters and implemented Infrastructure as Code using Terraform
+Monitoring Enhancement: Enhanced Prometheus and Grafana monitoring systems with custom alerting capabilities for proactive system management
+Process Automation: Automated patching, application upgrades, and routine maintenance through custom scripting
+Multi-Cloud Experience: Gained expertise transitioning between Azure and GCP projects, adapting to different cloud ecosystems
+
+Capgemini | Associate Consultant (DevOps) | Aug 2018 - Nov 2021 | Mumbai, Bangalore, Chennai
+Client: Royal Mail | Infrastructure & Platform Engineering
+Associate Consultant | Aug 2020 - Nov 2021
+
+ELK Implementation: Successfully delivered enterprise-wide ELK stack migration, reducing operational costs by 40% and improving incident resolution time by 60%
+Team Leadership: Led 10-member support team alongside manager, handling critical client escalations and serving as technical subject matter expert
+Big Data Solution: Identified Royal Mail's US mail processing scalability challenges and architected robust big data cluster solution
+Client Success: Onboarded 8 enterprise clients within 6 months for the new big data platform, including top-tier companies requiring specialized configurations
+Process Excellence: Created comprehensive SOPs, technical documentation, and POCs for system upgrades and integrations
+Automation Pioneer: Pioneered Ansible automation implementation and enhanced CI/CD pipelines, cutting deployment time by 70%
+
+Software Developer (Senior Analyst) | Oct 2018 - Aug 2020
+
+Monitoring Transition: Key contributor in architectural design for migrating from legacy Nagios to open-source ELK stack, participating in blueprint creation and implementation
+Application Expertise: Evolved into the sole team member with comprehensive knowledge of end-to-end on-premises application troubleshooting
+Platform Integration: Collaborated with development teams to introduce SonarQube for code quality and Nexus Repository for artifact management
+Scripting Development: Developed multiple automation scripts for routine maintenance tasks, reducing manual intervention by 50%
+Incident Management: Achieved 95% first-call resolution rate for DevOps application downtime and threshold breaches
+
+Software Developer (Analyst) | Aug 2018 - Oct 2018
+
+Foundation Building: Joined Royal Mail DevOps support team as entry-level analyst, learning enterprise infrastructure management
+Core Skills Development: Built foundational knowledge in ServiceNow incident management, enterprise Nagios monitoring, Linux, and Bash scripting
+ITIL Training: Gained understanding of IT service management processes and weekly deployment cycles
+
+
+EDUCATION
+Bachelor of Technology - Electrical and Electronics Engineering
+Vellore Institute of Technology (VIT), Vellore, India | 2014-2018
+CGPA: 8.48/10 (First Class with Distinction)
+Academic Excellence & Research:
+
+Published Research: Developed Emotion Recognition system using machine learning and neuroscience, resulting in published research paper analyzing physiological signals for emotional state detection
+Industry Internships: Gained practical experience at Schneider Electric (automation systems), TE Connectivity (electrical components), and BEML Limited (industrial machinery electrical systems)
+Technical Projects: Executed multiple MATLAB projects for signal processing and control systems, earning consistent faculty appreciation
+Leadership Recognition: Achieved top rankings in both soft skills and technical competency assessments
