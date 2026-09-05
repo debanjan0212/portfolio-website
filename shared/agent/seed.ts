@@ -13,7 +13,7 @@ import type { Entry, Store } from "./types"
 const seeds: { q: string; a: string; tags?: string[] }[] = [
   {
     q: "What is he building right now?",
-    a: "He has just delivered the backend-agnostic observability platform for OAA, Hitachi's Operational Agentic AI product. It covers 18 managed microservices and around 8 operational agents: an instrumentation SDK giving end-to-end traces, metrics and structured logging, feeding an OpenTelemetry gateway collector on AKS. It's cloud-agnostic by design — the same approach carries to AWS or GCP.",
+    a: "He has just delivered the backend-agnostic observability platform for OAA, Hitachi's Operational Agentic AI product. It covers 18 managed microservices and around 8 operational agents: an instrumentation SDK giving end-to-end traces, metrics and structured logging, feeding an OpenTelemetry gateway collector on AKS. Two separate things are portable here, and they should not be confused: switching telemetry backend needs no application changes at all, while moving to another cloud such as AWS or GCP carries over the same design and requires the SDK to be added there.",
     tags: ["current", "oaa", "agentic", "observability", "opentelemetry"],
   },
   {
@@ -23,7 +23,7 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
   },
   {
     q: "What does backend-agnostic actually mean here?",
-    a: "Multi-exporter routing. A customer can send telemetry to whatever vendor backend they already pay for, or use the bundled LGTM stack — Loki, Grafana, Tempo, Mimir — without changing a line of application code. The observability layer is never the thing that locks them in.",
+    a: "Multi-exporter routing. A customer can send telemetry to whatever vendor backend they already pay for, or use the bundled LGTM stack — Loki, Grafana, Tempo, Mimir — without changing a line of application code. That is specifically about the backend, not the cloud: running on a different cloud is also supported by the same design, but does require the SDK to be added there.",
     tags: ["architecture", "lgtm", "vendor", "exporters"],
   },
   {
