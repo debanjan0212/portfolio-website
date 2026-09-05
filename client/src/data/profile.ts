@@ -25,7 +25,7 @@ export const profile = {
   email: "itsme.deb1995@gmail.com",
   linkedin: "https://www.linkedin.com/in/debanjan0212/",
   github: "https://github.com/debanjan0212",
-  site: "debanjanops.online",
+  site: "debanjansre.online",
   years: yearsOfExperience(),
   tagline: "Reliability for systems that think",
   intro:

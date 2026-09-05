@@ -5,7 +5,7 @@ Digital Services. A dark, single-canvas React site with an AI assistant that
 answers questions about his work — and, when it cannot, asks him and learns the
 answer permanently.
 
-Live: [debanjanops.online](https://debanjanops.online)
+Live: [debanjansre.online](https://debanjansre.online)
 
 ---
 
