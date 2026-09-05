@@ -42,3 +42,6 @@ temp/
 
 # Scripts
 push-to-github.js
+
+# Local agent knowledge store (dev only)
+.agent-data/

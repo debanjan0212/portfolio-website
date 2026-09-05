@@ -1,41 +1,65 @@
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ThemeProvider } from "./components/ThemeProvider";
-import Navigation from "./components/Navigation";
-import Hero from "./components/Hero";
-import About from "./components/About";
-import Experience from "./components/Experience";
-import Skills from "./components/Skills";
-import Services from "./components/Services";
-import Portfolio from "./components/Portfolio";
-import Contact from "./components/Contact";
-import Footer from "./components/Footer";
+import Nav from "./components/Nav"
+import Footer from "./components/Footer"
+import AgentChat from "./components/AgentChat"
+import Hero from "./sections/Hero"
+import About from "./sections/About"
+import Experience from "./sections/Experience"
+import AgenticLoop from "./sections/AgenticLoop"
+import Work from "./sections/Work"
+import Skills from "./sections/Skills"
+import Contact from "./sections/Contact"
+import Answer from "./pages/Answer"
+import {
+  AmbientField,
+  CursorGlow,
+  Curtain,
+  ScrollProgress,
+  SmoothScroll,
+} from "./lib/motion"
 
-function App() {
+export default function App() {
+  // One extra route only: the private answer page the digest email links to.
+  // Not worth a router dependency for a single path.
+  const isAnswerPage = window.location.pathname.replace(/\/$/, "") === "/answer"
+
+  if (isAnswerPage) {
+    return (
+      <>
+        <AmbientField />
+        <div className="grain" />
+        <Answer />
+      </>
+    )
+  }
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <ThemeProvider>
-          <div className="min-h-screen bg-background">
-            <Navigation />
-            <main>
-              <Hero />
-              <About />
-              <Experience />
-              <Skills />
-              <Services />
-              <Portfolio />
-              <Contact />
-            </main>
-            <Footer />
-          </div>
-          <Toaster />
-        </ThemeProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-}
+    <SmoothScroll>
+      <Curtain />
+      <AmbientField />
+      <CursorGlow />
+      <div className="grain" />
+      <ScrollProgress />
 
-export default App;
+      {/*
+        Everything sits on one canvas. No section paints its own background,
+        so there is nothing to blend at the seams - sections are separated by
+        rhythm and space, never by an edge.
+      */}
+      <div className="relative z-10">
+        <Nav />
+        <main>
+          <Hero />
+          <About />
+          <Experience />
+          <AgenticLoop />
+          <Work />
+          <Skills />
+          <Contact />
+        </main>
+        <Footer />
+      </div>
+
+      <AgentChat />
+    </SmoothScroll>
+  )
+}
