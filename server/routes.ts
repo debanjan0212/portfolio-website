@@ -4,7 +4,7 @@ import { orchestrate, entryFromAnswer, type ChatMessage } from "../shared/agent/
 import { buildAndSendDigest } from "../shared/agent/digest";
 import { fileStore } from "../shared/agent/store-file";
 import { seedCollection } from "../shared/agent/seed";
-import { resolveConfig } from "../shared/agent/llm";
+import { resolveConfigs } from "../shared/agent/llm";
 
 /**
  * Dev twins of the Netlify functions. Same orchestrator, same digest builder -
@@ -33,8 +33,8 @@ async function handleChat(req: Request, res: Response) {
     return res.status(429).json({ error: "Too many questions at once. Give it a minute." });
   }
 
-  const config = resolveConfig(process.env);
-  if (!config) {
+  const configs = resolveConfigs(process.env);
+  if (configs.length === 0) {
     return res.status(503).json({
       error:
         "The assistant isn't configured locally. Put GEMINI_API_KEY (free) in .env and restart.",
@@ -57,7 +57,7 @@ async function handleChat(req: Request, res: Response) {
     messages,
     baseProfile: (body?.knowledge || "").slice(0, 20000),
     store: fileStore,
-    config,
+    configs,
     askerEmail: body?.email,
   });
 

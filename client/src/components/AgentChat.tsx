@@ -114,7 +114,7 @@ export default function AgentChat() {
         transition={{ delay: 2.6, duration: 0.7 }}
         aria-label={open ? "Close assistant" : "Ask about Debanjan"}
         data-testid="button-agent-chat"
-        className="group fixed bottom-6 right-6 z-[85] flex items-center gap-2.5 rounded-full border border-hairline/12 bg-ink-1/85 px-5 py-3 backdrop-blur-xl transition-colors duration-400 hover:border-accent/35"
+        className="group fixed bottom-20 right-4 z-[85] flex items-center gap-2.5 rounded-full border border-hairline/12 bg-ink-1/85 px-5 py-3 backdrop-blur-xl transition-colors duration-400 hover:border-accent/35 sm:bottom-6 sm:right-6"
       >
         {open ? (
           <X className="h-4 w-4 text-mid" />
@@ -135,7 +135,9 @@ export default function AgentChat() {
             transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
             role="dialog"
             aria-label="Assistant"
-            className="panel fixed bottom-24 right-4 z-[85] flex h-[min(34rem,72vh)] w-[min(26rem,calc(100vw-2rem))] flex-col overflow-hidden sm:right-6"
+            /* Solid ground. The translucent .panel surface let page text bleed
+               through the transcript - unreadable on a small screen. */
+            className="panel fixed inset-x-4 bottom-36 z-[85] flex h-[min(34rem,calc(100dvh-11rem))] flex-col overflow-hidden !bg-ink-1 shadow-2xl shadow-black/60 sm:inset-x-auto sm:bottom-24 sm:right-6 sm:w-[26rem]"
           >
             <div className="flex items-center gap-3 border-b border-hairline/[0.07] px-5 py-4">
               <span className="dot-live" />
