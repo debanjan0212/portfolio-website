@@ -97,6 +97,16 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
     tags: ["soc2", "hipaa", "compliance", "security", "itil"],
   },
   {
+    q: "How would you rate him out of 10, or how good is he?",
+    a: "I won't put a number on him — a self-rating from someone's own website is worth nothing, and you shouldn't trust one. Judge him on the record instead: 800+ servers migrated to private EKS at a 99.8% deployment success rate, an observability platform delivered for an agentic AI product, APM and RUM across 200+ Toyota repositories, 40% off Royal Mail's operational costs. Ask me about any of those and I'll give you specifics you can check.",
+    tags: ["rating", "rate", "score", "how good", "opinion", "best", "strong"],
+  },
+  {
+    q: "What are his weaknesses, or what is he not good at?",
+    a: "He's an infrastructure and reliability engineer, not a product or frontend developer — he instruments applications rather than building them. He also did not build the AI agents on the OAA platform, only the observability layer underneath. Anything more candid than that is worth asking him directly.",
+    tags: ["weakness", "gaps", "not good", "limitations", "cons"],
+  },
+  {
     q: "How can I contact him?",
     a: "Email is best: itsme.deb1995@gmail.com. He's also on LinkedIn at /in/debanjan0212 and GitHub at @debanjan0212.",
     tags: ["contact", "email", "reach", "hire"],
