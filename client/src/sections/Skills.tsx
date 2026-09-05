@@ -1,11 +1,16 @@
 import { skillGroups } from "@/data/profile"
-import { RevealWords, Rise } from "@/lib/motion"
+import { Marquee, RevealWords, Rise } from "@/lib/motion"
 import { motion } from "framer-motion"
 
 export default function Skills() {
+  const marquee = skillGroups.flatMap((g) =>
+    g.items.map((i) => i.replace(/\s*\(.*\)$/, "")),
+  )
+
   return (
-    <section id="skills" className="relative px-6 py-32 md:py-44">
-      <div className="mx-auto max-w-shell">
+    <section id="skills" className="relative py-32 md:py-44">
+      <Marquee items={marquee} speed={70} />
+      <div className="mx-auto mt-20 max-w-shell px-6">
         <div className="grid gap-16 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1fr)]">
           <div className="lg:sticky lg:top-32 lg:self-start">
             <p className="mono-label">Stack</p>

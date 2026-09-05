@@ -60,6 +60,16 @@ export default function AgentChat() {
         throw new Error(detail?.error || "The assistant is unavailable right now.")
       }
 
+      // A dev server or misconfigured host can answer /api/chat with the SPA
+      // shell. Without this check the widget happily streamed raw HTML into
+      // the transcript as if it were an answer.
+      const type = res.headers.get("content-type") || ""
+      if (!type.includes("text/plain")) {
+        throw new Error(
+          "The assistant endpoint isn't running. Start it with `netlify dev`, or set ANTHROPIC_API_KEY and restart.",
+        )
+      }
+
       setMessages((m) => [...m, { role: "assistant", content: "" }])
       const reader = res.body.getReader()
       const dec = new TextDecoder()

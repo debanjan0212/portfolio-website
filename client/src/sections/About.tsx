@@ -22,11 +22,13 @@ export default function About() {
             transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
             className="relative aspect-[4/5] overflow-hidden rounded-2xl"
           >
+            {/* Crop biased down the frame - anchored at the top there was far
+                too much empty space above his head. */}
             <motion.img
               src={portrait}
               alt={profile.name}
-              style={{ y: imgY }}
-              className="absolute inset-0 h-[116%] w-full object-cover object-top contrast-[1.05] grayscale-[0.55]"
+              style={{ y: imgY, objectPosition: "50% 34%" }}
+              className="absolute inset-0 h-[112%] w-full object-cover contrast-[1.05] grayscale-[0.5]"
             />
             {/* Accent wash + bottom fade into the canvas. */}
             <div
@@ -62,7 +64,7 @@ export default function About() {
           <div className="mt-9 space-y-5 text-base leading-relaxed text-mid md:text-lg">
             <Rise delay={0.1}>
               <p>
-                Seven years in, most of my work comes down to one thing: when
+                {profile.years.replace("+", "")} years in, most of my work comes down to one thing: when
                 something breaks at 3am, can the system tell you why. That has
                 taken me through Royal Mail's ELK migration, 800+ servers moved
                 onto private EKS at TransUnion, and full-stack APM and RUM across

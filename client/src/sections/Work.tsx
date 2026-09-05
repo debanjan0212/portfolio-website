@@ -1,5 +1,5 @@
 import { projects } from "@/data/profile"
-import { RevealWords, Rise } from "@/lib/motion"
+import { CountUp, RevealWords, Rise, Tilt } from "@/lib/motion"
 import { motion } from "framer-motion"
 import { useRef, useState } from "react"
 
@@ -65,7 +65,7 @@ export default function Work() {
             <div className="mt-10 flex flex-wrap gap-12">
               {featured.metrics.map((m) => (
                 <div key={m.label}>
-                  <p className="font-mono text-3xl text-hi md:text-4xl">{m.value}</p>
+                  <CountUp value={m.value} className="font-mono text-3xl text-hi md:text-4xl" />
                   <p className="mt-2 text-xs text-low">{m.label}</p>
                 </div>
               ))}
@@ -94,6 +94,7 @@ export default function Work() {
               viewport={{ once: true, margin: "-8%" }}
               transition={{ duration: 0.7, delay: i * 0.07, ease: [0.2, 0.8, 0.2, 1] }}
             >
+              <Tilt className="h-full">
               <Spotlight>
                 <p className="mono-label">
                   {p.org} · {p.period}
@@ -104,7 +105,7 @@ export default function Work() {
                 <div className="mt-8 flex flex-wrap gap-8">
                   {p.metrics.map((m) => (
                     <div key={m.label}>
-                      <p className="font-mono text-xl text-hi">{m.value}</p>
+                      <CountUp value={m.value} className="block font-mono text-xl text-hi" />
                       <p className="mt-1 text-[0.7rem] text-low">{m.label}</p>
                     </div>
                   ))}
@@ -121,6 +122,7 @@ export default function Work() {
                   ))}
                 </div>
               </Spotlight>
+              </Tilt>
             </motion.div>
           ))}
         </div>

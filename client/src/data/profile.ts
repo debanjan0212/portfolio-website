@@ -3,6 +3,19 @@
  * grounded on this, so the two can never disagree.
  */
 
+/** Career start: Capgemini, August 2018. Derived so it never goes stale. */
+const CAREER_START = new Date("2018-08-09")
+
+function yearsOfExperience(): string {
+  const now = new Date()
+  let y = now.getFullYear() - CAREER_START.getFullYear()
+  const beforeAnniversary =
+    now.getMonth() < CAREER_START.getMonth() ||
+    (now.getMonth() === CAREER_START.getMonth() && now.getDate() < CAREER_START.getDate())
+  if (beforeAnniversary) y -= 1
+  return `${y}+`
+}
+
 export const profile = {
   name: "Debanjan Das",
   first: "Debanjan",
@@ -13,11 +26,11 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/debanjan0212/",
   github: "https://github.com/debanjan0212",
   site: "debanjanops.online",
-  years: "7+",
+  years: yearsOfExperience(),
   tagline: "Reliability for systems that think",
   intro:
     "I build the observability and reliability layer underneath large systems — most recently the telemetry platform for an agentic AI product, and before that full-stack APM instrumentation across Toyota North America.",
-} as const
+}
 
 export type Role = {
   company: string

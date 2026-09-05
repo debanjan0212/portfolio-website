@@ -391,3 +391,151 @@ export function Magnetic({
     </button>
   )
 }
+
+/* ------------------------------------------------------------------ */
+/* Marquee - continuous horizontal drift                               */
+/* ------------------------------------------------------------------ */
+
+export function Marquee({
+  items,
+  speed = 38,
+  reverse = false,
+}: {
+  items: string[]
+  speed?: number
+  reverse?: boolean
+}) {
+  const reduced = useReducedMotion()
+  // Two copies back to back, so the loop point is invisible.
+  const run = [...items, ...items]
+
+  return (
+    <div
+      className="relative overflow-hidden py-3"
+      style={{
+        maskImage: "linear-gradient(90deg, transparent, black 12%, black 88%, transparent)",
+        WebkitMaskImage:
+          "linear-gradient(90deg, transparent, black 12%, black 88%, transparent)",
+      }}
+    >
+      <motion.div
+        className="flex w-max gap-10 whitespace-nowrap"
+        animate={reduced ? {} : { x: reverse ? ["-50%", "0%"] : ["0%", "-50%"] }}
+        transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
+      >
+        {run.map((item, i) => (
+          <span key={i} className="flex items-center gap-10 font-mono text-sm text-low">
+            {item}
+            <span className="h-1 w-1 rounded-full bg-accent/40" />
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Tilt - subtle 3D response to the pointer                            */
+/* ------------------------------------------------------------------ */
+
+export function Tilt({
+  children,
+  max = 5,
+  className = "",
+}: {
+  children: ReactNode
+  max?: number
+  className?: string
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const reduced = useReducedMotion()
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el || reduced || !window.matchMedia("(pointer: fine)").matches) return
+
+    const onMove = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect()
+      const px = (e.clientX - r.left) / r.width - 0.5
+      const py = (e.clientY - r.top) / r.height - 0.5
+      el.style.transform = `perspective(900px) rotateY(${px * max}deg) rotateX(${-py * max}deg) translateZ(0)`
+    }
+    const onLeave = () => {
+      el.style.transform = "perspective(900px) rotateY(0deg) rotateX(0deg)"
+    }
+
+    el.addEventListener("pointermove", onMove)
+    el.addEventListener("pointerleave", onLeave)
+    return () => {
+      el.removeEventListener("pointermove", onMove)
+      el.removeEventListener("pointerleave", onLeave)
+    }
+  }, [max, reduced])
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-transform duration-500 ease-smooth ${className}`}
+      style={{ transformStyle: "preserve-3d" }}
+    >
+      {children}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Count up - numbers that resolve when they enter view                */
+/* ------------------------------------------------------------------ */
+
+export function CountUp({ value, className = "" }: { value: string; className?: string }) {
+  const reduced = useReducedMotion()
+  const ref = useRef<HTMLSpanElement>(null)
+  const [shown, setShown] = useState(value)
+
+  // Only animate values that are actually numeric; "hours → minutes" is left
+  // exactly as written.
+  const match = value.match(/^(~?)(\d[\d.,]*)(.*)$/)
+
+  useEffect(() => {
+    if (!match || reduced) {
+      setShown(value)
+      return
+    }
+    const [, prefix, digits, suffix] = match
+    const target = parseFloat(digits.replace(/,/g, ""))
+    const decimals = digits.includes(".") ? digits.split(".")[1].length : 0
+
+    const el = ref.current
+    if (!el) return
+
+    let raf = 0
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return
+        io.disconnect()
+        const start = performance.now()
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / 1300)
+          const eased = 1 - Math.pow(1 - t, 3)
+          setShown(`${prefix}${(target * eased).toFixed(decimals)}${suffix}`)
+          if (t < 1) raf = requestAnimationFrame(tick)
+        }
+        raf = requestAnimationFrame(tick)
+      },
+      { threshold: 0.4 },
+    )
+    io.observe(el)
+    setShown(`${prefix}0${suffix}`)
+
+    return () => {
+      io.disconnect()
+      cancelAnimationFrame(raf)
+    }
+  }, [value, reduced, match])
+
+  return (
+    <span ref={ref} className={className}>
+      {shown}
+    </span>
+  )
+}
