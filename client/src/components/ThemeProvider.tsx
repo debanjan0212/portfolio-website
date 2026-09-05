@@ -26,9 +26,17 @@ export function ThemeProvider({
   storageKey = "portfolio-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  )
+  // localStorage throws in private browsing, sandboxed frames, and when the
+  // browser is set to block site data. Never let that take the page down.
+  const readTheme = (): Theme => {
+    try {
+      return (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    } catch {
+      return defaultTheme
+    }
+  }
+
+  const [theme, setTheme] = useState<Theme>(readTheme)
 
   useEffect(() => {
     const root = window.document.documentElement
@@ -51,7 +59,11 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
+      try {
+        localStorage.setItem(storageKey, theme)
+      } catch {
+        // Preference just won't persist for this visitor.
+      }
       setTheme(theme)
     },
   }
