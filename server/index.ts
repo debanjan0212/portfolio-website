@@ -56,11 +56,10 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
+  // Port 5000 is taken by AirPlay Receiver on macOS, which answers requests
+  // with its own "unauthorized" page - so the default is 5173 instead.
+  // Override with PORT when deploying somewhere that expects another port.
+  const port = parseInt(process.env.PORT || '5173', 10);
   const host = process.env.HOST || (process.platform === "linux" ? "0.0.0.0" : "127.0.0.1");
 
   // reusePort is a Linux-only socket option. macOS and Windows reject it with
