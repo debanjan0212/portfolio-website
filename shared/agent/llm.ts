@@ -86,28 +86,53 @@ async function gemini(
   messages: Msg[],
   maxTokens: number,
 ): Promise<string> {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${cfg.model}:generateContent`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-goog-api-key": cfg.apiKey },
-      body: JSON.stringify({
-        // Gemini keeps the system prompt separate, like Anthropic does.
-        systemInstruction: { parts: [{ text: system }] },
-        contents: messages.map((m) => ({
-          role: m.role === "assistant" ? "model" : "user",
-          parts: [{ text: m.content }],
-        })),
-        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.3 },
-      }),
-    },
-  )
-  if (!res.ok) await fail(res, "gemini")
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${cfg.model}:generateContent`
+  const body = JSON.stringify({
+    // Gemini keeps the system prompt separate, like Anthropic does.
+    systemInstruction: { parts: [{ text: system }] },
+    contents: messages.map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    })),
+    generationConfig: { maxOutputTokens: maxTokens, temperature: 0.3 },
+  })
 
-  const data = (await res.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[]
+  /*
+    Google is migrating Gemini keys from the old `AIza` format to a new `AQ.`
+    auth-key format. The two authenticate differently: `AIza` keys go in the
+    x-goog-api-key header, while `AQ.` keys are bearer tokens and are rejected
+    with ACCESS_TOKEN_TYPE_UNSUPPORTED if sent as an API key.
+
+    Rather than sniff the prefix - which is exactly the brittle assumption that
+    broke everyone else's tooling - try the header that matches the key shape,
+    then fall back to the other on an auth failure.
+  */
+  const looksLikeAuthKey = cfg.apiKey.startsWith("AQ.")
+  const attempts: Record<string, string>[] = looksLikeAuthKey
+    ? [{ authorization: `Bearer ${cfg.apiKey}` }, { "x-goog-api-key": cfg.apiKey }]
+    : [{ "x-goog-api-key": cfg.apiKey }, { authorization: `Bearer ${cfg.apiKey}` }]
+
+  let last: Response | null = null
+  for (const auth of attempts) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json", ...auth },
+      body,
+    })
+    if (res.ok) {
+      const data = (await res.json()) as {
+        candidates?: { content?: { parts?: { text?: string }[] } }[]
+      }
+      return (
+        data.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || ""
+      ).trim()
+    }
+    // Only an auth failure is worth retrying with the other scheme.
+    if (res.status !== 401 && res.status !== 403) return fail(res, "gemini")
+    last = res
   }
-  return (data.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "").trim()
+
+  return fail(last as Response, "gemini")
 }
 
 async function anthropic(
