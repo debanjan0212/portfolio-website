@@ -62,6 +62,11 @@ async function handleChat(req: Request, res: Response) {
 
   res.setHeader("content-type", "text/plain; charset=utf-8");
   res.setHeader("cache-control", "no-store");
+  res.setHeader(
+    "x-suggestions",
+    Buffer.from(JSON.stringify(result.suggestions), "utf8").toString("base64"),
+  );
+  res.setHeader("access-control-expose-headers", "x-suggestions");
 
   if (result.kind !== "answer") {
     return res.end(result.message);

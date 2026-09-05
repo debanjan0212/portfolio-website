@@ -59,7 +59,14 @@ export default async (req: Request, context: Context) => {
       askerEmail: body.email,
     })
 
-    const headers = { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" }
+    // Suggestions ride along as a header so the body stays a clean text
+    // stream. Base64 keeps non-ASCII safe in a header value.
+    const headers = {
+      "content-type": "text/plain; charset=utf-8",
+      "cache-control": "no-store",
+      "x-suggestions": Buffer.from(JSON.stringify(result.suggestions), "utf8").toString("base64"),
+      "access-control-expose-headers": "x-suggestions",
+    }
 
     if (result.kind === "answer") return new Response(result.stream, { headers })
 

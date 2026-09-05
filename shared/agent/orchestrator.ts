@@ -86,10 +86,48 @@ function systemPrompt(context: string, baseProfile: string) {
   ].join("\n")
 }
 
-export type OrchestratorResult =
+export type OrchestratorResult = {
+  suggestions: string[]
+} & (
   | { kind: "answer"; stream: ReadableStream<Uint8Array> }
   | { kind: "escalated"; message: string }
   | { kind: "declined"; message: string }
+)
+
+/**
+ * Follow-up prompts offered after every reply.
+ *
+ * Drawn from the collection itself, so a visitor who stays on the rails is
+ * always asking something the agent can actually answer well. Anything they
+ * type instead still works - and if it cannot be answered, it escalates.
+ */
+export function suggestFollowUps(
+  entries: Entry[],
+  asked: string[],
+  lastQuestion: string,
+  limit = 3,
+): string[] {
+  const seen = new Set(asked.map((a) => a.trim().toLowerCase()))
+
+  const fresh = entries.filter((e) => !seen.has(e.question.trim().toLowerCase()))
+  if (fresh.length === 0) return []
+
+  // Prefer entries related to what was just asked, so the conversation flows
+  // rather than jumping around at random.
+  const related = retrieve(lastQuestion, fresh, limit + 4)
+    .map((s) => s.entry)
+    .filter((e) => e.question.trim().toLowerCase() !== lastQuestion.trim().toLowerCase())
+
+  const rest = fresh.filter((e) => !related.includes(e))
+  const ordered = [...related.slice(0, 2), ...rest]
+
+  const out: string[] = []
+  for (const e of ordered) {
+    if (out.length >= limit) break
+    if (!out.includes(e.question)) out.push(e.question)
+  }
+  return out
+}
 
 /**
  * Step 2 - route.
@@ -123,11 +161,15 @@ export async function orchestrate({
     entries = await store.listEntries()
   }
 
+  const asked = messages.filter((m) => m.role === "user").map((m) => m.content)
+  const suggestions = suggestFollowUps(entries, asked, question)
+
   if (intent === "off_topic") {
     return {
       kind: "declined",
+      suggestions,
       message:
-        "I only cover Debanjan's work and background. Ask me about his experience, the platforms he has built, or what he is looking for.",
+        "I only cover Debanjan's work and background. Here are some things I can help with:",
     }
   }
 
@@ -154,6 +196,7 @@ export async function orchestrate({
     await queueQuestion({ store, question, messages, askerEmail })
     return {
       kind: "escalated",
+      suggestions,
       message:
         "That is not something I have an answer for yet. I have passed it to Debanjan — he reviews these daily, and once he answers it I will be able to answer it for good. If you would like a direct reply, email him at itsme.deb1995@gmail.com.",
     }
@@ -179,7 +222,7 @@ export async function orchestrate({
     },
   })
 
-  return { kind: "answer", stream }
+  return { kind: "answer", stream, suggestions }
 }
 
 async function queueQuestion({

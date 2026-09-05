@@ -5,7 +5,8 @@ import { knowledgeBase, profile } from "@/data/profile"
 
 type Message = { role: "user" | "assistant"; content: string }
 
-const SUGGESTIONS = [
+/** Shown before the first question. After that the server suggests. */
+const OPENERS = [
   "What is he building right now?",
   "How deep is his OpenTelemetry experience?",
   "What kind of role is he looking for?",
@@ -22,6 +23,9 @@ export default function AgentChat() {
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: GREETING },
   ])
+  // Follow-ups for the latest reply. The server picks these from what it can
+  // actually answer, so staying on the rails always lands well.
+  const [suggestions, setSuggestions] = useState<string[]>(OPENERS)
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -58,6 +62,13 @@ export default function AgentChat() {
       if (!res.ok || !res.body) {
         const detail = await res.json().catch(() => null)
         throw new Error(detail?.error || "The assistant is unavailable right now.")
+      }
+
+      try {
+        const raw = res.headers.get("x-suggestions")
+        setSuggestions(raw ? (JSON.parse(atob(raw)) as string[]) : [])
+      } catch {
+        setSuggestions([])
       }
 
       // A dev server or misconfigured host can answer /api/chat with the SPA
@@ -162,16 +173,23 @@ export default function AgentChat() {
                 </div>
               )}
 
-              {messages.length === 1 && (
-                <div className="space-y-1.5 pt-3">
-                  {SUGGESTIONS.map((s) => (
-                    <button
+              {/* Offered after every reply, not just the first. */}
+              {!busy && suggestions.length > 0 && (
+                <div className="space-y-1.5 pt-2">
+                  {messages.length > 1 && (
+                    <p className="mono-label pb-1">Or ask</p>
+                  )}
+                  {suggestions.map((s) => (
+                    <motion.button
                       key={s}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4 }}
                       onClick={() => send(s)}
                       className="block w-full rounded-lg border border-hairline/[0.07] px-3.5 py-2.5 text-left text-xs text-low transition-colors duration-300 hover:border-accent/25 hover:text-mid"
                     >
                       {s}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               )}
