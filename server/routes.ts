@@ -1,19 +1,18 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import { orchestrate, entryFromAnswer, type ChatMessage } from "../shared/agent/orchestrator";
+import { buildAndSendDigest } from "../shared/agent/digest";
+import { fileStore } from "../shared/agent/store-file";
 
 /**
- * Dev-time twin of netlify/functions/chat.mts.
- *
- * In production Netlify serves /api/chat from the function. Locally there is
- * no function runtime, and Vite's catch-all was answering /api/chat with
- * index.html - which the widget then streamed into the chat as raw HTML.
- * This route makes `npm run dev` behave like production.
+ * Dev twins of the Netlify functions. Same orchestrator, same digest builder -
+ * only the storage adapter differs (a gitignored JSON file instead of Netlify
+ * Blobs), so what you exercise locally is what ships.
  */
 
-const MODEL = process.env.AGENT_MODEL || "claude-sonnet-4-5";
+const MAX_MESSAGES = 20;
+const MAX_CHARS = 4000;
 
-// Same per-IP throttle the deployed function applies, so dev behaves like
-// production rather than being quietly more permissive.
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 12;
 const hits = new Map<string, number[]>();
@@ -26,28 +25,6 @@ function rateLimited(ip: string): boolean {
   if (hits.size > 5000) hits.clear();
   return recent.length > MAX_PER_WINDOW;
 }
-const MAX_MESSAGES = 20;
-const MAX_CHARS = 4000;
-
-type ChatMessage = { role: "user" | "assistant"; content: string };
-
-function systemPrompt(knowledge: string) {
-  return [
-    "You are the assistant embedded in Debanjan Das's portfolio website.",
-    "Visitors are usually recruiters, hiring managers or engineers evaluating him.",
-    "",
-    "Rules:",
-    "- Answer only from the profile below. If something is not covered, say you don't have that detail and point them at his email.",
-    "- Never invent employers, dates, metrics or certifications.",
-    "- Do not discuss salary or compensation expectations; say that is best raised with him directly.",
-    "- Keep answers to a few sentences unless asked for depth. Plain, direct English.",
-    "- Speak about Debanjan in the third person. You are his site's assistant, not him.",
-    "- Decline anything unrelated to his work and redirect politely.",
-    "",
-    "PROFILE",
-    knowledge,
-  ].join("\n");
-}
 
 async function handleChat(req: Request, res: Response) {
   if (rateLimited(req.ip || "unknown")) {
@@ -58,15 +35,14 @@ async function handleChat(req: Request, res: Response) {
   if (!apiKey) {
     return res.status(503).json({
       error:
-        "The assistant isn't configured locally. Set ANTHROPIC_API_KEY and restart the dev server.",
+        "The assistant isn't configured locally. Put ANTHROPIC_API_KEY in .env and restart.",
     });
   }
 
-  const body = req.body as { messages?: ChatMessage[]; knowledge?: string };
+  const body = req.body as { messages?: ChatMessage[]; knowledge?: string; email?: string };
   const messages = (body?.messages || [])
     .filter(
-      (m) =>
-        m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string",
+      (m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string",
     )
     .slice(-MAX_MESSAGES)
     .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_CHARS) }));
@@ -75,58 +51,64 @@ async function handleChat(req: Request, res: Response) {
     return res.status(400).json({ error: "No messages supplied." });
   }
 
-  const upstream = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 700,
-      system: systemPrompt(body?.knowledge || ""),
-      messages,
-      stream: true,
-    }),
+  const result = await orchestrate({
+    messages,
+    baseProfile: (body?.knowledge || "").slice(0, 20000),
+    store: fileStore,
+    apiKey,
+    askerEmail: body?.email,
   });
-
-  if (!upstream.ok || !upstream.body) {
-    const detail = await upstream.text().catch(() => "");
-    console.error("anthropic upstream error", upstream.status, detail.slice(0, 500));
-    return res
-      .status(502)
-      .json({ error: "The assistant is having trouble right now. Please try again." });
-  }
 
   res.setHeader("content-type", "text/plain; charset=utf-8");
   res.setHeader("cache-control", "no-store");
 
-  const reader = upstream.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
+  if (result.kind !== "answer") {
+    return res.end(result.message);
+  }
 
+  const reader = result.stream.getReader();
+  const decoder = new TextDecoder();
   for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
-    for (const line of lines) {
-      if (!line.startsWith("data:")) continue;
-      const payload = line.slice(5).trim();
-      if (!payload || payload === "[DONE]") continue;
-      try {
-        const event = JSON.parse(payload);
-        if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
-          res.write(event.delta.text);
-        }
-      } catch {
-        // partial or keepalive frame
-      }
-    }
+    res.write(decoder.decode(value, { stream: true }));
   }
   res.end();
+}
+
+async function handleAnswer(req: Request, res: Response) {
+  const id = String(req.query.id || "");
+  const token = String(req.query.token || "");
+
+  const pending = await fileStore.getPending(id);
+  if (!pending || pending.token !== token) {
+    return res.status(404).json({ error: "This link is not valid." });
+  }
+
+  if (req.method === "GET") {
+    return res.json({
+      question: pending.question,
+      context: pending.context,
+      status: pending.status,
+      answer: pending.answer ?? "",
+      askedAt: pending.createdAt,
+    });
+  }
+
+  const answer = String((req.body as { answer?: string })?.answer || "").trim();
+  if (answer.length < 2) {
+    return res.status(400).json({ error: "Answer is empty." });
+  }
+
+  await fileStore.putEntry(entryFromAnswer(pending.question, answer.slice(0, 5000)));
+  await fileStore.putPending({
+    ...pending,
+    status: "answered",
+    answer: answer.slice(0, 5000),
+    answeredAt: new Date().toISOString(),
+  });
+
+  return res.json({ ok: true });
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -141,8 +123,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Anything else under /api is genuinely missing - answer as JSON so the
-  // client never receives Vite's HTML fallback and try to render it.
+  app.all("/api/answer", (req, res) => {
+    handleAnswer(req, res).catch((err) => {
+      console.error("answer route failed", err);
+      if (!res.headersSent) res.status(500).json({ error: "Failed to save." });
+    });
+  });
+
+  // Manual trigger for the nightly digest, so you can test it without waiting
+  // until 23:00. Dev only - the deployed version runs on a schedule.
+  app.post("/api/digest/run", (_req, res) => {
+    buildAndSendDigest({
+      store: fileStore,
+      siteUrl: process.env.SITE_URL || `http://localhost:${process.env.PORT || 5173}`,
+      resendKey: process.env.RESEND_API_KEY || "",
+      to: process.env.DIGEST_TO || "",
+      from: process.env.DIGEST_FROM || "Portfolio Agent <onboarding@resend.dev>",
+    })
+      .then((r) => res.json(r))
+      .catch((e) => res.status(500).json({ error: String(e) }));
+  });
+
+  // Inspect what the agent currently knows and what is queued.
+  app.get("/api/debug/state", async (_req, res) => {
+    res.json({
+      entries: await fileStore.listEntries(),
+      pending: await fileStore.listPending(),
+    });
+  });
+
+  // Anything else under /api answers JSON, so the client never receives Vite's
+  // HTML fallback and tries to render it as a reply.
   app.all("/api/*", (_req, res) => {
     res.status(404).json({ error: "Not found." });
   });

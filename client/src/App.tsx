@@ -8,6 +8,7 @@ import AgenticLoop from "./sections/AgenticLoop"
 import Work from "./sections/Work"
 import Skills from "./sections/Skills"
 import Contact from "./sections/Contact"
+import Answer from "./pages/Answer"
 import {
   AmbientField,
   CursorGlow,
@@ -17,6 +18,20 @@ import {
 } from "./lib/motion"
 
 export default function App() {
+  // One extra route only: the private answer page the digest email links to.
+  // Not worth a router dependency for a single path.
+  const isAnswerPage = window.location.pathname.replace(/\/$/, "") === "/answer"
+
+  if (isAnswerPage) {
+    return (
+      <>
+        <AmbientField />
+        <div className="grain" />
+        <Answer />
+      </>
+    )
+  }
+
   return (
     <SmoothScroll>
       <Curtain />
