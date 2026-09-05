@@ -120,10 +120,18 @@ async function handleAnswer(req: Request, res: Response) {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", (req, res) => {
-    handleChat(req, res).catch((err) => {
-      console.error("chat route failed", err);
+    handleChat(req, res).catch((err: unknown) => {
+      console.error("chat route failed:", err);
       if (!res.headersSent) {
-        res.status(500).json({ error: "The assistant failed unexpectedly." });
+        // In dev, show the actual upstream reason. Swallowing it behind a
+        // generic message meant a provider error looked like a code bug.
+        const detail = err instanceof Error ? err.message : String(err);
+        res.status(500).json({
+          error:
+            process.env.NODE_ENV === "development"
+              ? `Assistant failed: ${detail}`
+              : "The assistant failed unexpectedly.",
+        });
       } else {
         res.end();
       }

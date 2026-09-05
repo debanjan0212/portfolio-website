@@ -75,7 +75,7 @@ export default async (req: Request, context: Context) => {
     // exactly like any other reply.
     return new Response(result.message, { headers })
   } catch (err) {
-    console.error("orchestrator failed", err)
+    console.error("orchestrator failed:", err instanceof Error ? err.message : err)
     return Response.json(
       { error: "The assistant is having trouble right now. Please try again." },
       { status: 502 },
