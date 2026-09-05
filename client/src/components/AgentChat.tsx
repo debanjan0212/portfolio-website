@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowUp, X } from "lucide-react"
+import { ArrowUp, MessageCircle, X } from "lucide-react"
 import { knowledgeBase, profile } from "@/data/profile"
 
 type Message = { role: "user" | "assistant"; content: string }
@@ -26,6 +26,7 @@ export default function AgentChat() {
   // Follow-ups for the latest reply. The server picks these from what it can
   // actually answer, so staying on the rails always lands well.
   const [suggestions, setSuggestions] = useState<string[]>(OPENERS)
+  const [nudge, setNudge] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -36,6 +37,33 @@ export default function AgentChat() {
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 350)
   }, [open])
+
+  // Show the nudge once per visit, a few seconds in - late enough that the
+  // hero has landed, early enough to be seen.
+  useEffect(() => {
+    let seen = false
+    try {
+      seen = sessionStorage.getItem("agent-nudge-seen") === "1"
+    } catch {
+      // Private browsing or blocked storage: just show it.
+    }
+    if (seen) return
+
+    const show = setTimeout(() => setNudge(true), 5200)
+    const hide = setTimeout(() => {
+      setNudge(false)
+      try {
+        sessionStorage.setItem("agent-nudge-seen", "1")
+      } catch {
+        // Nothing to do - worst case it appears again next page load.
+      }
+    }, 15200)
+
+    return () => {
+      clearTimeout(show)
+      clearTimeout(hide)
+    }
+  }, [])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false)
@@ -107,23 +135,52 @@ export default function AgentChat() {
 
   return (
     <>
+      {/* A one-time nudge. Most visitors never notice a chat launcher, and an
+          assistant nobody opens is worth nothing - so it introduces itself
+          once, then never again for this visit. */}
+      <AnimatePresence>
+        {nudge && !open && (
+          <motion.button
+            onClick={() => setOpen(true)}
+            initial={{ opacity: 0, y: 10, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+            transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+            className="fixed bottom-36 right-4 z-[84] max-w-[16rem] rounded-2xl rounded-br-md border border-accent/25 bg-ink-1 px-4 py-3 text-left shadow-2xl shadow-black/50 sm:bottom-24 sm:right-6"
+          >
+            <p className="text-sm leading-snug text-hi">
+              Ask me anything about {profile.first}'s work
+            </p>
+            <p className="mt-1 text-xs text-low">
+              I answer from his real profile — try me
+            </p>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       <motion.button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          setOpen((o) => !o)
+          setNudge(false)
+        }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2.6, duration: 0.7 }}
         aria-label={open ? "Close assistant" : "Ask about Debanjan"}
         data-testid="button-agent-chat"
-        className="group fixed bottom-20 right-4 z-[85] flex items-center gap-2.5 rounded-full border border-hairline/12 bg-ink-1/85 px-5 py-3 backdrop-blur-xl transition-colors duration-400 hover:border-accent/35 sm:bottom-6 sm:right-6"
+        className="group fixed bottom-20 right-4 z-[85] flex items-center gap-2.5 rounded-full bg-accent px-5 py-3.5 text-ink-0 shadow-lg shadow-accent/20 transition-transform duration-300 hover:scale-[1.03] sm:bottom-6 sm:right-6"
       >
-        {open ? (
-          <X className="h-4 w-4 text-mid" />
-        ) : (
-          <span className="dot-live" />
+        {/* A slow ring, so the eye catches it without it nagging. */}
+        {!open && (
+          <motion.span
+            aria-hidden
+            className="absolute inset-0 rounded-full border border-accent"
+            animate={{ scale: [1, 1.22], opacity: [0.55, 0] }}
+            transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }}
+          />
         )}
-        <span className="font-mono text-xs text-mid group-hover:text-hi">
-          {open ? "close" : "ask about me"}
-        </span>
+        {open ? <X className="h-4 w-4" /> : <MessageCircle className="h-4 w-4" />}
+        <span className="text-sm font-medium">{open ? "Close" : "Ask about me"}</span>
       </motion.button>
 
       <AnimatePresence>
