@@ -33,7 +33,7 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
   },
   {
     q: "What is his Kubernetes experience?",
-    a: "Seven-plus years of it in production. AKS at Hitachi for the OAA observability stack, private EKS clusters at TransUnion where he migrated 800+ servers from on-premises, EKS at Signeasy across 30+ microservices, and Rancher and OpenShift at TCS. He also moved 30+ services from raw manifests to standardised Helm charts.",
+    a: "Around five years of it in production, since late 2021. AKS at Hitachi for the OAA observability stack, private EKS clusters at TransUnion where he migrated 800+ servers from on-premises, EKS at Signeasy across 30+ microservices, and Rancher and OpenShift at TCS. He also moved 30+ services from raw manifests to standardised Helm charts.",
     tags: ["kubernetes", "eks", "aks", "helm", "openshift", "rancher"],
   },
   {
@@ -113,26 +113,46 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
   },
 ]
 
-/** Adds any seed the collection does not already have. Safe to run repeatedly. */
-export async function seedCollection(store: Store): Promise<number> {
+/**
+ * Adds missing seeds, and refreshes seeded answers whose wording has changed.
+ * Safe to run repeatedly.
+ *
+ * Anything Debanjan answered himself (source "debanjan") is never touched -
+ * his words always win over a seed, even if a seed later covers the same
+ * question.
+ */
+export async function seedCollection(
+  store: Store,
+): Promise<{ added: number; updated: number }> {
   const existing = await store.listEntries()
-  const known = new Set(existing.map((e) => e.question.trim().toLowerCase()))
+  const byQuestion = new Map(existing.map((e) => [e.question.trim().toLowerCase(), e]))
   const now = new Date().toISOString()
   let added = 0
+  let updated = 0
 
   for (const s of seeds) {
-    if (known.has(s.q.trim().toLowerCase())) continue
-    const entry: Entry = {
-      id: `seed-${added}-${Date.now().toString(36)}`,
-      question: s.q,
-      answer: s.a,
-      tags: s.tags ?? [],
-      source: "profile",
-      createdAt: now,
-      updatedAt: now,
+    const current = byQuestion.get(s.q.trim().toLowerCase())
+
+    if (!current) {
+      await store.putEntry({
+        id: `seed-${added}-${Date.now().toString(36)}`,
+        question: s.q,
+        answer: s.a,
+        tags: s.tags ?? [],
+        source: "profile",
+        createdAt: now,
+        updatedAt: now,
+      })
+      added++
+      continue
     }
-    await store.putEntry(entry)
-    added++
+
+    // Only correct our own seeds, and only when the text actually moved.
+    if (current.source === "profile" && current.answer !== s.a) {
+      await store.putEntry({ ...current, answer: s.a, tags: s.tags ?? [], updatedAt: now })
+      updated++
+    }
   }
-  return added
+
+  return { added, updated }
 }

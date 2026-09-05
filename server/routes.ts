@@ -161,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/seed", (_req, res) => {
     seedCollection(fileStore)
-      .then((added) => res.json({ added }))
+      .then((r) => res.json(r))
       .catch((e) => res.status(500).json({ error: String(e) }));
   });
 
