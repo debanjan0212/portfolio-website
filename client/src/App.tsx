@@ -3,6 +3,9 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { SmoothScrollProvider, ScrollProgress } from "./lib/smooth-scroll";
+import AgenticOps from "./components/AgenticOps";
+import AgentChat from "./components/AgentChat";
 import Navigation from "./components/Navigation";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -18,6 +21,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ThemeProvider>
+          <SmoothScrollProvider>
+          <ScrollProgress />
           <div className="min-h-screen bg-background">
             <Navigation />
             <main>
@@ -25,12 +30,15 @@ function App() {
               <About />
               <Experience />
               <Skills />
+              <AgenticOps />
               <Services />
               <Portfolio />
               <Contact />
             </main>
             <Footer />
           </div>
+          <AgentChat />
+          </SmoothScrollProvider>
           <Toaster />
         </ThemeProvider>
       </TooltipProvider>

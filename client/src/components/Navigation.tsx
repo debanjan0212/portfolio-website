@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Home, User, Briefcase, Code, Wrench, FolderOpen, Mail } from "lucide-react"
+import { Menu, X, Home, User, Briefcase, Code, Wrench, FolderOpen, Mail, Bot } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ThemeToggle from "./ThemeToggle"
+import { useSmoothScroll } from "@/lib/smooth-scroll"
 
 const navItems = [
   { name: "Home", href: "#home", icon: Home },
   { name: "About", href: "#about", icon: User },
   { name: "Experience", href: "#experience", icon: Briefcase },
   { name: "Skills", href: "#skills", icon: Code },
+  { name: "Agentic", href: "#agentic", icon: Bot },
   { name: "Services", href: "#services", icon: Wrench },
   { name: "Portfolio", href: "#portfolio", icon: FolderOpen },
   { name: "Contact", href: "#contact", icon: Mail },
@@ -18,6 +20,7 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("home")
   const [isScrolled, setIsScrolled] = useState(false)
+  const { scrollTo } = useSmoothScroll()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,8 +45,7 @@ export default function Navigation() {
   }, [])
 
   const scrollToSection = (href: string) => {
-    const element = document.getElementById(href.slice(1))
-    element?.scrollIntoView({ behavior: "smooth" })
+    scrollTo(href)
     setIsOpen(false)
   }
 
@@ -51,7 +53,8 @@ export default function Navigation() {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${
+      style={{ x: "-50%" }}
+      className={`fixed top-4 left-1/2 max-w-[calc(100vw-2rem)] z-50 transition-all duration-300 ${
         isScrolled
           ? "backdrop-blur-md bg-background/80 border shadow-lg"
           : "bg-transparent"
@@ -67,28 +70,24 @@ export default function Navigation() {
         </motion.div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-0.5 lg:gap-1">
           {navItems.map((item) => {
-            const Icon = item.icon
             const isActive = activeSection === item.href.slice(1)
             
             return (
               <motion.button
                 key={item.name}
                 onClick={() => scrollToSection(item.href)}
-                className={`relative px-3 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`relative px-2.5 lg:px-3 py-2 rounded-full text-sm font-medium transition-colors ${
                   isActive
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                data-testid={`nav-${item.name.toLowerCase()}`}
+                data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
-                <div className="flex items-center gap-2">
-                  <Icon className="h-4 w-4" />
-                  <span>{item.name}</span>
-                </div>
+                <span>{item.name}</span>
                 {isActive && (
                   <motion.div
                     layoutId="activeNavItem"
@@ -153,7 +152,7 @@ export default function Navigation() {
                         ? "bg-primary/10 text-primary"
                         : "hover:bg-accent text-muted-foreground hover:text-foreground"
                     }`}
-                    data-testid={`mobile-nav-${item.name.toLowerCase()}`}
+                    data-testid={`mobile-nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                   >
                     <Icon className="h-4 w-4" />
                     <span>{item.name}</span>
