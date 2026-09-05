@@ -61,11 +61,16 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  const host = process.env.HOST || (process.platform === "linux" ? "0.0.0.0" : "127.0.0.1");
+
+  // reusePort is a Linux-only socket option. macOS and Windows reject it with
+  // ENOTSUP, which took the whole dev server down.
+  const listenOptions: { port: number; host: string; reusePort?: boolean } = { port, host };
+  if (process.platform === "linux") {
+    listenOptions.reusePort = true;
+  }
+
+  server.listen(listenOptions, () => {
+    log(`serving on http://${host}:${port}`);
   });
 })();
