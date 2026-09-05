@@ -18,7 +18,7 @@ export type LlmConfig = { provider: Provider; apiKey: string; model: string }
 
 const DEFAULT_MODEL: Record<Provider, string> = {
   gemini: "gemini-2.5-flash",
-  groq: "llama-3.3-70b-versatile",
+  groq: "llama-3.1-8b-instant",
   openai: "gpt-4o-mini",
   anthropic: "claude-sonnet-4-5",
 }
@@ -156,6 +156,19 @@ async function anthropic(
   return (data.content?.[0]?.text || "").trim()
 }
 
+/**
+ * Models to fall back through when the configured one is not available to this
+ * account. Groq gates some models by tier, so a name that appears in the public
+ * docs can still 404 for a free key. Ordered cheapest/most-available first.
+ */
+const FALLBACK_MODELS: Partial<Record<Provider, string[]>> = {
+  groq: ["llama-3.1-8b-instant", "openai/gpt-oss-20b", "llama-3.3-70b-versatile"],
+  openai: ["gpt-4o-mini"],
+}
+
+/** Remembered for the life of the process, so we only discover this once. */
+const resolvedModel = new Map<Provider, string>()
+
 /** Groq and OpenAI both speak the OpenAI chat-completions shape. */
 async function openaiCompatible(
   cfg: LlmConfig,
@@ -163,23 +176,41 @@ async function openaiCompatible(
   messages: Msg[],
   maxTokens: number,
 ): Promise<string> {
-  const base =
+  const url =
     cfg.provider === "groq"
       ? "https://api.groq.com/openai/v1/chat/completions"
       : "https://api.openai.com/v1/chat/completions"
 
-  const res = await fetch(base, {
-    method: "POST",
-    headers: { "content-type": "application/json", authorization: `Bearer ${cfg.apiKey}` },
-    body: JSON.stringify({
-      model: cfg.model,
-      max_tokens: maxTokens,
-      temperature: 0.3,
-      messages: [{ role: "system", content: system }, ...messages],
-    }),
-  })
-  if (!res.ok) await fail(res, cfg.provider)
+  const known = resolvedModel.get(cfg.provider)
+  const candidates = known
+    ? [known]
+    : [cfg.model, ...(FALLBACK_MODELS[cfg.provider] ?? []).filter((m) => m !== cfg.model)]
 
-  const data = (await res.json()) as { choices?: { message?: { content?: string } }[] }
-  return (data.choices?.[0]?.message?.content || "").trim()
+  let last: Response | null = null
+
+  for (const model of candidates) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${cfg.apiKey}` },
+      body: JSON.stringify({
+        model,
+        max_tokens: maxTokens,
+        temperature: 0.3,
+        messages: [{ role: "system", content: system }, ...messages],
+      }),
+    })
+
+    if (res.ok) {
+      resolvedModel.set(cfg.provider, model)
+      const data = (await res.json()) as { choices?: { message?: { content?: string } }[] }
+      return (data.choices?.[0]?.message?.content || "").trim()
+    }
+
+    // 404 here means "this account cannot use that model" - worth trying the
+    // next one. Anything else is a real error and should surface immediately.
+    if (res.status !== 404) return fail(res, cfg.provider)
+    last = res
+  }
+
+  return fail(last as Response, cfg.provider)
 }
