@@ -11,6 +11,21 @@ import { createServer, type Server } from "http";
  */
 
 const MODEL = process.env.AGENT_MODEL || "claude-sonnet-4-5";
+
+// Same per-IP throttle the deployed function applies, so dev behaves like
+// production rather than being quietly more permissive.
+const WINDOW_MS = 60_000;
+const MAX_PER_WINDOW = 12;
+const hits = new Map<string, number[]>();
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const recent = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 5000) hits.clear();
+  return recent.length > MAX_PER_WINDOW;
+}
 const MAX_MESSAGES = 20;
 const MAX_CHARS = 4000;
 
@@ -35,6 +50,10 @@ function systemPrompt(knowledge: string) {
 }
 
 async function handleChat(req: Request, res: Response) {
+  if (rateLimited(req.ip || "unknown")) {
+    return res.status(429).json({ error: "Too many questions at once. Give it a minute." });
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return res.status(503).json({

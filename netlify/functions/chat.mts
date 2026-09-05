@@ -12,6 +12,22 @@ const MODEL = process.env.AGENT_MODEL || "claude-sonnet-4-5"
 const MAX_MESSAGES = 20
 const MAX_CHARS = 4000
 
+// Per-IP throttle. Function instances are recycled, so this is a speed bump
+// against casual abuse of a public endpoint, not a hard guarantee. If the site
+// ever gets real traffic, move this to a durable store.
+const WINDOW_MS = 60_000
+const MAX_PER_WINDOW = 12
+const hits = new Map<string, number[]>()
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now()
+  const recent = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS)
+  recent.push(now)
+  hits.set(ip, recent)
+  if (hits.size > 5000) hits.clear()
+  return recent.length > MAX_PER_WINDOW
+}
+
 type ChatMessage = { role: "user" | "assistant"; content: string }
 
 function systemPrompt(knowledge: string) {
@@ -20,8 +36,9 @@ function systemPrompt(knowledge: string) {
     "Visitors are usually recruiters, hiring managers or engineers evaluating him.",
     "",
     "Rules:",
-    "- Answer only from the profile below. If something is not covered, say you don't have that detail and point them at the contact form.",
-    "- Never invent employers, dates, metrics, certifications or salary expectations.",
+    "- Answer only from the profile below. If something is not covered, say you don't have that detail and point them at his email.",
+    "- Never invent employers, dates, metrics or certifications.",
+    "- Do not discuss salary or compensation expectations; say that is best raised with him directly.",
     "- Keep answers to a few sentences unless asked for depth. Plain, direct English.",
     "- Speak about Debanjan in the third person. You are his site's assistant, not him.",
     "- Decline anything unrelated to his work and redirect politely.",
@@ -31,9 +48,17 @@ function systemPrompt(knowledge: string) {
   ].join("\n")
 }
 
-export default async (req: Request, _context: Context) => {
+export default async (req: Request, context: Context) => {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 })
+  }
+
+  const ip = context.ip || req.headers.get("x-nf-client-connection-ip") || "unknown"
+  if (rateLimited(ip)) {
+    return Response.json(
+      { error: "Too many questions at once. Give it a minute." },
+      { status: 429 },
+    )
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY
@@ -52,7 +77,9 @@ export default async (req: Request, _context: Context) => {
   }
 
   const messages = (body.messages || [])
-    .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+    .filter(
+      (m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string",
+    )
     .slice(-MAX_MESSAGES)
     .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_CHARS) }))
 
