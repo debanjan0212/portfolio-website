@@ -1,5 +1,6 @@
 import { retrieve, hasUsableContext } from "./retrieve"
 import { seedCollection } from "./seed"
+import { complete, type LlmConfig } from "./llm"
 import type { Entry, Pending, Store } from "./types"
 
 export type ChatMessage = { role: "user" | "assistant"; content: string }
@@ -11,39 +12,17 @@ export type Intent =
   | "unknown" // needs Debanjan
   | "off_topic" // not about him
 
-const MODEL = () => process.env.AGENT_MODEL || "claude-sonnet-4-5"
-
-async function anthropic(body: unknown, apiKey: string) {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify(body),
-  })
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "")
-    throw new Error(`anthropic ${res.status}: ${detail.slice(0, 300)}`)
-  }
-  return res
-}
-
 /**
  * Step 1 - intent. One small, cheap call with a tight token budget. Knowing
  * the intent up front is what lets the orchestrator decide whether to answer,
  * escalate, or politely decline, instead of letting the model guess.
  */
-export async function classify(
-  question: string,
-  apiKey: string,
-): Promise<Intent> {
+export async function classify(question: string, config: LlmConfig): Promise<Intent> {
   try {
-    const res = await anthropic(
-      {
-        model: MODEL(),
-        max_tokens: 12,
+    const raw = (
+      await complete({
+        config,
+        maxTokens: 12,
         system:
           "Classify a question asked on Debanjan Das's portfolio site (he is a Site Reliability Engineer). " +
           "Reply with exactly one word and nothing else:\n" +
@@ -53,11 +32,11 @@ export async function classify(
           "off_topic - not about Debanjan at all\n" +
           "unknown - about him, but personal or specific in a way a CV would not cover",
         messages: [{ role: "user", content: question }],
-      },
-      apiKey,
+      })
     )
-    const data = (await res.json()) as { content?: { text?: string }[] }
-    const raw = (data.content?.[0]?.text || "").trim().toLowerCase()
+      .trim()
+      .toLowerCase()
+
     const valid: Intent[] = ["about_work", "logistics", "contact", "unknown", "off_topic"]
     return valid.includes(raw as Intent) ? (raw as Intent) : "about_work"
   } catch {
@@ -140,18 +119,18 @@ export async function orchestrate({
   messages,
   baseProfile,
   store,
-  apiKey,
+  config,
   askerEmail,
 }: {
   messages: ChatMessage[]
   baseProfile: string
   store: Store
-  apiKey: string
+  config: LlmConfig
   askerEmail?: string
 }): Promise<OrchestratorResult> {
   const question = messages[messages.length - 1]?.content ?? ""
 
-  const [intent, initial] = await Promise.all([classify(question, apiKey), store.listEntries()])
+  const [intent, initial] = await Promise.all([classify(question, config), store.listEntries()])
 
   // First request on a fresh deploy fills the collection, so the agent is
   // never cold-started empty and emailing about basics.
@@ -178,19 +157,15 @@ export async function orchestrate({
     .map((s) => `Q: ${s.entry.question}\nA: ${s.entry.answer}`)
     .join("\n\n")
 
-  // Ask for the answer non-streaming first, so NEEDS_DEBANJAN can be caught
-  // before a single token reaches the visitor.
-  const res = await anthropic(
-    {
-      model: MODEL(),
-      max_tokens: 700,
+  // Ask for the answer in full first, so NEEDS_DEBANJAN can be caught before a
+  // single token reaches the visitor.
+  const text = (
+    await complete({
+      config,
       system: systemPrompt(hasUsableContext(scored) ? context : "", baseProfile),
       messages,
-    },
-    apiKey,
-  )
-  const data = (await res.json()) as { content?: { text?: string }[] }
-  const text = (data.content?.[0]?.text || "").trim()
+    })
+  ).trim()
 
   if (text === "NEEDS_DEBANJAN" || text.startsWith("NEEDS_DEBANJAN")) {
     await queueQuestion({ store, question, messages, askerEmail })

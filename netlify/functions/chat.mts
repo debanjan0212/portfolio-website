@@ -1,6 +1,7 @@
 import type { Config, Context } from "@netlify/functions"
 import { orchestrate, type ChatMessage } from "../../shared/agent/orchestrator"
 import { blobStore } from "../../shared/agent/store-blobs"
+import { resolveConfig } from "../../shared/agent/llm"
 
 const MAX_MESSAGES = 20
 const MAX_CHARS = 4000
@@ -26,10 +27,10 @@ export default async (req: Request, context: Context) => {
     return Response.json({ error: "Too many questions at once. Give it a minute." }, { status: 429 })
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) {
+  const config = resolveConfig(process.env)
+  if (!config) {
     return Response.json(
-      { error: "The assistant is not configured yet. ANTHROPIC_API_KEY is missing." },
+      { error: "The assistant is not configured yet. No LLM API key is set." },
       { status: 503 },
     )
   }
@@ -55,7 +56,7 @@ export default async (req: Request, context: Context) => {
       messages,
       baseProfile: (body.knowledge || "").slice(0, 20000),
       store: blobStore,
-      apiKey,
+      config,
       askerEmail: body.email,
     })
 

@@ -4,6 +4,7 @@ import { orchestrate, entryFromAnswer, type ChatMessage } from "../shared/agent/
 import { buildAndSendDigest } from "../shared/agent/digest";
 import { fileStore } from "../shared/agent/store-file";
 import { seedCollection } from "../shared/agent/seed";
+import { resolveConfig } from "../shared/agent/llm";
 
 /**
  * Dev twins of the Netlify functions. Same orchestrator, same digest builder -
@@ -32,11 +33,11 @@ async function handleChat(req: Request, res: Response) {
     return res.status(429).json({ error: "Too many questions at once. Give it a minute." });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
+  const config = resolveConfig(process.env);
+  if (!config) {
     return res.status(503).json({
       error:
-        "The assistant isn't configured locally. Put ANTHROPIC_API_KEY in .env and restart.",
+        "The assistant isn't configured locally. Put GEMINI_API_KEY (free) in .env and restart.",
     });
   }
 
@@ -56,7 +57,7 @@ async function handleChat(req: Request, res: Response) {
     messages,
     baseProfile: (body?.knowledge || "").slice(0, 20000),
     store: fileStore,
-    apiKey,
+    config,
     askerEmail: body?.email,
   });
 
