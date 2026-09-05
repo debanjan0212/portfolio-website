@@ -33,17 +33,60 @@ const KEY_ENV: Record<Provider, string> = {
   anthropic: "ANTHROPIC_API_KEY",
 }
 
-export function resolveConfig(env: Record<string, string | undefined>): LlmConfig | null {
+/**
+ * Every provider with a key present, in preference order.
+ *
+ * More than one can be configured at once, and that is deliberate: a stale or
+ * revoked key should not take the assistant down when a working key is sitting
+ * right next to it.
+ */
+export function resolveConfigs(env: Record<string, string | undefined>): LlmConfig[] {
   const forced = env.LLM_PROVIDER as Provider | undefined
   const order = forced && ORDER.includes(forced) ? [forced] : ORDER
 
-  for (const provider of order) {
-    const apiKey = env[KEY_ENV[provider]]
-    if (apiKey) {
-      return { provider, apiKey, model: env.AGENT_MODEL || DEFAULT_MODEL[provider] }
+  return order
+    .filter((provider) => env[KEY_ENV[provider]])
+    .map((provider) => ({
+      provider,
+      apiKey: env[KEY_ENV[provider]] as string,
+      model: env.AGENT_MODEL || DEFAULT_MODEL[provider],
+    }))
+}
+
+export function resolveConfig(env: Record<string, string | undefined>): LlmConfig | null {
+  return resolveConfigs(env)[0] ?? null
+}
+
+/** Auth and quota failures are worth trying the next provider for. */
+function isProviderFailure(message: string): boolean {
+  return /\b(400|401|403|429)\b/.test(message)
+}
+
+/**
+ * Try each configured provider in turn. Anything that looks like a bad key or
+ * an exhausted quota moves on to the next; a genuine bug does not.
+ */
+export async function completeWithFallback(args: {
+  configs: LlmConfig[]
+  system: string
+  messages: Msg[]
+  maxTokens?: number
+}): Promise<string> {
+  const { configs, ...rest } = args
+  let last: unknown
+
+  for (const config of configs) {
+    try {
+      return await complete({ config, ...rest })
+    } catch (err) {
+      last = err
+      const message = err instanceof Error ? err.message : String(err)
+      if (!isProviderFailure(message)) throw err
+      console.error(`provider ${config.provider} unusable, trying next:`, message.slice(0, 200))
     }
   }
-  return null
+
+  throw last instanceof Error ? last : new Error("No usable LLM provider configured.")
 }
 
 export type Msg = { role: "user" | "assistant"; content: string }
