@@ -4,32 +4,32 @@ import { RevealWords } from "@/lib/motion"
 
 const steps = [
   {
-    id: "observe",
+    id: "instrument",
     n: "01",
-    title: "Observe",
-    body: "Every agent run is instrumented like a production service. The OTel Contrib Collector picks up traces, metrics and logs from all 18 microservices and from the Kafka fabric the agents talk over — so inter-agent calls are as visible as any HTTP hop.",
-    signal: "traces · metrics · logs · kafka topics",
+    title: "Instrument",
+    body: "The platform ships with an SDK rather than a bolt-on. Framework coverage across the stack, end-to-end distributed traces, metrics, and structured logging on one consistent event and action taxonomy — so every agent emits the same shape of signal without each team inventing its own.",
+    signal: "sdk · traces · metrics · structured logs",
   },
   {
-    id: "reason",
+    id: "collect",
     n: "02",
-    title: "Reason",
-    body: "Telemetry is only useful if the signal survives. Grok parsing and reference-table enrichment strip false positives and de-duplicate repeats, so what reaches a human or an agent is a real event with its evidence attached, not raw noise.",
-    signal: "enrichment · de-duplication · correlation",
+    title: "Collect",
+    body: "An OpenTelemetry gateway collector on AKS gathers it all, including the Kafka fabric the agents talk over, so inter-agent calls are as visible as any HTTP hop. Nothing about it is tied to Azure — the same design carries to AWS or GCP with the SDK in place.",
+    signal: "otel gateway · aks · kafka · cloud-agnostic",
   },
   {
-    id: "act",
+    id: "route",
     n: "03",
-    title: "Act",
-    body: "Action goes through the same reviewed path a human would use. Monitors fire into ServiceNow and PagerDuty for routing and escalation; remediation lands through GitOps. Nothing changes production by a route that cannot be audited or reversed.",
-    signal: "servicenow · pagerduty · gitops",
+    title: "Route",
+    body: "Multi-exporter routing means a customer can send telemetry to whatever vendor backend they already pay for, or use the bundled LGTM stack, without changing a line of application code. The observability layer is never the thing that locks them in.",
+    signal: "multi-exporter · lgtm · vendor-neutral",
   },
   {
-    id: "verify",
+    id: "explain",
     n: "04",
-    title: "Verify",
-    body: "SLOs decide whether it worked. Error budget burn is the gate on what ships next, and telemetry can be exported to the customer's own vendor backend or the bundled LGTM stack — the verification layer is never locked to one vendor.",
-    signal: "slo · error budget · multi-exporter",
+    title: "Explain",
+    body: "The point of all of it: when an operational query comes in, the people running the system can see the agent topology, the context and intent behind it, and where it actually went wrong. I did not build the agents — I made them explain themselves.",
+    signal: "topology · context · intent · triage",
   },
 ]
 

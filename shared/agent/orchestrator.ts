@@ -1,4 +1,5 @@
 import { retrieve, hasUsableContext } from "./retrieve"
+import { seedCollection } from "./seed"
 import type { Entry, Pending, Store } from "./types"
 
 export type ChatMessage = { role: "user" | "assistant"; content: string }
@@ -112,7 +113,15 @@ export async function orchestrate({
 }): Promise<OrchestratorResult> {
   const question = messages[messages.length - 1]?.content ?? ""
 
-  const [intent, entries] = await Promise.all([classify(question, apiKey), store.listEntries()])
+  const [intent, initial] = await Promise.all([classify(question, apiKey), store.listEntries()])
+
+  // First request on a fresh deploy fills the collection, so the agent is
+  // never cold-started empty and emailing about basics.
+  let entries = initial
+  if (entries.length === 0) {
+    await seedCollection(store)
+    entries = await store.listEntries()
+  }
 
   if (intent === "off_topic") {
     return {

@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { orchestrate, entryFromAnswer, type ChatMessage } from "../shared/agent/orchestrator";
 import { buildAndSendDigest } from "../shared/agent/digest";
 import { fileStore } from "../shared/agent/store-file";
+import { seedCollection } from "../shared/agent/seed";
 
 /**
  * Dev twins of the Netlify functions. Same orchestrator, same digest builder -
@@ -141,6 +142,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       from: process.env.DIGEST_FROM || "Portfolio Agent <onboarding@resend.dev>",
     })
       .then((r) => res.json(r))
+      .catch((e) => res.status(500).json({ error: String(e) }));
+  });
+
+  app.post("/api/seed", (_req, res) => {
+    seedCollection(fileStore)
+      .then((added) => res.json({ added }))
       .catch((e) => res.status(500).json({ error: String(e) }));
   });
 

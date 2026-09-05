@@ -51,10 +51,12 @@ export const roles: Role[] = [
     blurb:
       "Two projects: full-stack observability for Toyota Motors North America, then the backend-agnostic telemetry platform for Hitachi's Operational Agentic AI product.",
     points: [
-      "Designing a backend-agnostic observability platform on the OpenTelemetry Contrib Collector for the OAA agentic AI platform on Azure — 18 managed microservices plus Confluent Kafka, PostgreSQL, Redis and App Gateway",
-      "Multi-exporter collector deployment so customers route telemetry to their own vendor stack or the bundled LGTM stack, with no application changes",
-      "Instrumenting Python OAA microservices through a platform-native SDK that embeds the OTel SDK alongside proprietary libraries, giving consistent traces, metrics and logs across every Kafka-connected orchestration, ingestion and enrichment agent",
-      "Helm-based deployment of Loki, Grafana, Tempo and Mimir on AKS as an optional sidecar, kept fully separate from OAA workloads",
+      "Delivered a backend-agnostic observability platform for the OAA agentic AI platform — 18 managed microservices and around 8 operational agents, alongside Confluent Kafka, PostgreSQL, Redis and App Gateway",
+      "Built the instrumentation SDK the platform ships with: framework coverage across the stack, end-to-end distributed traces, metrics, and structured logging on a consistent event/action taxonomy",
+      "Instrumented the platform end to end, including telemetry artifact collection and export, so a run can be followed from the first request through every agent that touched it",
+      "OpenTelemetry gateway collector configuration, deployed on AKS — cloud-agnostic by design, so the same approach carries to AWS or GCP with the SDK added",
+      "Multi-exporter routing so customers send telemetry to their own vendor backend or the bundled LGTM stack, with no application changes",
+      "Made agent topologies, and the context and intent behind each operational query, visible to the people running the system — so they can see what broke and what is likely to break next",
       "Led DataDog APM and RUM instrumentation across 9 Toyota applications spanning 200+ repositories on Lambda, ECS Fargate and EKS Fargate — Java backends and Angular frontends",
       "Built an email-to-DataDog ingestion pipeline processing 15,000–18,000 incident emails a day at 1,000 per 8-minute cycle, cutting triage from hours of manual work to near-real-time routing",
       "Shipped ~180 monitors wired to ServiceNow webhooks and PagerDuty, replacing email-based triage entirely",
@@ -202,12 +204,12 @@ export const projects: Project[] = [
   {
     title: "Backend-agnostic observability for an agentic AI platform",
     org: "Hitachi Digital Services",
-    period: "2026 — Present",
+    period: "2026 — Delivered",
     summary:
-      "A plug-and-play OpenTelemetry Contrib Collector architecture for the 18-service OAA platform on Azure. Telemetry routes to any vendor backend or to a bundled LGTM stack, deployed by Helm chart, with no application changes required from the customer.",
+      "A plug-and-play OpenTelemetry architecture for the OAA agentic platform: an instrumentation SDK giving end-to-end traces, metrics and structured logging, behind a gateway collector on AKS. Telemetry routes to any vendor backend or a bundled LGTM stack with no application changes, and the design is cloud-agnostic — the same approach carries to AWS or GCP. I did not build the agents; I made them observable, so the people running them can see what broke and why.",
     metrics: [
       { value: "18", label: "microservices instrumented" },
-      { value: "0", label: "app changes to switch backend" },
+      { value: "8", label: "operational agents traced" },
     ],
     tags: ["OpenTelemetry", "Azure AKS", "LGTM", "Kafka", "Helm", "Python"],
     featured: true,
