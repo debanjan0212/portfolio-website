@@ -234,7 +234,9 @@ export function DarkBand({ children }: { children: ReactNode }) {
         <div className="grain-layer" />
       </div>
 
-      <div className="relative z-10">{children}</div>
+      {/* The cross-dissolve runs 22rem; content starts below it so nothing is
+          read against a half-faded background. */}
+      <div className="relative z-10 py-32 md:py-36">{children}</div>
     </div>
   )
 }

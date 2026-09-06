@@ -1,20 +1,15 @@
 import portrait from "@/assets/portrait-cutout.webp"
 import { profile, education, languages } from "@/data/profile"
 import { RevealWords, Rise } from "@/lib/motion"
-import { motion, useScroll, useTransform } from "framer-motion"
-import { useRef } from "react"
+import { motion } from "framer-motion"
 
 export default function About() {
-  const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] })
-  const imgY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"])
-
   return (
-    <section id="about" className="relative px-6 py-32 md:py-44">
-      <div className="mx-auto grid max-w-shell items-center gap-16 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]">
+    <section id="about" className="relative px-6 py-24 md:py-32">
+      <div className="mx-auto grid max-w-shell items-start gap-x-16 gap-y-12 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1fr)]">
         {/* Portrait, treated to sit in the dark rather than on top of it:
             desaturated, accent-tinted, and masked away at the bottom edge. */}
-        <div ref={ref} className="relative mx-auto w-full max-w-sm lg:max-w-none">
+        <div className="relative mx-auto w-full max-w-sm lg:sticky lg:top-28 lg:max-w-none">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -37,10 +32,15 @@ export default function About() {
               }}
             />
 
-            <motion.img
+            {/*
+              No parallax on the figure. Moving the image inside its own frame
+              slid the head out of the top and made the floor fade travel
+              across the body as you scrolled. The column is sticky instead:
+              the portrait holds still and the text moves past it.
+            */}
+            <img
               src={portrait}
               alt={profile.name}
-              style={{ y: imgY }}
               className="relative w-full select-none object-contain contrast-[1.02] saturate-[0.92]"
               draggable={false}
             />

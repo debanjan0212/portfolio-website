@@ -63,7 +63,7 @@ export default function Melt() {
   }, [inView, reduced])
 
   return (
-    <section id="melt" className="relative px-6 py-32 md:py-44">
+    <section id="melt" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-shell">
         <p className="mono-label">Observability, in motion</p>
         <h2 className="display mt-5 text-[clamp(1.9rem,4.2vw,3.25rem)]">

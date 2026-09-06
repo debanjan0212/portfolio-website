@@ -8,7 +8,7 @@ export default function Skills() {
   )
 
   return (
-    <section id="skills" className="relative py-32 md:py-44">
+    <section id="skills" className="relative py-24 md:py-32">
       <Marquee items={marquee} speed={70} />
       <div className="mx-auto mt-20 max-w-shell px-6">
         <div className="grid gap-16 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1fr)]">

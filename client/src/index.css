@@ -223,17 +223,42 @@
     position: absolute;
     left: 0;
     right: 0;
-    height: 7rem;
+    height: 13rem;
     pointer-events: none;
     z-index: 1;
   }
+  /*
+    A two-stop gradient over 7rem reads as a grey wipe: the eye sees the band
+    edge, not a blend. Long distance plus an eased ramp (dense stops early,
+    sparse late) makes the light hand over to the dark without a seam.
+  */
   .band-top-fade::before {
     top: 0;
-    background: linear-gradient(180deg, rgb(250 250 249), transparent);
+    background: linear-gradient(
+      180deg,
+      rgb(250 250 249) 0%,
+      rgb(250 250 249 / 0.94) 14%,
+      rgb(250 250 249 / 0.82) 27%,
+      rgb(250 250 249 / 0.62) 41%,
+      rgb(250 250 249 / 0.38) 56%,
+      rgb(250 250 249 / 0.18) 72%,
+      rgb(250 250 249 / 0.06) 86%,
+      transparent 100%
+    );
   }
   .band-bottom-fade::after {
     bottom: 0;
-    background: linear-gradient(0deg, rgb(250 250 249), transparent);
+    background: linear-gradient(
+      0deg,
+      rgb(250 250 249) 0%,
+      rgb(250 250 249 / 0.94) 14%,
+      rgb(250 250 249 / 0.82) 27%,
+      rgb(250 250 249 / 0.62) 41%,
+      rgb(250 250 249 / 0.38) 56%,
+      rgb(250 250 249 / 0.18) 72%,
+      rgb(250 250 249 / 0.06) 86%,
+      transparent 100%
+    );
   }
 }
 

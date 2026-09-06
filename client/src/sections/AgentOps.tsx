@@ -53,7 +53,7 @@ export default function AgentOps() {
   const done = phase >= STAGES.length
 
   return (
-    <section id="agentops" className="relative px-6 py-32 md:py-44">
+    <section id="agentops" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-shell">
         <p className="mono-label">Agentic operations</p>
         <h2 className="display mt-5 text-[clamp(1.9rem,4.2vw,3.25rem)]">
