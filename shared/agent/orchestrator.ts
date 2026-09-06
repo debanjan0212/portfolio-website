@@ -245,12 +245,12 @@ export async function orchestrate({
   if (isSmallTalk(question)) {
     return {
       kind: "declined",
-      suggestions: suggestFollowUps(entries, asked, "what is he building right now", 4),
+      suggestions: suggestFollowUps(entries, asked, "what is he building right now", 10),
       message:
         "Hello. I'm Debanjan's assistant — I answer questions about his work from his real profile. Ask me anything, or start with one of these:",
     }
   }
-  const suggestions = suggestFollowUps(entries, asked, question, 4)
+  const suggestions = suggestFollowUps(entries, asked, question, 10)
 
   if (intent === "off_topic") {
     return {

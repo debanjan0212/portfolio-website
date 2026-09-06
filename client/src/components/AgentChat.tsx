@@ -17,6 +17,16 @@ const OPENERS = [
 
 const GREETING = `Ask me anything about ${profile.first}'s work. I answer from his actual profile — nothing invented.`
 
+const NUDGE_KEY = "agent-nudge-seen"
+
+function nudgeSeen() {
+  try {
+    return localStorage.getItem(NUDGE_KEY) === "1"
+  } catch {
+    return false
+  }
+}
+
 export default function AgentChat() {
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState("")
@@ -31,6 +41,10 @@ export default function AgentChat() {
   const [nudge, setNudge] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  // Every prompt this visitor has already been offered. A suggestion is a
+  // suggestion once; showing the same three chips after every reply makes the
+  // assistant look like it has four things to say in total.
+  const offered = useRef(new Set(OPENERS.map((o) => o.toLowerCase())))
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
@@ -40,32 +54,30 @@ export default function AgentChat() {
     if (open) setTimeout(() => inputRef.current?.focus(), 350)
   }, [open])
 
-  // Show the nudge once per visit, a few seconds in - late enough that the
-  // hero has landed, early enough to be seen.
+  // Show the nudge once, ever - not once per session. A returning visitor has
+  // already been told the assistant exists; telling them again every visit is
+  // nagging, not helpfulness.
   useEffect(() => {
-    let seen = false
-    try {
-      seen = sessionStorage.getItem("agent-nudge-seen") === "1"
-    } catch {
-      // Private browsing or blocked storage: just show it.
-    }
-    if (seen) return
+    if (nudgeSeen()) return
 
     const show = setTimeout(() => setNudge(true), 5200)
-    const hide = setTimeout(() => {
-      setNudge(false)
-      try {
-        sessionStorage.setItem("agent-nudge-seen", "1")
-      } catch {
-        // Nothing to do - worst case it appears again next page load.
-      }
-    }, 15200)
+    const hide = setTimeout(() => dismissNudge(), 15200)
 
     return () => {
       clearTimeout(show)
       clearTimeout(hide)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  function dismissNudge() {
+    setNudge(false)
+    try {
+      localStorage.setItem(NUDGE_KEY, "1")
+    } catch {
+      // Blocked storage: worst case it appears again next visit.
+    }
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false)
@@ -96,7 +108,10 @@ export default function AgentChat() {
 
       try {
         const raw = res.headers.get("x-suggestions")
-        setSuggestions(raw ? (JSON.parse(atob(raw)) as string[]) : [])
+        const incoming = raw ? (JSON.parse(atob(raw)) as string[]) : []
+        const unseen = incoming.filter((s) => !offered.current.has(s.toLowerCase()))
+        unseen.forEach((s) => offered.current.add(s.toLowerCase()))
+        setSuggestions(unseen.slice(0, 3))
       } catch {
         setSuggestions([])
       }
@@ -139,50 +154,84 @@ export default function AgentChat() {
     <>
       {/* A one-time nudge. Most visitors never notice a chat launcher, and an
           assistant nobody opens is worth nothing - so it introduces itself
-          once, then never again for this visit. */}
+          once, then never again on this browser. */}
       <AnimatePresence>
         {nudge && !open && (
-          <motion.button
-            onClick={() => setOpen(true)}
-            initial={{ opacity: 0, y: 10, scale: 0.96 }}
+          <motion.div
+            initial={{ opacity: 0, y: 12, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.96 }}
-            transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-            className="fixed bottom-36 right-4 z-[84] max-w-[16rem] rounded-2xl rounded-br-md border border-accent/25 bg-ink-1 px-4 py-3 text-left shadow-2xl shadow-black/50 sm:bottom-24 sm:right-6"
+            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+            transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
+            className="fixed bottom-40 right-4 z-[84] max-w-[17rem] rounded-2xl rounded-br-md border border-accent/25 bg-ink-1 p-4 text-left shadow-2xl shadow-black/40 sm:bottom-28 sm:right-6"
           >
-            <p className="text-sm leading-snug text-hi">
-              Ask me anything about {profile.first}'s work
-            </p>
-            <p className="mt-1 text-xs text-low">
-              I answer from his real profile — try me
-            </p>
-          </motion.button>
+            <button
+              onClick={dismissNudge}
+              aria-label="Dismiss"
+              className="absolute right-2 top-2 rounded-full p-1 text-low transition-colors hover:text-hi"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => {
+                dismissNudge()
+                setOpen(true)
+              }}
+              className="block pr-4 text-left"
+            >
+              <p className="text-sm leading-snug text-hi">
+                Ask me anything about {profile.first}'s work
+              </p>
+              <p className="mt-1 text-xs text-low">
+                I answer from his real profile — try me
+              </p>
+            </button>
+          </motion.div>
         )}
       </AnimatePresence>
 
+      {/*
+        The launcher has to survive being ignored. A small circle in a corner
+        is furniture; a labelled pill with a live dot and a halo reads as
+        something running, which is the point of the whole feature.
+      */}
       <motion.button
         onClick={() => {
           setOpen((o) => !o)
-          setNudge(false)
+          dismissNudge()
         }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.6, duration: 0.7 }}
+        initial={{ opacity: 0, y: 24, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 2.6, duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
         aria-label={open ? "Close assistant" : "Ask about Debanjan"}
         data-testid="button-agent-chat"
-        className="group fixed bottom-20 right-4 z-[85] flex items-center gap-2.5 rounded-full bg-accent px-5 py-3.5 text-ink-0 shadow-lg shadow-accent/20 transition-transform duration-300 hover:scale-[1.03] sm:bottom-6 sm:right-6"
+        className="group fixed bottom-6 right-4 z-[85] flex items-center gap-3 rounded-full bg-accent px-6 py-4 text-ink-0 shadow-[0_10px_40px_-10px_rgb(var(--accent)/0.7)] transition-transform duration-300 hover:scale-[1.04] active:scale-[0.98] sm:right-6"
       >
-        {/* A slow ring, so the eye catches it without it nagging. */}
+        {!open && (
+          <>
+            {/* Two rings, offset, so the halo never fully closes. */}
+            {[0, 1.3].map((delay) => (
+              <motion.span
+                key={delay}
+                aria-hidden
+                className="absolute inset-0 rounded-full border-2 border-accent"
+                animate={{ scale: [1, 1.35], opacity: [0.5, 0] }}
+                transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut", delay }}
+              />
+            ))}
+          </>
+        )}
+        {open ? <X className="h-4 w-4" /> : <MessageCircle className="h-5 w-5" />}
+        <span className="text-[0.95rem] font-semibold tracking-tight">
+          {open ? "Close" : "Ask about me"}
+        </span>
         {!open && (
           <motion.span
             aria-hidden
-            className="absolute inset-0 rounded-full border border-accent"
-            animate={{ scale: [1, 1.22], opacity: [0.55, 0] }}
-            transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }}
+            className="h-2 w-2 rounded-full bg-ink-0/80"
+            animate={{ opacity: [1, 0.25, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
         )}
-        {open ? <X className="h-4 w-4" /> : <MessageCircle className="h-4 w-4" />}
-        <span className="text-sm font-medium">{open ? "Close" : "Ask about me"}</span>
       </motion.button>
 
       <AnimatePresence>
@@ -196,7 +245,7 @@ export default function AgentChat() {
             aria-label="Assistant"
             /* Solid ground. The translucent .panel surface let page text bleed
                through the transcript - unreadable on a small screen. */
-            className="panel fixed inset-x-4 bottom-36 z-[85] flex h-[min(34rem,calc(100dvh-11rem))] flex-col overflow-hidden !bg-ink-1 shadow-2xl shadow-black/60 sm:inset-x-auto sm:bottom-24 sm:right-6 sm:w-[26rem]"
+            className="panel fixed inset-x-4 bottom-28 z-[85] flex h-[min(34rem,calc(100dvh-9rem))] flex-col overflow-hidden !bg-ink-1 shadow-2xl shadow-black/60 sm:inset-x-auto sm:bottom-28 sm:right-6 sm:w-[26rem]"
           >
             <div className="flex items-center gap-3 border-b border-hairline/[0.07] px-5 py-4">
               <span className="dot-live" />
