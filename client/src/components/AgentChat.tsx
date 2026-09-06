@@ -11,6 +11,8 @@ const OPENERS = [
   "How deep is his OpenTelemetry experience?",
   "What kind of role is he looking for?",
   "What's the largest migration he has run?",
+  "Did he build the AI agents themselves?",
+  "What has he done with cost optimisation?",
 ]
 
 const GREETING = `Ask me anything about ${profile.first}'s work. I answer from his actual profile — nothing invented.`

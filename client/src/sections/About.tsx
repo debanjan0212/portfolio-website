@@ -1,4 +1,4 @@
-import portrait from "@/assets/professional_portrait_final.jpg"
+import portrait from "@/assets/portrait-cutout.webp"
 import { profile, education, languages } from "@/data/profile"
 import { RevealWords, Rise } from "@/lib/motion"
 import { motion, useScroll, useTransform } from "framer-motion"
@@ -16,29 +16,44 @@ export default function About() {
             desaturated, accent-tinted, and masked away at the bottom edge. */}
         <div ref={ref} className="relative mx-auto w-full max-w-sm lg:max-w-none">
           <motion.div
-            initial={{ opacity: 0, scale: 1.04 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-15%" }}
             transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
-            className="relative aspect-[4/5] overflow-hidden rounded-2xl"
+            className="relative"
           >
-            {/* Crop biased down the frame - anchored at the top there was far
-                too much empty space above his head. */}
+            {/*
+              No frame. A boxed photo on a dark canvas always reads as pasted
+              on; a cut-out standing in the light behind it reads as part of
+              the scene. The glow sits behind the figure, the floor fade
+              dissolves the bottom edge, so there is no rectangle anywhere.
+            */}
+            <div
+              aria-hidden
+              className="absolute left-1/2 top-[12%] h-[70%] w-[85%] -translate-x-1/2 rounded-full blur-[70px]"
+              style={{
+                background:
+                  "radial-gradient(circle, rgb(var(--accent) / 0.20), transparent 68%)",
+              }}
+            />
+
             <motion.img
               src={portrait}
               alt={profile.name}
-              style={{ y: imgY, objectPosition: "50% 34%" }}
-              className="absolute inset-0 h-[112%] w-full object-cover contrast-[1.05] grayscale-[0.5]"
+              style={{ y: imgY }}
+              className="relative w-full select-none object-contain contrast-[1.02] saturate-[0.92]"
+              draggable={false}
             />
-            {/* Accent wash + bottom fade into the canvas. */}
+
+            {/* Dissolve the bottom edge into the canvas. */}
             <div
-              className="absolute inset-0"
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
               style={{
                 background:
-                  "linear-gradient(180deg, rgb(var(--accent) / 0.10) 0%, transparent 40%, rgb(var(--ink-0) / 0.55) 78%, rgb(var(--ink-0)) 100%)",
+                  "linear-gradient(180deg, transparent, rgb(var(--ink-0) / 0.85) 60%, rgb(var(--ink-0)))",
               }}
             />
-            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-hairline/10" />
           </motion.div>
 
           <Rise delay={0.2} className="mt-6 flex flex-wrap gap-x-6 gap-y-2">

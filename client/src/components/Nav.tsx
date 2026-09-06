@@ -8,6 +8,7 @@ const items = [
   { label: "Trajectory", href: "#experience" },
   { label: "Agentic", href: "#agentic" },
   { label: "Work", href: "#work" },
+  { label: "MELT", href: "#melt" },
   { label: "Stack", href: "#skills" },
   { label: "Contact", href: "#contact" },
 ]

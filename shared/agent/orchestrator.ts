@@ -5,6 +5,42 @@ import type { Entry, Pending, Store } from "./types"
 
 export type ChatMessage = { role: "user" | "assistant"; content: string }
 
+/**
+ * Greetings and pleasantries, matched before anything else.
+ *
+ * These were being escalated: "hi" is not in the collection, so the model
+ * emitted NEEDS_DEBANJAN and the visitor was told their greeting had been
+ * forwarded to a human. Absurd, and it would have filled the nightly digest
+ * with "hello". Handled here, so it costs no model call at all.
+ */
+const GREETING_OPENER =
+  /^\s*(hi|hey+|hello+|yo|hiya|howdy|namaste|greetings|good\s*(morning|afternoon|evening)|how\s*(are|r)\s*(you|u)|how'?s it going|what'?s up|sup|thanks?|thank you|cheers|ok(ay)?|cool|nice|great|awesome|bye|goodbye|see ya)\b/i
+
+/**
+ * True for greetings and pleasantries.
+ *
+ * Anchoring the pattern to the end of the string was too strict - "hey there"
+ * fell through and got escalated. A greeting opener plus a short message is
+ * the reliable signal: "hi" and "hey there" match, "hi, what does he do with
+ * Kubernetes?" does not, and is answered properly.
+ */
+function isSmallTalk(text: string): boolean {
+  const match = text.match(GREETING_OPENER)
+  if (!match) return false
+
+  // Strip the greeting and see what is left. "hey there" leaves nothing worth
+  // answering; "hi, what's his Kubernetes experience?" leaves a real question,
+  // which must go through the normal path rather than get a wave back.
+  const rest = text
+    .replace(GREETING_OPENER, "")
+    .replace(/[^a-z0-9\s]/gi, " ")
+    .trim()
+    .split(/\s+/)
+    .filter((w) => w && !/^(there|mate|folks|everyone|all|again|so|and|hi|hey)$/i.test(w))
+
+  return rest.length <= 1
+}
+
 export type Intent =
   | "about_work" // answerable from the collection
   | "logistics" // availability, location, what he's looking for
@@ -150,7 +186,17 @@ export async function orchestrate({
   }
 
   const asked = messages.filter((m) => m.role === "user").map((m) => m.content)
-  const suggestions = suggestFollowUps(entries, asked, question)
+
+  // Answered before any model call - a greeting should feel like a greeting.
+  if (isSmallTalk(question)) {
+    return {
+      kind: "declined",
+      suggestions: suggestFollowUps(entries, asked, "what is he building right now", 4),
+      message:
+        "Hello. I'm Debanjan's assistant — I answer questions about his work from his real profile. Ask me anything, or start with one of these:",
+    }
+  }
+  const suggestions = suggestFollowUps(entries, asked, question, 4)
 
   if (intent === "off_topic") {
     return {

@@ -6,6 +6,7 @@ import About from "./sections/About"
 import Experience from "./sections/Experience"
 import AgenticLoop from "./sections/AgenticLoop"
 import Work from "./sections/Work"
+import Melt from "./sections/Melt"
 import Skills from "./sections/Skills"
 import Contact from "./sections/Contact"
 import Answer from "./pages/Answer"
@@ -53,6 +54,7 @@ export default function App() {
           <Experience />
           <AgenticLoop />
           <Work />
+          <Melt />
           <Skills />
           <Contact />
         </main>
