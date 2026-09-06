@@ -11,13 +11,7 @@ import AgentOps from "./sections/AgentOps"
 import Skills from "./sections/Skills"
 import Contact from "./sections/Contact"
 import Answer from "./pages/Answer"
-import {
-  AmbientField,
-  CursorGlow,
-  Curtain,
-  ScrollProgress,
-  SmoothScroll,
-} from "./lib/motion"
+import { Curtain, DarkBand, ScrollProgress, SmoothScroll } from "./lib/motion"
 
 export default function App() {
   // One extra route only: the private answer page the digest email links to.
@@ -25,38 +19,33 @@ export default function App() {
   const isAnswerPage = window.location.pathname.replace(/\/$/, "") === "/answer"
 
   if (isAnswerPage) {
-    return (
-      <>
-        <AmbientField />
-        <div className="grain" />
-        <Answer />
-      </>
-    )
+    return <Answer />
   }
 
   return (
     <SmoothScroll>
       <Curtain />
-      <AmbientField />
-      <CursorGlow />
-      <div className="grain" />
       <ScrollProgress />
 
       {/*
-        Everything sits on one canvas. No section paints its own background,
-        so there is nothing to blend at the seams - sections are separated by
-        rhythm and space, never by an edge.
+        Two-tone page. Light and editorial where the reading happens, dark
+        bands where the technical work is shown - so the contrast means
+        something instead of everything being dark by default.
       */}
-      <div className="relative z-10">
+      <div className="relative">
         <Nav />
         <main>
           <Hero />
           <About />
           <Experience />
-          <AgenticLoop />
+
+          <DarkBand>
+            <AgenticLoop />
+            <Melt />
+            <AgentOps />
+          </DarkBand>
+
           <Work />
-          <Melt />
-          <AgentOps />
           <Skills />
           <Contact />
         </main>

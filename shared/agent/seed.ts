@@ -107,6 +107,86 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
     tags: ["weakness", "gaps", "not good", "limitations", "cons"],
   },
   {
+    q: "Can I have his phone number?",
+    a: "No — and not because I'm being difficult. Phone numbers on public websites exist to be scraped by recruiters selling insurance. Email him at itsme.deb1995@gmail.com and he'll reply, usually with a real answer rather than a callback menu.",
+    tags: ["phone", "number", "mobile", "call", "contact", "whatsapp"],
+  },
+  {
+    q: "What is he like to work with?",
+    a: "You should ask someone who has, rather than a program he wrote. What the record shows: he has mentored 15 graduates at TCS, led a 10-member support team at Capgemini, and carried 24/7 on-call for telecom systems — none of which survives being difficult to work with. He'll happily put you in touch with references.",
+    tags: ["personality", "work with", "team", "culture", "collaborate"],
+  },
+  {
+    q: "Tell me about his personal life, family or hobbies",
+    a: "That's not something this site covers — it's a professional profile, and he'd rather tell you himself over a conversation. Ask me about the work instead, there's plenty of it.",
+    tags: ["personal", "family", "married", "hobbies", "private", "life", "age"],
+  },
+  {
+    q: "Is he available for freelance or consulting work?",
+    a: "That's worth asking him directly at itsme.deb1995@gmail.com — availability changes, and he'd rather answer honestly for your specific timeline than have me guess.",
+    tags: ["freelance", "consulting", "contract", "part time", "available"],
+  },
+  {
+    q: "What certifications does he have?",
+    a: "I don't have a certification list on file. Ask him at itsme.deb1995@gmail.com — and in fairness, migrating 800+ servers to EKS is a more convincing credential than most exams.",
+    tags: ["certification", "certified", "aws certified", "cka", "credentials"],
+  },
+  {
+    q: "Does he know Terraform or OpenTofu?",
+    a: "Yes, both. Terraform and Terragrunt for the IaC transformation at Signeasy, Terraform for AKS clusters at TCS, and OpenTofu for the observability stack at Hitachi. He also works with Pulumi and CloudFormation.",
+    tags: ["terraform", "opentofu", "tofu", "iac", "pulumi", "cloudformation"],
+  },
+  {
+    q: "What is his experience with Azure versus AWS?",
+    a: "Both, properly. AWS is the longer relationship — EKS, ECS Fargate, Lambda, VPC, IAM, CloudFront, API Gateway across TransUnion and Signeasy. Azure is the current one: AKS, Container Apps, App Gateway and Confluent Kafka for the OAA platform at Hitachi. He has touched GCP but would not claim it as a strength.",
+    tags: ["azure", "aws", "gcp", "cloud", "multi-cloud"],
+  },
+  {
+    q: "Has he worked with Kafka?",
+    a: "Yes. He designed a Kafka-based big data cluster at Capgemini for US mail processing, and at Hitachi he instruments the Confluent Kafka fabric the OAA agents communicate over — so inter-agent messages are as traceable as any HTTP call.",
+    tags: ["kafka", "confluent", "streaming", "messaging", "events"],
+  },
+  {
+    q: "What does he do about alert fatigue?",
+    a: "Treats it as a design problem rather than a tuning problem. At Toyota he applied Grok parsing and reference-table enrichment to strip false positives and de-duplicate repeats before anything reached a human, and replaced email-based triage with ~180 monitors routed through ServiceNow and PagerDuty. The goal is fewer alerts that all matter, not more alerts that mostly don't.",
+    tags: ["alert", "fatigue", "noise", "monitoring", "paging", "signal"],
+  },
+  {
+    q: "How does he think about SLOs and error budgets?",
+    a: "As a decision-making tool, not a dashboard. An SLO is only real if burning the budget actually changes what ships — otherwise it's a number nobody looks at. He defines SLIs with the teams who own the service, aligns SLO targets with them, and uses budget burn as the gate on the next release.",
+    tags: ["slo", "sli", "error budget", "reliability", "sla"],
+  },
+  {
+    q: "What is the hardest problem he has solved?",
+    a: "Probably the 800+ server migration to private EKS at TransUnion — live systems for telecom clients where port-in and port-out operations could not stop. The technical work is one thing; doing it at 99.8% deployment success across 200+ releases without a business-visible outage is the harder half.",
+    tags: ["hardest", "difficult", "challenge", "proud", "biggest"],
+  },
+  {
+    q: "Does he do frontend or full-stack development?",
+    a: "No, and he'd tell you the same. He is an infrastructure and reliability engineer. He has instrumented Java and Angular applications and worked across Node and React build pipelines, but he doesn't build product frontends and doesn't claim to.",
+    tags: ["frontend", "fullstack", "react", "developer", "ui"],
+  },
+  {
+    q: "What is he learning at the moment?",
+    a: "Agentic AI operations, mostly by building the observability for one. The interesting part is that agents make decisions nobody wrote down, so the usual tooling assumptions stop holding — you have to capture intent and context, not just spans and status codes.",
+    tags: ["learning", "studying", "growth", "next", "interested"],
+  },
+  {
+    q: "Why should we hire him?",
+    a: "I'd rather give you the facts and let you decide, since I'm hardly an impartial witness. He has spent eight years making large systems explainable — 800+ servers migrated at 99.8% deployment success, 40% off Royal Mail's operational costs, APM and RUM across 200+ Toyota repositories, and the observability platform for an agentic AI product. If those are the problems on your desk, he has solved versions of them already.",
+    tags: ["hire", "why", "fit", "candidate", "recruit"],
+  },
+  {
+    q: "What time is it, or what is today's date?",
+    a: "I can tell you the time and date — both where Debanjan is in Bengaluru and, roughly, where you are. Just ask. It's the least an assistant should manage.",
+    tags: ["time", "date", "today", "clock", "timezone", "now"],
+  },
+  {
+    q: "How does this chatbot work?",
+    a: "Fairly: it retrieves from a curated set of answers Debanjan has written, and it is instructed to say it doesn't know rather than improvise. Anything it can't answer gets queued and emailed to him at 11pm, and once he answers it I can answer it permanently. He built it — appropriately enough for someone whose job is making systems explain themselves.",
+    tags: ["chatbot", "how do you work", "ai", "bot", "assistant", "built"],
+  },
+  {
     q: "How can I contact him?",
     a: "Email is best: itsme.deb1995@gmail.com. He's also on LinkedIn at /in/debanjan0212 and GitHub at @debanjan0212.",
     tags: ["contact", "email", "reach", "hire"],

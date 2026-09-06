@@ -12,7 +12,7 @@ export default function Experience() {
       <div className="mx-auto max-w-shell">
         <p className="mono-label">Trajectory</p>
         <h2 className="display mt-5 text-[clamp(1.9rem,4.2vw,3.25rem)]">
-          <RevealWords text="Seven years, five companies," />
+          <RevealWords text="Eight years, five companies," />
           <br />
           <span className="text-mid">
             <RevealWords text="one recurring problem." delay={0.1} />

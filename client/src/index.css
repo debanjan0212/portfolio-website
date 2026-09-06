@@ -3,41 +3,74 @@
 @tailwind utilities;
 
 /*
-  One dark canvas. Sections never paint their own background - the whole page
-  floats on a single field so there are no edges to blend in the first place.
+  Two-tone page, one token set.
+
+  The page is light and editorial by default. Technical sections opt into a
+  dark band by adding `.on-dark`, which redefines the SAME tokens rather than
+  introducing a second palette - so every component works in both without
+  knowing which it is in.
 */
 :root {
+  color-scheme: light;
+
+  /* Surfaces, lightest to deepest. */
+  --ink-0: 250 250 249; /* page */
+  --ink-1: 255 255 255; /* raised */
+  --ink-2: 244 244 242;
+  --ink-3: 232 232 229;
+
+  /* Ink. */
+  --text-hi: 18 20 26;
+  --text-mid: 74 80 92;
+  --text-low: 122 128 140;
+
+  /* One accent. Deep teal reads technical and serious on paper-white, where
+     the bright cyan used on dark would look like a highlighter. */
+  --accent: 13 106 110;
+  --accent-dim: 148 196 197;
+  --accent-glow: 13 106 110;
+
+  /* Reserved for state. Never decoration. */
+  --ok: 22 122 90;
+  --warn: 168 116 20;
+  --crit: 186 51 51;
+
+  --hairline: 18 20 26;
+
+  --font-sans: "Geist", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* A dark band. Same tokens, different values. */
+.on-dark {
   color-scheme: dark;
 
-  --ink-0: 6 8 14;        /* deepest, page floor */
-  --ink-1: 11 14 22;
-  --ink-2: 17 21 32;
-  --ink-3: 26 32 46;
+  --ink-0: 8 10 16;
+  --ink-1: 14 17 26;
+  --ink-2: 20 25 37;
+  --ink-3: 30 37 52;
 
-  --text-hi: 236 240 248;
-  --text-mid: 156 166 186;
-  --text-low: 104 114 134;
+  --text-hi: 240 243 249;
+  --text-mid: 166 176 194;
+  --text-low: 118 128 147;
 
-  /* One accent, used sparingly. A cool signal-cyan reads technical without
-     the toy-brightness of the old orange/red gradients. */
   --accent: 94 214 214;
   --accent-dim: 46 122 128;
   --accent-glow: 94 214 214;
 
-  /* Reserved status colours - never reused as decoration. */
   --ok: 74 201 155;
   --warn: 226 183 92;
   --crit: 232 106 106;
 
   --hairline: 255 255 255;
 
-  --font-sans: "Geist", "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  background: rgb(var(--ink-0));
+  color: rgb(var(--text-hi));
 }
 
 @layer base {
   * {
-    border-color: rgb(var(--hairline) / 0.07);
+    border-color: rgb(var(--hairline) / 0.1);
   }
 
   html {
@@ -55,11 +88,10 @@
   }
 
   ::selection {
-    background: rgb(var(--accent) / 0.25);
+    background: rgb(var(--accent) / 0.18);
     color: rgb(var(--text-hi));
   }
 
-  /* Lenis needs the page itself to not fight it. */
   html.lenis,
   html.lenis body {
     height: auto;
@@ -70,11 +102,19 @@
 }
 
 @layer components {
-  /* Type -------------------------------------------------------------- */
+  /* Type ---------------------------------------------------------------- */
   .display {
     font-weight: 500;
     letter-spacing: -0.035em;
     line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  /* The name. Tighter and heavier than anything else on the page. */
+  .display-name {
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 0.88;
     text-wrap: balance;
   }
 
@@ -92,28 +132,37 @@
     text-wrap: pretty;
   }
 
-  /* Surfaces ---------------------------------------------------------- */
-  /* Panels are barely-there lifts off the canvas, not cards on a page. */
+  /* Surfaces ------------------------------------------------------------ */
   .panel {
     position: relative;
+    background: rgb(var(--ink-1));
+    border: 1px solid rgb(var(--hairline) / 0.09);
+    border-radius: 1rem;
+  }
+
+  /* On dark the panel lifts off the canvas instead of sitting on paper. */
+  .on-dark .panel {
     background: linear-gradient(
       180deg,
       rgb(var(--hairline) / 0.035),
       rgb(var(--hairline) / 0.012)
     );
-    border: 1px solid rgb(var(--hairline) / 0.07);
-    border-radius: 1rem;
+    border-color: rgb(var(--hairline) / 0.07);
     backdrop-filter: blur(12px);
   }
 
   .panel-hover {
     transition:
       border-color 0.4s ease,
-      background 0.4s ease,
+      box-shadow 0.4s ease,
       transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   .panel-hover:hover {
-    border-color: rgb(var(--accent) / 0.28);
+    border-color: rgb(var(--accent) / 0.3);
+    box-shadow: 0 12px 40px -18px rgb(var(--hairline) / 0.25);
+  }
+  .on-dark .panel-hover:hover {
+    box-shadow: none;
     background: linear-gradient(
       180deg,
       rgb(var(--hairline) / 0.06),
@@ -121,23 +170,22 @@
     );
   }
 
-  /* A hairline that fades at both ends - used instead of hard section rules. */
   .rule-fade {
     height: 1px;
     background: linear-gradient(
       90deg,
       transparent,
-      rgb(var(--hairline) / 0.12) 20%,
-      rgb(var(--hairline) / 0.12) 80%,
+      rgb(var(--hairline) / 0.14) 20%,
+      rgb(var(--hairline) / 0.14) 80%,
       transparent
     );
   }
 
-  /* Telemetry accents -------------------------------------------------- */
+  /* Telemetry accents ---------------------------------------------------- */
   .grid-faint {
     background-image:
-      linear-gradient(rgb(var(--hairline) / 0.028) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(var(--hairline) / 0.028) 1px, transparent 1px);
+      linear-gradient(rgb(var(--hairline) / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--hairline) / 0.035) 1px, transparent 1px);
     background-size: 56px 56px;
   }
 
@@ -166,6 +214,27 @@
     0% { transform: scale(0.7); opacity: 0.9; }
     75%, 100% { transform: scale(1.6); opacity: 0; }
   }
+
+  /* Long vertical bleeds at a band's edges, so light never meets dark on a
+     hard line. */
+  .band-top-fade::before,
+  .band-bottom-fade::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 7rem;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .band-top-fade::before {
+    top: 0;
+    background: linear-gradient(180deg, rgb(250 250 249), transparent);
+  }
+  .band-bottom-fade::after {
+    bottom: 0;
+    background: linear-gradient(0deg, rgb(250 250 249), transparent);
+  }
 }
 
 @layer utilities {
@@ -173,24 +242,17 @@
   .text-mid { color: rgb(var(--text-mid)); }
   .text-low { color: rgb(var(--text-low)); }
 
-  /* Long vertical bleeds, so nothing ever meets at a hard edge. */
-  .bleed-top {
-    mask-image: linear-gradient(180deg, transparent, black 12rem);
-    -webkit-mask-image: linear-gradient(180deg, transparent, black 12rem);
-  }
-
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { scrollbar-width: none; }
 }
 
-/* Film grain, fixed over the whole canvas. Kills gradient banding and is most
-   of why the dark reads as "photographed" rather than "flat #000". */
-.grain {
-  position: fixed;
-  inset: -50%;
+/* Grain only makes sense on the dark bands; on paper it reads as dirt. */
+.on-dark .grain-layer {
+  position: absolute;
+  inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.16;
+  opacity: 0.14;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
 }

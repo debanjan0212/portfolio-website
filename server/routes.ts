@@ -59,6 +59,7 @@ async function handleChat(req: Request, res: Response) {
     store: fileStore,
     configs,
     askerEmail: body?.email,
+    live: { visitorTz: Intl.DateTimeFormat().resolvedOptions().timeZone },
   });
 
   res.setHeader("content-type", "text/plain; charset=utf-8");

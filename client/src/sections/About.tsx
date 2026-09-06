@@ -33,7 +33,7 @@ export default function About() {
               className="absolute left-1/2 top-[12%] h-[70%] w-[85%] -translate-x-1/2 rounded-full blur-[70px]"
               style={{
                 background:
-                  "radial-gradient(circle, rgb(var(--accent) / 0.20), transparent 68%)",
+                  "radial-gradient(circle, rgb(var(--accent) / 0.13), transparent 68%)",
               }}
             />
 
@@ -51,7 +51,7 @@ export default function About() {
               className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
               style={{
                 background:
-                  "linear-gradient(180deg, transparent, rgb(var(--ink-0) / 0.85) 60%, rgb(var(--ink-0)))",
+                  "linear-gradient(180deg, transparent, rgb(var(--ink-0) / 0.9) 62%, rgb(var(--ink-0)))",
               }}
             />
           </motion.div>

@@ -19,10 +19,25 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState("")
   const [menu, setMenu] = useState(false)
+  // The page is two-tone, so a fixed bar has to know what is behind it.
+  const [overDark, setOverDark] = useState(false)
 
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 40)
+
+      /*
+        Which band is behind the bar decides how it paints. Hit-testing at the
+        bar's own position returns the bar itself, so measure the bands
+        directly and ask whether one spans the bar's lower edge.
+      */
+      const barBottom = 64
+      const bands = Array.from(document.querySelectorAll<HTMLElement>("main .on-dark"))
+      const dark = bands.some((el) => {
+        const r = el.getBoundingClientRect()
+        return r.top <= barBottom && r.bottom >= barBottom
+      })
+      setOverDark(dark)
       let current = ""
       for (const it of items) {
         const el = document.getElementById(it.href.slice(1))
@@ -47,8 +62,8 @@ export default function Nav() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 1.35, duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
         className={`fixed inset-x-0 top-0 z-[75] transition-all duration-500 ${
-          scrolled ? "border-b border-hairline/[0.07] bg-ink-0/70 backdrop-blur-xl" : ""
-        }`}
+          overDark ? "on-dark" : ""
+        } ${scrolled ? "border-b border-hairline/10 bg-ink-0/80 backdrop-blur-xl" : ""}`}
       >
         <div className="mx-auto flex max-w-shell items-center justify-between px-6 py-4">
           <button onClick={() => go("#home")} className="font-mono text-sm tracking-tight text-hi">

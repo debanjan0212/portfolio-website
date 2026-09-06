@@ -181,65 +181,60 @@ export function CursorGlow() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Ambient field - the single background the whole page floats on       */
+/* Dark band - a self-contained dark region on an otherwise light page  */
 /* ------------------------------------------------------------------ */
 
-export function AmbientField() {
-  const { scrollYProgress } = useScroll()
-  const y1 = useTransform(scrollYProgress, [0, 1], ["0%", "-18%"])
-  const y2 = useTransform(scrollYProgress, [0, 1], ["0%", "24%"])
-  const hueShift = useTransform(scrollYProgress, [0, 0.5, 1], [0, 24, -14])
-  const hueFilter = useTransform(hueShift, (h) => `hue-rotate(${h}deg)`)
+/**
+ * Wraps the technical sections in dark. Carries its own ambient field and
+ * grain, and fades at both edges so light never meets dark on a hard line.
+ *
+ * `.on-dark` redefines the shared tokens, so the sections inside need no
+ * knowledge of which mode they are in.
+ */
+export function DarkBand({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] })
+  const y1 = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"])
+  const y2 = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"])
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      {/* Parallax depth layers. Each drifts at a different rate, which is what
-          gives the page a sense of depth rather than a flat backdrop. */}
-      <motion.div
-        style={{ y: y1, filter: hueFilter }}
-        className="absolute -left-1/4 -top-1/3 h-[85vh] w-[85vw] rounded-full blur-[120px]"
-      >
+    <div ref={ref} className="on-dark band-top-fade band-bottom-fade relative isolate">
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <motion.div
+          style={{ y: y1 }}
+          className="absolute -left-1/4 top-0 h-[70vh] w-[80vw] rounded-full blur-[130px]"
+        >
+          <div
+            className="h-full w-full"
+            style={{
+              background: "radial-gradient(circle, rgb(var(--accent) / 0.16), transparent 62%)",
+            }}
+          />
+        </motion.div>
+        <motion.div
+          style={{ y: y2 }}
+          className="absolute -right-1/4 bottom-0 h-[70vh] w-[70vw] rounded-full blur-[140px]"
+        >
+          <div
+            className="h-full w-full"
+            style={{
+              background: "radial-gradient(circle, rgb(120 90 220 / 0.14), transparent 62%)",
+            }}
+          />
+        </motion.div>
+
         <div
-          className="h-full w-full"
+          className="grid-faint absolute inset-0"
           style={{
-            background:
-              "radial-gradient(circle, rgb(var(--accent) / 0.13), transparent 62%)",
+            maskImage: "radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 100%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent 100%)",
           }}
         />
-      </motion.div>
+        <div className="grain-layer" />
+      </div>
 
-      <motion.div
-        style={{ y: y2 }}
-        className="absolute -right-1/4 top-1/3 h-[80vh] w-[70vw] rounded-full blur-[130px]"
-      >
-        <div
-          className="h-full w-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgb(120 90 220 / 0.11), transparent 62%)",
-          }}
-        />
-      </motion.div>
-
-      {/* Faint telemetry grid, masked so it never reaches an edge. */}
-      <div
-        className="grid-faint absolute inset-0"
-        style={{
-          maskImage:
-            "radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent 100%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent 100%)",
-        }}
-      />
-
-      {/* Vignette floor, so content always sits on darker ground at the edges. */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 90% 70% at 50% 45%, transparent, rgb(var(--ink-0) / 0.85) 100%)",
-        }}
-      />
+      <div className="relative z-10">{children}</div>
     </div>
   )
 }
@@ -492,15 +487,21 @@ export function CountUp({ value, className = "" }: { value: string; className?: 
   const ref = useRef<HTMLSpanElement>(null)
   const [shown, setShown] = useState(value)
 
-  // Only animate values that are actually numeric; "hours → minutes" is left
-  // exactly as written.
-  const match = value.match(/^(~?)(\d[\d.,]*)(.*)$/)
-
   useEffect(() => {
+    /*
+      The match is computed inside the effect on purpose. It used to be a
+      dependency, and since String.match returns a fresh array every render
+      the effect re-ran on every render, resetting the display to zero each
+      time - so the number never counted past 0.
+    */
+    const match = value.match(/^(~?)(\d[\d.,]*)(.*)$/)
+
+    // Only numeric values animate; "hours → minutes" is left exactly as written.
     if (!match || reduced) {
       setShown(value)
       return
     }
+
     const [, prefix, digits, suffix] = match
     const target = parseFloat(digits.replace(/,/g, ""))
     const decimals = digits.includes(".") ? digits.split(".")[1].length : 0
@@ -531,7 +532,7 @@ export function CountUp({ value, className = "" }: { value: string; className?: 
       io.disconnect()
       cancelAnimationFrame(raf)
     }
-  }, [value, reduced, match])
+  }, [value, reduced])
 
   return (
     <span ref={ref} className={className}>

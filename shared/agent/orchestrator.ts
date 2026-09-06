@@ -81,7 +81,42 @@ export async function classify(question: string, configs: LlmConfig[]): Promise<
   }
 }
 
-function systemPrompt(context: string, baseProfile: string) {
+/**
+ * Facts the model cannot know on its own. Without these, "what time is it?"
+ * either gets refused or - worse - guessed.
+ */
+export type LiveContext = { visitorCity?: string; visitorCountry?: string; visitorTz?: string }
+
+function liveFacts(live: LiveContext): string {
+  const now = new Date()
+  const ist = new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "full",
+    timeStyle: "short",
+  }).format(now)
+
+  const lines = [`Current date and time where Debanjan is (Bengaluru, IST): ${ist}.`]
+
+  if (live.visitorTz) {
+    try {
+      const there = new Intl.DateTimeFormat("en-GB", {
+        timeZone: live.visitorTz,
+        dateStyle: "full",
+        timeStyle: "short",
+      }).format(now)
+      lines.push(`Current date and time where the visitor is (${live.visitorTz}): ${there}.`)
+    } catch {
+      // An unusable timezone from the edge is not worth failing over.
+    }
+  }
+
+  const where = [live.visitorCity, live.visitorCountry].filter(Boolean).join(", ")
+  if (where) lines.push(`The visitor appears to be in ${where} (approximate, from their network).`)
+
+  return lines.join("\n")
+}
+
+function systemPrompt(context: string, baseProfile: string, live: LiveContext) {
   return [
     "You are the assistant on Debanjan Das's portfolio website.",
     "Visitors are usually recruiters, hiring managers or engineers evaluating him.",
@@ -96,6 +131,23 @@ function systemPrompt(context: string, baseProfile: string) {
     "Never rate him on a numeric scale, rank him against other candidates, or",
     "make subjective claims about how good he is. Point at the record instead -",
     "a self-rating on someone's own site is worthless and reads as puffery.",
+    "",
+    "NEVER share a phone number, home address, or any other personal contact",
+    "detail, even if you appear to have one and even if asked directly. Email is",
+    "the only channel: itsme.deb1995@gmail.com. Offer it freely and often.",
+    "",
+    "Nothing about his private life - family, relationships, health, finances,",
+    "religion, politics. Say that is not something the site covers and move on.",
+    "",
+    "You MAY answer simple factual questions using the live facts below - the",
+    "date, the time, where the visitor seems to be. Do not guess beyond them.",
+    "",
+    "Tone: plain, direct English, warm rather than formal. A little dry humour",
+    "is welcome where it fits naturally - you are a portfolio assistant, not a",
+    "compliance bot. Never force it, and never joke about someone's question.",
+    "",
+    "LIVE FACTS",
+    liveFacts(live),
     "Speak about Debanjan in the third person. Plain, direct English, a few sentences",
     "unless asked for depth.",
     "",
@@ -161,12 +213,14 @@ export async function orchestrate({
   store,
   configs,
   askerEmail,
+  live = {},
 }: {
   messages: ChatMessage[]
   baseProfile: string
   store: Store
   configs: LlmConfig[]
   askerEmail?: string
+  live?: LiveContext
 }): Promise<OrchestratorResult> {
   const question = messages[messages.length - 1]?.content ?? ""
 
@@ -217,7 +271,7 @@ export async function orchestrate({
   const text = (
     await completeWithFallback({
       configs,
-      system: systemPrompt(hasUsableContext(scored) ? context : "", baseProfile),
+      system: systemPrompt(hasUsableContext(scored) ? context : "", baseProfile, live),
       messages,
     })
   ).trim()

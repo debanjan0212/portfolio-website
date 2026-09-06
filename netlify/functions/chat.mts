@@ -58,6 +58,13 @@ export default async (req: Request, context: Context) => {
       store: blobStore,
       configs,
       askerEmail: body.email,
+      // Netlify resolves rough geo at the edge. Used only to answer "what time
+      // is it" style questions - never stored, never logged.
+      live: {
+        visitorCity: context.geo?.city,
+        visitorCountry: context.geo?.country?.name,
+        visitorTz: context.geo?.timezone,
+      },
     })
 
     // Suggestions ride along as a header so the body stays a clean text
