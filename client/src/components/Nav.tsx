@@ -9,6 +9,7 @@ const items = [
   { label: "Agentic", href: "#agentic" },
   { label: "Work", href: "#work" },
   { label: "MELT", href: "#melt" },
+  { label: "Agents", href: "#agentops" },
   { label: "Stack", href: "#skills" },
   { label: "Contact", href: "#contact" },
 ]
