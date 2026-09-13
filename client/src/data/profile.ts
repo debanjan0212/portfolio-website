@@ -73,7 +73,7 @@ export const roles: Role[] = [
       "Infrastructure automation and cost work across a digital signature platform running 30+ microservices on AWS.",
     points: [
       "Cut average Docker image size from 850MB to 320MB (62%) across 30+ microservices using multi-stage builds, Alpine bases and layer caching",
-      "Migrated CI/CD to GitHub Actions with parallel jobs and caching — build times from 18 minutes to 9, and roughly 30% off CodeBuild costs",
+      "Migrated CI/CD to GitHub Actions with parallel jobs and caching — build times from 18 minutes to 9 (50%), and roughly 30% off CodeBuild costs",
       "Moved 30+ services from raw Kubernetes manifests to standardised Helm charts, improving release consistency and rollback reliability",
       "Contributed to SOC2 and HIPAA compliance via Vanta integration with AWS",
       "Ran the annual DR exercise, failing data flow over from us-east-1 to us-west-2 with scripted procedures",
@@ -286,8 +286,8 @@ export const education = {
 }
 
 export const languages = [
-  { name: "English", level: "Proficient (C2)" },
-  { name: "Hindi", level: "Upper intermediate (B2)" },
+  { name: "English", level: "Professional working" },
+  { name: "Hindi", level: "Limited working" },
   { name: "Bengali", level: "Native" },
 ]
 
