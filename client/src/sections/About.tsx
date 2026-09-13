@@ -9,7 +9,7 @@ export default function About() {
       <div className="mx-auto grid max-w-shell items-start gap-x-16 gap-y-12 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1fr)]">
         {/* Portrait, treated to sit in the dark rather than on top of it:
             desaturated, accent-tinted, and masked away at the bottom edge. */}
-        <div className="relative mx-auto w-full max-w-sm lg:sticky lg:top-28 lg:max-w-none">
+        <div className="about-portrait relative mx-auto w-full max-w-sm lg:sticky lg:top-28 lg:max-w-none">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -46,14 +46,6 @@ export default function About() {
             />
 
             {/* Dissolve the bottom edge into the canvas. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
-              style={{
-                background:
-                  "linear-gradient(180deg, transparent, rgb(var(--ink-0) / 0.9) 62%, rgb(var(--ink-0)))",
-              }}
-            />
           </motion.div>
 
           <Rise delay={0.2} className="mt-6 flex flex-wrap gap-x-6 gap-y-2">

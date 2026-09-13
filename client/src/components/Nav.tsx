@@ -66,8 +66,8 @@ export default function Nav() {
         } ${scrolled ? "border-b border-hairline/10 bg-ink-0/80 backdrop-blur-xl" : ""}`}
       >
         <div className="mx-auto flex max-w-shell items-center justify-between px-6 py-4">
-          <button onClick={() => go("#home")} className="font-mono text-sm tracking-tight text-hi">
-            debanjan<span className="text-accent">.</span>das
+          <button onClick={() => go("#home")} className="nav-signature font-mono text-sm tracking-tight text-hi">
+            <span className="nav-crosshair" aria-hidden />debanjan<span className="text-accent">.</span>das
           </button>
 
           <nav className="hidden items-center gap-1 md:flex">

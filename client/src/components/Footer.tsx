@@ -9,7 +9,12 @@ export default function Footer() {
           <p className="mono-label">
             © {new Date().getFullYear()} {profile.name}
           </p>
-          <p className="mono-label">{profile.location}</p>
+          <div className="flex items-center gap-5">
+            <a className="mono-label transition-colors hover:text-accent" href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
+            <a className="mono-label transition-colors hover:text-accent" href={profile.github} target="_blank" rel="noreferrer">GitHub</a>
+            <a className="mono-label transition-colors hover:text-accent" href="/DebanjanDas-Resume.pdf" download>Résumé</a>
+            <p className="mono-label">{profile.location}</p>
+          </div>
         </div>
       </div>
     </footer>

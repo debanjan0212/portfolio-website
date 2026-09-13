@@ -1,58 +1,26 @@
-import Nav from "./components/Nav"
-import Footer from "./components/Footer"
-import AgentChat from "./components/AgentChat"
-import Hero from "./sections/Hero"
+import { useState } from "react"
+import { ArrowUpRight, ChevronRight, Menu, Send, X } from "lucide-react"
+import { profile, knowledgeBase } from "./data/profile"
 import About from "./sections/About"
 import Experience from "./sections/Experience"
 import AgenticLoop from "./sections/AgenticLoop"
-import Work from "./sections/Work"
 import Melt from "./sections/Melt"
 import AgentOps from "./sections/AgentOps"
+import Work from "./sections/Work"
 import Skills from "./sections/Skills"
 import Contact from "./sections/Contact"
-import Answer from "./pages/Answer"
-import { Curtain, DarkBand, ScrollProgress, SmoothScroll } from "./lib/motion"
+import Footer from "./components/Footer"
+import SREScene from "./components/SREScene"
 
-export default function App() {
-  // One extra route only: the private answer page the digest email links to.
-  // Not worth a router dependency for a single path.
-  const isAnswerPage = window.location.pathname.replace(/\/$/, "") === "/answer"
+const proof = [{value:"800+",label:"servers migrated to private EKS"},{value:"99.8%",label:"release success across 200+ deploys"},{value:"40%",label:"infrastructure cost removed"}]
+const prompts=["What makes him senior?","Show me his strongest impact","How does he approach reliability?","Tell me about the EKS migration","What roles is he looking for?"]
+const cases=[{title:"Observability platform",meta:"OPEN SOURCE / OBSERVABILITY",result:"Explore the implementation",text:"A practical observability project covering the signals, instrumentation, and operational thinking behind reliable systems.",link:"https://github.com/debanjan0212/observability"},{title:"Private EKS migration",meta:"PLATFORM / MIGRATION",result:"800+ servers moved",text:"Reframed a fragmented estate into a private EKS platform with repeatable delivery, safer rollback paths, and operational visibility."},{title:"Observability at scale",meta:"TELEMETRY / APM",result:"99.8% release success",text:"Connected logs, metrics, traces, APM, and RUM so engineering teams could move from alert noise to decisions."},{title:"Agentic AI operations",meta:"AI SYSTEMS / SRE",result:"Decision paths made visible",text:"Designed the observability layer for an agentic platform, tracing what an agent saw, decided, called, and changed."}]
+const skillGroups=[{name:"Cloud & platform",items:"AWS · EKS · Kubernetes · Terraform"},{name:"Observability",items:"OpenTelemetry · Dynatrace · ELK · APM · RUM"},{name:"Delivery",items:"GitHub Actions · Jenkins · ArgoCD · Helm"},{name:"Systems",items:"Python · Go · Linux · Incident response"}]
 
-  if (isAnswerPage) {
-    return <Answer />
-  }
+function SignalMap(){return <div className="signal-map" aria-label="Animated reliability signal map"><SREScene/><div className="signal-core"><span>99.8</span><small>RELIABILITY SIGNAL</small><b>● LIVE</b></div></div>}
 
-  return (
-    <SmoothScroll>
-      <Curtain />
-      <ScrollProgress />
+function Chat(){const [open,setOpen]=useState(false);const [input,setInput]=useState("");const [messages,setMessages]=useState([{role:"assistant",text:`Ask me about ${profile.first}'s impact, systems, or experience.`}]);const [busy,setBusy]=useState(false);async function send(){if(!input.trim()||busy)return;const text=input.trim();setInput("");setMessages(m=>[...m,{role:"user",text}]);setBusy(true);try{const r=await fetch("/api/chat",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({messages:[{role:"user",content:text}],knowledge:knowledgeBase()})});const reply=await r.text();setMessages(m=>[...m,{role:"assistant",text:reply}])}catch{setMessages(m=>[...m,{role:"assistant",text:"The assistant is temporarily offline. The portfolio content is still available below."}])}finally{setBusy(false)}}return <><button className="chat-launch" onClick={()=>setOpen(true)}><span/> Ask about my work <ArrowUpRight size={15}/></button>{open&&<div className="chat-window"><div className="chat-head"><div><small>PROFILE ASSISTANT / ONLINE</small><b>Ask about Debanjan</b></div><button onClick={()=>setOpen(false)} aria-label="Close chatbot"><X size={17}/></button></div><div className="chat-messages">{messages.map((m,i)=><div key={i} className={m.role}>{m.text}</div>)}{busy&&<div className="assistant typing">Thinking through his work...</div>}{messages.length===1&&<div className="chat-prompts">{prompts.map(p=><button key={p} onClick={()=>{setInput(p)}}>{p}<ChevronRight size={13}/></button>)}</div>}</div><form onSubmit={e=>{e.preventDefault();send()}}><input value={input} onChange={e=>setInput(e.target.value)} placeholder="Ask a recruiter-level question..."/><button aria-label="Send"><Send size={16}/></button></form></div>}</>}
 
-      {/*
-        Two-tone page. Light and editorial where the reading happens, dark
-        bands where the technical work is shown - so the contrast means
-        something instead of everything being dark by default.
-      */}
-      <div className="relative">
-        <Nav />
-        <main>
-          <Hero />
-          <About />
-          <Experience />
+function DeploymentFlow(){return <section className="deployment-section"><div><p className="future-kicker">HOW I SHIP</p><h2>From commit<br/><em>to confidence.</em></h2><p className="section-note">A delivery path is only reliable when the signal continues after deploy.</p></div><div className="deployment-flow">{["COMMIT","BUILD","TEST","DEPLOY","OBSERVE"].map((step,i)=><div className="flow-step" key={step}><span className="flow-node">0{i+1}</span><b>{step}</b>{i<4&&<i className="flow-line"/>}</div>)}</div></section>}
 
-          <DarkBand>
-            <AgenticLoop />
-            <Melt />
-            <AgentOps />
-          </DarkBand>
-
-          <Work />
-          <Skills />
-          <Contact />
-        </main>
-        <Footer />
-      </div>
-
-      <AgentChat />
-    </SmoothScroll>
-  )
-}
+export default function App(){const [menu,setMenu]=useState(false);const [caseIndex,setCaseIndex]=useState(0);return <div className="future-site"><header className="future-nav"><a href="#top" className="future-logo">debanjan<span>.</span>das</a><nav className={menu?"open":""}><a href="#about" onClick={()=>setMenu(false)}>About</a><a href="#experience" onClick={()=>setMenu(false)}>Experience</a><a href="#work" onClick={()=>setMenu(false)}>Work</a><a href="#skills" onClick={()=>setMenu(false)}>Stack</a><a href="#contact" onClick={()=>setMenu(false)}>Contact</a></nav><a className="nav-resume desktop-resume" href="/DebanjanDas-Resume.pdf" download>Résumé</a><button className="menu-button" onClick={()=>setMenu(!menu)} aria-label="Toggle menu">{menu?<X/>:<Menu/>}</button></header><main id="top"><section className="future-hero"><div className="hero-copy"><p className="future-kicker"><i/> SENIOR SITE RELIABILITY ENGINEER / BENGALURU</p><h1 className="hero-nameplate">DEBANJAN<br/><em>DAS</em></h1><p className="hero-title">Senior Site Reliability Engineer <span>/</span> Cloud, Observability & Agentic AI</p><p className="future-lede">I build reliable cloud platforms, observability systems, and delivery paths that help teams move faster without losing control.</p><div className="future-actions"><a className="future-primary" href="#work">See the work <ArrowUpRight size={17}/></a><a className="future-secondary" href="#contact">Start a conversation</a></div><p className="availability"><span/> Open to senior SRE & platform opportunities</p><a className="resume-link" href="/DebanjanDas-Resume.pdf" download>Download resume <ArrowUpRight size={14}/></a></div><div className="hero-portrait scene-only"><SignalMap/></div></section><section className="proof-strip" id="impact">{proof.map(p=><div key={p.label}><strong>{p.value}</strong><span>{p.label}</span></div>)}</section><section className="recruiter-card"><div><p className="future-kicker">RECRUITER QUICK VIEW</p><h2>Senior scope.<br/><em>Production proof.</em></h2></div><div className="quick-facts"><span><b>8+</b> years in SRE & platform</span><span><b>Bengaluru</b> based in India</span><span><b>Open</b> to senior opportunities</span><a href={`mailto:${profile.email}`}>Email me <ArrowUpRight size={14}/></a><span><a href={profile.linkedin}>LinkedIn</a><a href={profile.github}>GitHub</a></span></div></section><About/><section className="case-section" id="case-studies"><div className="section-top"><p className="future-kicker">SELECTED CASE STUDIES</p><span>{String(caseIndex+1).padStart(2,"0")} / 03</span></div><div className="case-main"><div><p className="case-meta">{cases[caseIndex].meta}</p><h2>{cases[caseIndex].title}</h2><p>{cases[caseIndex].text}</p><strong>{cases[caseIndex].result}{cases[caseIndex].link&&<a className="case-link" href={cases[caseIndex].link} target="_blank" rel="noreferrer"> View on GitHub <ArrowUpRight size={14}/></a>}</strong></div><div className="case-switcher">{cases.map((item,index)=><button key={item.title} className={index===caseIndex?"active":""} onClick={()=>setCaseIndex(index)}><span>0{index+1}</span>{item.title}<ArrowUpRight size={15}/></button>)}</div></div></section><DeploymentFlow/><Experience/><div className="legacy-dark"><AgenticLoop/><Melt/><AgentOps/></div><Work/><section className="capability-section" id="skills"><p className="future-kicker">CAPABILITY STACK</p><div className="capability-grid">{skillGroups.map(group=><div key={group.name}><b>{group.name}</b><span>{group.items}</span></div>)}</div></section><Skills/><Contact/></main><Footer/><Chat/></div>}

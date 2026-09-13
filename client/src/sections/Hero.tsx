@@ -41,7 +41,7 @@ export default function Hero() {
         }}
       />
 
-      <motion.div style={{ y, opacity }} className="relative mx-auto w-full max-w-shell">
+      <motion.div style={{ y, opacity }} className="relative mx-auto grid w-full max-w-shell items-center lg:grid-cols-[1.08fr_.92fr] lg:gap-12">
         <motion.div
           className="flex items-center gap-3"
           initial={{ opacity: 0 }}
@@ -133,6 +133,12 @@ export default function Hero() {
             ))}
           </div>
         </Rise>
+
+        <div className="hero-visual" aria-label="Live infrastructure signal visualization">
+          <div className="hero-visual-grid" />
+          <div className="hero-visual-core"><span>OBS</span><b>LIVE</b></div>
+          {['EKS','APM','RUM','AI','OTEL'].map((label, index) => <span key={label} className={`hero-visual-node node-${index}`}>{label}</span>)}
+        </div>
       </motion.div>
 
       <motion.button
