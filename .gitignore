@@ -48,3 +48,7 @@ push-to-github.js
 
 # Local Netlify folder
 .netlify
+
+# Scratch uploads from the original build - never commit these again
+attached_assets/
+Claude outputs/

@@ -42,7 +42,7 @@ Quiet days send no email at all.
 ## Architecture
 
 ```
-client/          React 19 + Vite + Tailwind. One dark canvas, no section
+client/          React 18 + Vite + Tailwind. One dark canvas, no section
   src/sections/  backgrounds — a fixed ambient field sits behind everything,
   src/lib/       so sections blend by rhythm rather than meeting at an edge.
   src/data/      profile.ts is the single source of truth: the page and the

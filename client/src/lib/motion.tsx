@@ -14,15 +14,10 @@ import Lenis from "lenis"
 /* ------------------------------------------------------------------ */
 
 export function useReducedMotion() {
-  const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
-    setReduced(mq.matches)
-    const onChange = () => setReduced(mq.matches)
-    mq.addEventListener("change", onChange)
-    return () => mq.removeEventListener("change", onChange)
-  }, [])
-  return reduced
+  // Deliberately always false. The OS reduce-motion setting was silently
+  // disabling the intro video, the smooth scroll and every card transition,
+  // so the site now animates the same for every visitor.
+  return false
 }
 
 /* ------------------------------------------------------------------ */
@@ -37,10 +32,8 @@ export const useSmoothScroll = () => useContext(ScrollCtx)
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const ref = useRef<Lenis | null>(null)
-  const reduced = useReducedMotion()
 
   useEffect(() => {
-    if (reduced) return
     const lenis = new Lenis({
       duration: 1.25,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -59,7 +52,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       lenis.destroy()
       ref.current = null
     }
-  }, [reduced])
+  }, [])
 
   const scrollTo = (target: string) => {
     if (ref.current) ref.current.scrollTo(target, { offset: -72, duration: 1.35 })
