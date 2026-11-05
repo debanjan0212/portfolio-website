@@ -73,7 +73,8 @@ export default async (req: Request, context: Context) => {
       "content-type": "text/plain; charset=utf-8",
       "cache-control": "no-store",
       "x-suggestions": Buffer.from(JSON.stringify(result.suggestions), "utf8").toString("base64"),
-      "access-control-expose-headers": "x-suggestions",
+      "x-mood": result.mood,
+      "access-control-expose-headers": "x-suggestions, x-mood",
     }
 
     if (result.kind === "answer") return new Response(result.stream, { headers })

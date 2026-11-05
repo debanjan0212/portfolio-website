@@ -1,21 +1,25 @@
 import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowUp, MessageCircle, X } from "lucide-react"
+import { ArrowUp, Briefcase, Code2, Layers, Mail, MapPin, Sparkles, X } from "lucide-react"
 import { knowledgeBase, profile } from "@/data/profile"
+import MiniMe, { type Mood } from "./MiniMe"
 
 type Message = { role: "user" | "assistant"; content: string }
 
-/** Shown before the first question. After that the server suggests. */
-const OPENERS = [
-  "What is he building right now?",
-  "How deep is his OpenTelemetry experience?",
-  "What kind of role is he looking for?",
-  "What's the largest migration he has run?",
-  "Did he build the AI agents themselves?",
-  "What has he done with cost optimisation?",
+/** Help-desk counters shown before the first question. After that the server suggests. */
+const TOPICS = [
+  { icon: Sparkles, label: "Current work", q: "What is he building right now?" },
+  { icon: Code2, label: "Open source", q: "What are Argus and IntentOps?" },
+  { icon: Briefcase, label: "Experience", q: "What's the largest migration he has run?" },
+  { icon: Layers, label: "Skills", q: "How deep is his OpenTelemetry experience?" },
+  { icon: MapPin, label: "Availability", q: "What kind of role is he looking for?" },
+  { icon: Mail, label: "Contact", q: "How can I reach him?" },
 ]
+const OPENERS = TOPICS.map((t) => t.q)
 
-const GREETING = `Ask me anything about ${profile.first}'s work. I answer from his actual profile — nothing invented.`
+const GREETING = `Hi, I'm mini-${profile.first}! I'm the pocket-sized help desk for ${profile.first}'s work. I only answer from his real profile, so no made-up stories. Pick a counter below or just ask.`
+
+const MOODS: Mood[] = ["wave", "happy", "talk", "think", "calm"]
 
 const NUDGE_KEY = "agent-nudge-seen"
 
@@ -39,6 +43,8 @@ export default function AgentChat() {
   // actually answer, so staying on the rails always lands well.
   const [suggestions, setSuggestions] = useState<string[]>(OPENERS)
   const [nudge, setNudge] = useState(false)
+  const [mood, setMood] = useState<Mood>("idle")
+  const moodTimer = useRef<ReturnType<typeof setTimeout>>()
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   // Every prompt this visitor has already been offered. A suggestion is a
@@ -52,6 +58,19 @@ export default function AgentChat() {
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 350)
+  }, [open])
+
+  /** Show a mood, then settle back to idle. */
+  function react(next: Mood, ms = 2400) {
+    clearTimeout(moodTimer.current)
+    setMood(next)
+    if (ms > 0) moodTimer.current = setTimeout(() => setMood("idle"), ms)
+  }
+
+  // Waves hello whenever the desk opens.
+  useEffect(() => {
+    if (open) react("wave", 1800)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   // Show the nudge once, ever - not once per session. A returning visitor has
@@ -94,6 +113,7 @@ export default function AgentChat() {
     const next: Message[] = [...messages, { role: "user", content: question }]
     setMessages(next)
     setBusy(true)
+    react("think", 0)
 
     try {
       const res = await fetch("/api/chat", {
@@ -122,9 +142,13 @@ export default function AgentChat() {
       const type = res.headers.get("content-type") || ""
       if (!type.includes("text/plain")) {
         throw new Error(
-          "The assistant endpoint isn't running. Start it with `netlify dev`, or set ANTHROPIC_API_KEY and restart.",
+          `Mini-me is taking a quick break. You can email ${profile.first} directly at ${profile.email}.`,
         )
       }
+
+      const header = res.headers.get("x-mood") as Mood | null
+      const after: Mood = header && MOODS.includes(header) ? header : "talk"
+      react(after === "calm" ? "calm" : "talk", 0)
 
       setMessages((m) => [...m, { role: "assistant", content: "" }])
       const reader = res.body.getReader()
@@ -142,7 +166,10 @@ export default function AgentChat() {
           return copy
         })
       }
+      // Answers stop talking once typed; small talk and jokes keep the grin a moment.
+      react(after === "talk" ? "idle" : after, after === "talk" ? 0 : 2600)
     } catch (e) {
+      react("calm", 2400)
       setError(e instanceof Error ? e.message : "Something went wrong.")
       setMessages((m) => (m[m.length - 1]?.content === "" ? m.slice(0, -1) : m))
     } finally {
@@ -152,9 +179,7 @@ export default function AgentChat() {
 
   return (
     <>
-      {/* A one-time nudge. Most visitors never notice a chat launcher, and an
-          assistant nobody opens is worth nothing - so it introduces itself
-          once, then never again on this browser. */}
+      {/* A one-time nudge: mini-me says hi once, then never again on this browser. */}
       <AnimatePresence>
         {nudge && !open && (
           <motion.div
@@ -162,7 +187,7 @@ export default function AgentChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.95 }}
             transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
-            className="fixed bottom-40 right-4 z-[84] max-w-[17rem] rounded-2xl rounded-br-md border border-accent/25 bg-ink-1 p-4 text-left shadow-2xl shadow-black/40 sm:bottom-28 sm:right-6"
+            className="glass fixed bottom-28 right-4 z-[84] max-w-[16rem] rounded-2xl rounded-br-md p-4 text-left sm:right-6"
           >
             <button
               onClick={dismissNudge}
@@ -178,60 +203,35 @@ export default function AgentChat() {
               }}
               className="block pr-4 text-left"
             >
-              <p className="text-sm leading-snug text-hi">
-                Ask me anything about {profile.first}'s work
-              </p>
-              <p className="mt-1 text-xs text-low">
-                I answer from his real profile — try me
-              </p>
+              <p className="text-sm font-medium leading-snug text-hi">Hi! I'm mini-{profile.first}.</p>
+              <p className="mt-1 text-xs leading-relaxed text-mid">Ask me anything about his work. I'm small, but I know my stuff.</p>
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/*
-        The launcher has to survive being ignored. A small circle in a corner
-        is furniture; a labelled pill with a live dot and a halo reads as
-        something running, which is the point of the whole feature.
-      */}
+      {/* The launcher is mini-me himself, waving from the corner. */}
       <motion.button
         onClick={() => {
           setOpen((o) => !o)
           dismissNudge()
         }}
+        onHoverStart={() => !open && react("wave", 1500)}
         initial={{ opacity: 0, y: 24, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 2.6, duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-        aria-label={open ? "Close assistant" : "Ask about Debanjan"}
+        aria-label={open ? "Close the help desk" : `Ask mini-${profile.first}`}
         data-testid="button-agent-chat"
-        className="group fixed bottom-6 right-4 z-[85] flex items-center gap-3 rounded-full bg-accent px-6 py-4 text-ink-0 shadow-[0_10px_40px_-10px_rgb(var(--accent)/0.7)] transition-transform duration-300 hover:scale-[1.04] active:scale-[0.98] sm:right-6"
+        className="glass group fixed bottom-5 right-4 z-[85] flex items-center gap-3 rounded-full p-1.5 transition-transform duration-300 hover:scale-[1.04] active:scale-[0.98] sm:right-6 sm:pr-5"
       >
-        {!open && (
-          <>
-            {/* Two rings, offset, so the halo never fully closes. */}
-            {[0, 1.3].map((delay) => (
-              <motion.span
-                key={delay}
-                aria-hidden
-                className="absolute inset-0 rounded-full border-2 border-accent"
-                animate={{ scale: [1, 1.35], opacity: [0.5, 0] }}
-                transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut", delay }}
-              />
-            ))}
-          </>
-        )}
-        {open ? <X className="h-4 w-4" /> : <MessageCircle className="h-5 w-5" />}
-        <span className="text-[0.95rem] font-semibold tracking-tight">
-          {open ? "Close" : "Ask about me"}
+        <span className="relative grid h-14 w-14 place-items-center overflow-hidden rounded-full bg-accent/25">
+          {open ? <X className="h-5 w-5 text-hi" /> : <MiniMe mood={nudge ? "wave" : mood} size={56} />}
+          {!open && <span className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full bg-ok ring-2 ring-ink-0" aria-hidden />}
         </span>
-        {!open && (
-          <motion.span
-            aria-hidden
-            className="h-2 w-2 rounded-full bg-ink-0/80"
-            animate={{ opacity: [1, 0.25, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          />
-        )}
+        <span className="hidden text-left sm:block">
+          <span className="block text-sm font-semibold tracking-tight text-hi">{open ? "Close" : "Ask mini-me"}</span>
+          {!open && <span className="block text-[0.7rem] text-low">help desk · online</span>}
+        </span>
       </motion.button>
 
       <AnimatePresence>
@@ -242,17 +242,28 @@ export default function AgentChat() {
             exit={{ opacity: 0, y: 20, scale: 0.98 }}
             transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
             role="dialog"
-            aria-label="Assistant"
-            /* Solid ground. The translucent .panel surface let page text bleed
-               through the transcript - unreadable on a small screen. */
-            className="panel fixed inset-x-4 bottom-28 z-[85] flex h-[min(34rem,calc(100dvh-9rem))] flex-col overflow-hidden !bg-ink-1 shadow-2xl shadow-black/60 sm:inset-x-auto sm:bottom-28 sm:right-6 sm:w-[26rem]"
+            aria-label={`Mini-${profile.first} help desk`}
+            /* Near-solid ground: page text bleeding through the transcript is unreadable on a phone. */
+            className="panel fixed inset-x-3 bottom-[5.75rem] z-[85] flex h-[min(36rem,calc(100dvh-8rem))] flex-col overflow-hidden !bg-ink-1/95 sm:inset-x-auto sm:right-6 sm:w-[27rem]"
           >
-            <div className="flex items-center gap-3 border-b border-hairline/[0.07] px-5 py-4">
-              <span className="dot-live" />
-              <div>
-                <p className="font-mono text-xs text-hi">ask about {profile.first.toLowerCase()}</p>
-                <p className="mt-0.5 text-[0.7rem] text-low">grounded in his real profile</p>
+            <div className="flex items-center gap-3.5 border-b border-hairline/[0.07] px-5 py-4">
+              <span className="relative grid h-16 w-16 shrink-0 place-items-center rounded-full bg-accent/20">
+                <MiniMe mood={mood} size={64} />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[0.95rem] font-semibold tracking-tight text-hi">Mini-{profile.first}</p>
+                <p className="mt-0.5 text-[0.72rem] text-low">Help desk · answers from his real profile</p>
+                <p className="mt-1.5 flex items-center gap-1.5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-ok">
+                  <span className="dot-live" />{busy ? "typing" : "online"}
+                </p>
               </div>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Close the help desk"
+                className="ml-auto self-start rounded-full p-1.5 text-low transition-colors hover:text-hi"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
             <div ref={scrollRef} className="no-scrollbar flex-1 space-y-4 overflow-y-auto px-5 py-5">
@@ -261,8 +272,8 @@ export default function AgentChat() {
                   <div
                     className={`max-w-[88%] whitespace-pre-wrap text-sm leading-relaxed ${
                       m.role === "user"
-                        ? "rounded-2xl rounded-br-sm bg-accent/12 px-4 py-2.5 text-hi"
-                        : "text-mid"
+                        ? "rounded-2xl rounded-br-sm bg-accent/15 px-4 py-2.5 text-hi"
+                        : "rounded-2xl rounded-bl-sm bg-hairline/[0.05] px-4 py-2.5 text-mid"
                     }`}
                   >
                     {m.content}
@@ -271,24 +282,41 @@ export default function AgentChat() {
               ))}
 
               {busy && messages[messages.length - 1]?.role === "user" && (
-                <div className="flex gap-1.5 py-1">
+                <div className="flex gap-1.5 px-1 py-1">
                   {[0, 1, 2].map((i) => (
                     <motion.span
                       key={i}
-                      className="h-1 w-1 rounded-full bg-accent"
-                      animate={{ opacity: [0.25, 1, 0.25] }}
+                      className="h-1.5 w-1.5 rounded-full bg-accent"
+                      animate={{ opacity: [0.25, 1, 0.25], y: [0, -2, 0] }}
                       transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.16 }}
                     />
                   ))}
                 </div>
               )}
 
-              {/* Offered after every reply, not just the first. */}
-              {!busy && suggestions.length > 0 && (
+              {/* Help-desk counters before the first question. */}
+              {!busy && messages.length === 1 && (
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  {TOPICS.map(({ icon: Icon, label, q }, i) => (
+                    <motion.button
+                      key={label}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.15 + i * 0.05 }}
+                      onClick={() => send(q)}
+                      className="flex items-center gap-2.5 rounded-xl border border-hairline/[0.08] px-3 py-2.5 text-left text-xs text-mid transition-colors duration-300 hover:border-accent/35 hover:text-hi"
+                    >
+                      <Icon className="h-3.5 w-3.5 shrink-0 text-accent" />
+                      {label}
+                    </motion.button>
+                  ))}
+                </div>
+              )}
+
+              {/* Follow-ups after every reply. */}
+              {!busy && messages.length > 1 && suggestions.length > 0 && (
                 <div className="space-y-1.5 pt-2">
-                  {messages.length > 1 && (
-                    <p className="mono-label pb-1">Or ask</p>
-                  )}
+                  <p className="mono-label pb-1">Or ask</p>
                   {suggestions.map((s) => (
                     <motion.button
                       key={s}
@@ -318,7 +346,7 @@ export default function AgentChat() {
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask something..."
+                placeholder={`Say hi, or ask about ${profile.first}...`}
                 disabled={busy}
                 data-testid="input-agent-chat"
                 className="flex-1 bg-transparent px-3 py-2 text-sm text-hi outline-none placeholder:text-low disabled:opacity-50"
@@ -327,7 +355,7 @@ export default function AgentChat() {
                 type="submit"
                 disabled={busy || !input.trim()}
                 aria-label="Send"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-ink-0 transition-opacity disabled:opacity-25"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-ink-0 transition-opacity disabled:opacity-25"
               >
                 <ArrowUp className="h-4 w-4" />
               </button>
