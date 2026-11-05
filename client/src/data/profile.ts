@@ -276,6 +276,51 @@ export const projects: Project[] = [
   },
 ]
 
+/** Open-source builds. Personal work, no employer code or internal names. */
+export type LabProject = {
+  name: string
+  kicker: string
+  summary: string
+  proof: { value: string; label: string }[]
+  tags: string[]
+  repo?: string
+}
+
+export const lab: LabProject[] = [
+  {
+    name: "Argus",
+    kicker: "AI SRE agent · MCP",
+    summary:
+      "An alert fires. Argus investigates through MCP tools over Prometheus, Loki, Tempo and Kubernetes, finds the root cause and proposes the fix as a GitOps pull request. It never writes to the cluster. Guardrails cover read-only tool gating, change limits, secret redaction and prompt-injection detection, and a rule-based runbook mode takes over when the LLM is down.",
+    proof: [
+      { value: "5/5", label: "recorded incidents passed in CI evals" },
+      { value: "0", label: "direct writes to the cluster" },
+    ],
+    tags: ["MCP", "Prometheus", "Loki", "Tempo", "Kubernetes", "GitOps", "Python"],
+    repo: "https://github.com/debanjan0212/argus-sre-agent",
+  },
+  {
+    name: "IntentOps",
+    kicker: "Cloud-agnostic platform agent",
+    summary:
+      "Describe a service in one YAML file, or in plain English. IntentOps works out capacity, the error budget and SLO burn-rate alerts, runs policy checks, compares cost per cloud, and ships a canary that rolls itself back on an SLO breach. Statistics decide the rollback; the model only explains it.",
+    proof: [
+      { value: "5", label: "targets: EKS, GKE, AKS, bare metal, kind" },
+      { value: "1", label: "YAML profile to add a new cloud" },
+    ],
+    tags: ["SLOs", "Argo Rollouts", "External Secrets", "Gateway API", "MCP", "GitHub Action"],
+    repo: "https://github.com/debanjan0212/intentops",
+  },
+  {
+    name: "Agent Harness SDK",
+    kicker: "Agent SDK · observe → decide → act",
+    summary:
+      "A small SDK for building operational agents: an observe → decide → act loop with tools, guardrails, human approvals and OpenTelemetry MELT signals built in. The model is swappable, DeepSeek by default, and an incident-management bot ships as the reference agent.",
+    proof: [],
+    tags: ["Python", "OpenTelemetry", "Guardrails", "Approvals", "DeepSeek"],
+  },
+]
+
 export const education = {
   degree: "B.Tech, Electrical and Electronics Engineering",
   school: "Vellore Institute of Technology (VIT), Vellore",
@@ -339,6 +384,10 @@ export function knowledgeBase(): string {
     )
     .join("\n\n")
 
+  const labText = lab
+    .map((p) => `## ${p.name} — open-source, ${p.kicker}\n${p.summary}${p.repo ? `\nRepo: ${p.repo}` : ""}`)
+    .join("\n\n")
+
   const skills = skillGroups
     .map((g) => `${g.label}: ${g.items.join(", ")}`)
     .join("\n")
@@ -350,6 +399,7 @@ export function knowledgeBase(): string {
     head,
     "\nEXPERIENCE\n" + exp,
     "\nSELECTED PROJECTS\n" + proj,
+    "\nOPEN-SOURCE BUILDS\n" + labText,
     "\nSKILLS\n" + skills,
     "\nEDUCATION\n" + edu,
     "\nLANGUAGES\n" + langs,

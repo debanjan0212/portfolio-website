@@ -135,20 +135,25 @@ himself are never overwritten** — his words win over a seed permanently.
 
 ## Design notes
 
-One continuous dark canvas. No section paints its own background; a fixed
-ambient layer (two parallax glow fields, a masked telemetry grid, a vignette,
-film grain) sits behind everything, so there are no seams to blend.
+One continuous canvas, one token set, two themes (dark default, light on
+toggle). No section paints its own palette. A fixed ambient layer of slow
+coloured light sits behind everything so the glass has something to refract.
 
-- One cool accent, used sparingly. Status colours are reserved and never
-  reused as decoration.
-- Mono type for technical labels, hairline borders, generous whitespace.
-- Motion: Lenis smooth scroll, page-load curtain, cursor glow, magnetic
-  buttons, per-word headline reveals, parallax depth, and a pinned
-  scroll-storytelling section for the OAA work.
-- **Every animation is gated behind `prefers-reduced-motion`.**
+- **Liquid glass.** `.glass` and `.panel` are the same material: frosted fill,
+  saturated backdrop blur, a specular rim drawn as a masked gradient border,
+  and a highlight that follows the pointer. Tokens live in `:root` and
+  `[data-theme="light"]` in `index.css`.
+- One cool accent. Violet and teal only appear inside gradients with it.
+  Status colours are reserved and never reused as decoration.
+- Hero: floating glass nav, the intro video framed like a product shot that
+  tilts flat as you scroll, real numbers floated over it as glass chips.
+- Motion: Lenis smooth scroll, staggered blur-in reveals, scroll-driven
+  frame tilt, per-word headline reveals, a pinned storytelling section.
+- The site deliberately animates the same for everyone (`useReducedMotion`
+  returns false). Only the ambient light and gradient shimmer stop under
+  `prefers-reduced-motion`.
 
-Bundle: ~342 KB (109 KB gzipped), CSS ~25 KB. Two font families, not
-twenty-four.
+Bundle: ~377 KB (121 KB gzipped), CSS ~50 KB. Two font families.
 
 ---
 
