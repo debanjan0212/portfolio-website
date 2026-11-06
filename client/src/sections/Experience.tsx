@@ -5,7 +5,7 @@ import { roles } from "@/data/profile"
 import { RevealWords, Rise } from "@/lib/motion"
 
 export default function Experience() {
-  const [open, setOpen] = useState<number | null>(1)
+  const [open, setOpen] = useState<number | null>(0)
 
   return (
     <section id="experience" className="relative px-6 py-24 md:py-32">

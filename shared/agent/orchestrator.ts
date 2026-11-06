@@ -2,6 +2,10 @@ import { retrieve, hasUsableContext } from "./retrieve"
 import { seedCollection } from "./seed"
 import { completeWithFallback, type LlmConfig } from "./llm"
 import type { Entry, Pending, Store } from "./types"
+import {
+  AFTER_JOKE, CARE_REPLY, HUMOR, IDENTITY_REPLY, JOKES, SENSITIVE_REPLY,
+  isDistress, isIdentity, isJokeRequest, pick, smallTalkReply, type Mood,
+} from "./banter"
 
 export type ChatMessage = { role: "user" | "assistant"; content: string }
 
@@ -46,7 +50,8 @@ export type Intent =
   | "logistics" // availability, location, what he's looking for
   | "contact" // wants to reach him
   | "unknown" // needs Debanjan
-  | "off_topic" // not about him
+  | "off_topic" // not about him, harmless - gets a light joke
+  | "sensitive" // religion, politics, tragedy, health - polite redirect, never a joke
 
 /**
  * Step 1 - intent. One small, cheap call with a tight token budget. Knowing
@@ -65,7 +70,8 @@ export async function classify(question: string, configs: LlmConfig[]): Promise<
           "about_work - his experience, projects, skills, technologies, career history\n" +
           "logistics - availability, location, relocation, notice period, what roles he wants\n" +
           "contact - how to reach him, hiring him, scheduling a call\n" +
-          "off_topic - not about Debanjan at all\n" +
+          "off_topic - not about Debanjan, and harmless (trivia, random or silly questions)\n" +
+        "sensitive - religion, politics, caste, gender, tragedy, war, health, or anything someone could be hurt by\n" +
           "unknown - about him, but personal or specific in a way a CV would not cover",
         messages: [{ role: "user", content: question }],
       })
@@ -73,7 +79,7 @@ export async function classify(question: string, configs: LlmConfig[]): Promise<
       .trim()
       .toLowerCase()
 
-    const valid: Intent[] = ["about_work", "logistics", "contact", "unknown", "off_topic"]
+    const valid: Intent[] = ["about_work", "logistics", "contact", "unknown", "off_topic", "sensitive"]
     return valid.includes(raw as Intent) ? (raw as Intent) : "about_work"
   } catch {
     // Classification is an optimisation, not a gate. If it fails, carry on.
@@ -159,6 +165,8 @@ function systemPrompt(context: string, baseProfile: string, live: LiveContext) {
 
 export type OrchestratorResult = {
   suggestions: string[]
+  /** How mini-Debanjan reacts in the widget. */
+  mood: Mood
 } & (
   | { kind: "answer"; stream: ReadableStream<Uint8Array> }
   | { kind: "escalated"; message: string }
@@ -203,7 +211,10 @@ export function suggestFollowUps(
 /**
  * Step 2 - route.
  *
- * off_topic          -> decline, no model call, no cost
+ * distress           -> care reply first, always, never a joke
+ * identity/greeting/joke -> canned, no model call
+ * off_topic          -> a light joke, then suggestions
+ * sensitive          -> polite redirect, no joke
  * everything else    -> retrieve, then answer; if the model says it cannot,
  *                       queue the question for Debanjan and tell the visitor
  */
@@ -224,7 +235,16 @@ export async function orchestrate({
 }): Promise<OrchestratorResult> {
   const question = messages[messages.length - 1]?.content ?? ""
 
-  const [intent, initial] = await Promise.all([classify(question, configs), store.listEntries()])
+  // Care beats everything: no classifier call, no suggestions, no humour.
+  if (isDistress(question)) return { kind: "declined", mood: "calm", suggestions: [], message: CARE_REPLY }
+
+  // Greetings, "are you a bot" and joke requests never need the model.
+  const local = isSmallTalk(question) || isIdentity(question) || isJokeRequest(question)
+
+  const [intent, initial] = await Promise.all([
+    local ? Promise.resolve<Intent>("about_work") : classify(question, configs),
+    store.listEntries(),
+  ])
 
   // First request on a fresh deploy fills the collection, so the agent is
   // never cold-started empty and emailing about basics.
@@ -240,25 +260,26 @@ export async function orchestrate({
   }
 
   const asked = messages.filter((m) => m.role === "user").map((m) => m.content)
+  const opening = () => suggestFollowUps(entries, asked, "what is he building right now", 10)
 
+  if (isIdentity(question)) {
+    return { kind: "declined", mood: "wave", suggestions: opening(), message: pick(IDENTITY_REPLY) }
+  }
+  if (isJokeRequest(question)) {
+    return { kind: "declined", mood: "happy", suggestions: opening(), message: `${pick(JOKES)}\n\n${AFTER_JOKE}` }
+  }
   // Answered before any model call - a greeting should feel like a greeting.
   if (isSmallTalk(question)) {
-    return {
-      kind: "declined",
-      suggestions: suggestFollowUps(entries, asked, "what is he building right now", 10),
-      message:
-        "Hello. I'm Debanjan's assistant — I answer questions about his work from his real profile. Ask me anything, or start with one of these:",
-    }
+    const { message, mood } = smallTalkReply(question)
+    return { kind: "declined", mood, suggestions: opening(), message }
   }
   const suggestions = suggestFollowUps(entries, asked, question, 10)
 
+  if (intent === "sensitive") {
+    return { kind: "declined", mood: "calm", suggestions, message: SENSITIVE_REPLY }
+  }
   if (intent === "off_topic") {
-    return {
-      kind: "declined",
-      suggestions,
-      message:
-        "I only cover Debanjan's work and background. Here are some things I can help with:",
-    }
+    return { kind: "declined", mood: "happy", suggestions, message: pick(HUMOR) }
   }
 
   const scored = retrieve(question, entries)
@@ -284,6 +305,7 @@ export async function orchestrate({
     }
     return {
       kind: "escalated",
+      mood: "calm",
       suggestions,
       message:
         "That is not something I have an answer for yet. I have passed it to Debanjan — he reviews these daily, and once he answers it I will be able to answer it for good. If you would like a direct reply, email him at itsme.deb1995@gmail.com.",
@@ -310,7 +332,7 @@ export async function orchestrate({
     },
   })
 
-  return { kind: "answer", stream, suggestions }
+  return { kind: "answer", mood: "talk", stream, suggestions }
 }
 
 async function queueQuestion({

@@ -49,10 +49,16 @@ export const roles: Role[] = [
     period: "Dec 2025 — Present",
     location: "Bengaluru, India",
     blurb:
-      "Two projects: full-stack observability for Toyota Motors North America, then the backend-agnostic telemetry platform for Hitachi's Operational Agentic AI product.",
+      "Full-stack observability for Toyota Motor North America, then the backend-agnostic telemetry platform for Hitachi's Operational Agentic AI product, which is now onboarded by 5 clients and going multi-cloud across Azure, AWS and GCP.",
     points: [
+      "Onboarded 5 clients onto the OAA platform and drive continuous delivery, security and SRE practices across their environments",
+      "Leading the GCP build of the platform from scratch as OAA becomes cloud-agnostic across Azure, AWS and GCP — a private GKE cluster on a shared VPC, OpenTofu modules and an approval-gated pipeline mirroring the Azure baseline",
+      "Run platform engineering and DevOps on private AKS: Gitflow releases (develop, release branches, GA tags), Helm charts with CalVer versions, and GitOps delivery through Argo CD",
+      "Worked on the migration from Azure Container Apps to AKS, with clusters, per-environment namespaces, Key Vault, managed identities and private endpoints built in OpenTofu",
+      "Maintain CI/CD pipelines that build, test, scan, sign and push images, then write the new tag and digest back to GitOps for Argo CD to deploy, now extending to GCP and AWS",
+      "Built pre-merge infrastructure guardrails with tests, including a check that validates secret-store references against the OpenTofu plan, alongside secret-leak and security scanning",
       "Delivered a backend-agnostic observability platform for the OAA agentic AI platform — 18 managed microservices and around 8 operational agents, alongside Confluent Kafka, PostgreSQL, Redis and App Gateway",
-      "Built the instrumentation SDK the platform ships with: framework coverage across the stack, end-to-end distributed traces, metrics, and structured logging on a consistent event/action taxonomy",
+      "Built the observability layer of the in-house agent SDK: multi-framework coverage, end-to-end distributed traces, metrics, and structured logging on a consistent event/action taxonomy",
       "Instrumented the platform end to end, including telemetry artifact collection and export, so a run can be followed from the first request through every agent that touched it",
       "OpenTelemetry gateway collector configuration, deployed on AKS — cloud-agnostic by design, so the same approach carries to AWS or GCP with the SDK added",
       "Multi-exporter routing so customers send telemetry to their own vendor backend or the bundled LGTM stack, with no application changes",
@@ -62,7 +68,7 @@ export const roles: Role[] = [
       "Shipped ~180 monitors wired to ServiceNow webhooks and PagerDuty, replacing email-based triage entirely",
       "Removed 5–6 hours of daily manual health-check toil through Python and Bash automation",
     ],
-    stack: ["OpenTelemetry", "Azure AKS", "DataDog", "LGTM", "Kafka", "Helm", "Python"],
+    stack: ["Azure AKS", "GKE", "OpenTofu", "Helm", "Argo CD", "OpenTelemetry", "DataDog", "LGTM", "Python"],
   },
   {
     company: "Signeasy",
@@ -206,7 +212,7 @@ export const projects: Project[] = [
     org: "Hitachi Digital Services",
     period: "2026 — Delivered",
     summary:
-      "A plug-and-play OpenTelemetry architecture for the OAA agentic platform: an instrumentation SDK giving end-to-end traces, metrics and structured logging, behind a gateway collector on AKS. Telemetry routes to any vendor backend or a bundled LGTM stack with no application changes, and the design is cloud-agnostic — the same approach carries to AWS or GCP. I did not build the agents; I made them observable, so the people running them can see what broke and why.",
+      "A plug-and-play OpenTelemetry architecture for the OAA agentic platform: the observability layer of the in-house agent SDK, giving end-to-end traces, metrics and structured logging, behind a gateway collector on AKS. Telemetry routes to any vendor backend or a bundled LGTM stack with no application changes, and the design is cloud-agnostic — the same approach carries to AWS or GCP. I did not build the agents; I made them observable, so the people running them can see what broke and why.",
     metrics: [
       { value: "18", label: "microservices instrumented" },
       { value: "8", label: "operational agents traced" },
@@ -276,6 +282,55 @@ export const projects: Project[] = [
   },
 ]
 
+/** Open-source builds. Personal work, no employer code or internal names. */
+export type LabProject = {
+  name: string
+  kicker: string
+  summary: string
+  proof: { value: string; label: string }[]
+  tags: string[]
+  repo?: string
+}
+
+export const lab: LabProject[] = [
+  {
+    name: "Argus",
+    kicker: "AI SRE agent · MCP",
+    summary:
+      "An alert fires. Argus investigates through MCP tools over Prometheus, Loki, Tempo and Kubernetes, finds the root cause and proposes the fix as a GitOps pull request. It never writes to the cluster. Guardrails cover read-only tool gating, change limits, secret redaction and prompt-injection detection, and a rule-based runbook mode takes over when the LLM is down.",
+    proof: [
+      { value: "5/5", label: "recorded incidents passed in CI evals" },
+      { value: "0", label: "direct writes to the cluster" },
+    ],
+    tags: ["MCP", "Prometheus", "Loki", "Tempo", "Kubernetes", "GitOps", "Python"],
+    repo: "https://github.com/debanjan0212/argus-sre-agent",
+  },
+  {
+    name: "IntentOps",
+    kicker: "Cloud-agnostic platform agent",
+    summary:
+      "Describe a service in one YAML file, or in plain English. IntentOps works out capacity, the error budget and SLO burn-rate alerts, runs policy checks, compares cost per cloud, and ships a canary that rolls itself back on an SLO breach. Statistics decide the rollback; the model only explains it.",
+    proof: [
+      { value: "5", label: "targets: EKS, GKE, AKS, bare metal, kind" },
+      { value: "1", label: "YAML profile to add a new cloud" },
+    ],
+    tags: ["SLOs", "Argo Rollouts", "External Secrets", "Gateway API", "MCP", "GitHub Action"],
+    repo: "https://github.com/debanjan0212/intentops",
+  },
+  {
+    name: "agent-harness-sdk",
+    kicker: "Agent SDK · read → analyse → decide → act",
+    summary:
+      "A Python SDK for operational AI agents. Every agent reads with read-only tools, analyses, decides on one action, and acts only after policy written in code and a human approval allow it, with secret redaction, prompt-injection checks and budgets built in. OpenTelemetry traces, metrics, logs and events come out automatically. DeepSeek is the default model, and Incident Commander, a reference incident-management bot, is built on top.",
+    proof: [
+      { value: "6", label: "agent frameworks it plugs into, plus MCP and Harness.io" },
+      { value: "4", label: "steps, with human approval before any change" },
+    ],
+    tags: ["Python", "OpenTelemetry", "DeepSeek", "LangGraph", "MCP", "Helm"],
+    repo: "https://github.com/debanjan0212/agent-harness-sdk",
+  },
+]
+
 export const education = {
   degree: "B.Tech, Electrical and Electronics Engineering",
   school: "Vellore Institute of Technology (VIT), Vellore",
@@ -339,6 +394,10 @@ export function knowledgeBase(): string {
     )
     .join("\n\n")
 
+  const labText = lab
+    .map((p) => `## ${p.name} — open-source, ${p.kicker}\n${p.summary}${p.repo ? `\nRepo: ${p.repo}` : ""}`)
+    .join("\n\n")
+
   const skills = skillGroups
     .map((g) => `${g.label}: ${g.items.join(", ")}`)
     .join("\n")
@@ -350,6 +409,7 @@ export function knowledgeBase(): string {
     head,
     "\nEXPERIENCE\n" + exp,
     "\nSELECTED PROJECTS\n" + proj,
+    "\nOPEN-SOURCE BUILDS\n" + labText,
     "\nSKILLS\n" + skills,
     "\nEDUCATION\n" + edu,
     "\nLANGUAGES\n" + langs,
