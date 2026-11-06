@@ -53,6 +53,10 @@ export const roles: Role[] = [
     points: [
       "Onboarded 5 clients onto the OAA platform and drive continuous delivery, security and SRE practices across their environments",
       "Leading the GCP build of the platform from scratch as OAA becomes cloud-agnostic across Azure, AWS and GCP — a private GKE cluster on a shared VPC, OpenTofu modules and an approval-gated pipeline mirroring the Azure baseline",
+      "Run platform engineering and DevOps on private AKS: Gitflow releases (develop, release branches, GA tags), Helm charts with CalVer versions, and GitOps delivery through Argo CD",
+      "Worked on the migration from Azure Container Apps to AKS, with clusters, per-environment namespaces, Key Vault, managed identities and private endpoints built in OpenTofu",
+      "Maintain CI/CD pipelines that build, test, scan, sign and push images, then write the new tag and digest back to GitOps for Argo CD to deploy, now extending to GCP and AWS",
+      "Built pre-merge infrastructure guardrails with tests, including a check that validates secret-store references against the OpenTofu plan, alongside secret-leak and security scanning",
       "Delivered a backend-agnostic observability platform for the OAA agentic AI platform — 18 managed microservices and around 8 operational agents, alongside Confluent Kafka, PostgreSQL, Redis and App Gateway",
       "Built the observability layer of the in-house agent SDK: multi-framework coverage, end-to-end distributed traces, metrics, and structured logging on a consistent event/action taxonomy",
       "Instrumented the platform end to end, including telemetry artifact collection and export, so a run can be followed from the first request through every agent that touched it",
@@ -64,7 +68,7 @@ export const roles: Role[] = [
       "Shipped ~180 monitors wired to ServiceNow webhooks and PagerDuty, replacing email-based triage entirely",
       "Removed 5–6 hours of daily manual health-check toil through Python and Bash automation",
     ],
-    stack: ["OpenTelemetry", "Azure AKS", "GKE", "OpenTofu", "DataDog", "LGTM", "Kafka", "Python"],
+    stack: ["Azure AKS", "GKE", "OpenTofu", "Helm", "Argo CD", "OpenTelemetry", "DataDog", "LGTM", "Python"],
   },
   {
     company: "Signeasy",
