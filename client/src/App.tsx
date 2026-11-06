@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { ArrowUpRight, ChevronLeft, ChevronRight, Menu, Moon, Pause, Play, RotateCcw, Sun, X } from "lucide-react"
 import { profile } from "./data/profile"
@@ -16,6 +16,7 @@ import AgentChat from "./components/AgentChat"
 import Answer from "./pages/Answer"
 import { CountUp, SmoothScroll, useSmoothScroll } from "./lib/motion"
 import CasePoster, { caseCards } from "./sections/CaseCards"
+import { swish } from "./lib/swish"
 
 const proof = [
   { value: "800+", label: "servers migrated to private EKS" },
@@ -174,57 +175,82 @@ function Hero({ ready, videoRef }: { ready: boolean; videoRef: React.RefObject<H
   </section>
 }
 
-const CASE_REPS = [-1, 0, 1]
+const AUTOPLAY_MS = 6500
 
 function CaseStack({ active, onPick }: { active: number; onPick: (i: number) => void }) {
   const n = caseCards.length
-  const [noAnim, setNoAnim] = useState(false)
+  const [hover, setHover] = useState(false)
+  const [stopped, setStopped] = useState(false)
+  const drag = useRef<{ x: number; moved: boolean } | null>(null)
+  const shown = ((active % n) + n) % n
 
   // `active` runs unbounded so every step is a real slide. Three copies of the
-  // deck are laid out end to end, so there is always a card waiting to come in
-  // from either side and nothing ever jumps across the stage.
-  // Once active leaves [0,n) we fold it back by exactly n: the card sitting at
-  // each visible position has the same content either way, so with transitions
-  // off for one frame the fold is invisible.
-  useLayoutEffect(() => {
-    if (active >= n || active < 0) {
-      setNoAnim(true)
-      onPick(((active % n) + n) % n)
-    }
-  }, [active, n, onPick])
+  // deck sit end to end around it, keyed by their absolute copy number: when
+  // `active` crosses a copy boundary, only an off-stage copy is swapped, so the
+  // cards on screen never remount and never jump.
+  const base = Math.floor(active / n)
+  const reps = [base - 1, base, base + 1]
 
-  useEffect(() => {
-    if (!noAnim) return
-    const r = requestAnimationFrame(() => setNoAnim(false))
-    return () => cancelAnimationFrame(r)
-  }, [noAnim])
+  // every change a visitor makes gets the swish; autoplay stays silent
+  const go = (next: number) => {
+    if (next === active) return
+    swish(next > active ? 1 : -1)
+    onPick(next)
+  }
 
   return (
-    <div className="case-carousel">
-      <button className="glass case-arrow" onClick={() => onPick(active - 1)} aria-label="Previous case study">
-        <ChevronLeft size={19} />
-      </button>
-      <div className={noAnim ? "case-stack no-anim" : "case-stack"}>
-        {CASE_REPS.map((rep) =>
-          caseCards.map((card, i) => {
-            const slot = i + rep * n
-            const p = slot - active
-            const abs = Math.abs(p)
-            return (
-              <article key={`${rep}-${card.titleTop}`} className="case-card"
-                       aria-hidden={p !== 0}
-                       onClick={() => onPick(slot)}
-                       style={{ ["--p" as string]: p, ["--abs" as string]: abs, zIndex: n - Math.min(abs, n),
-                                pointerEvents: abs > 1 ? "none" : undefined }}>
-                <CasePoster card={card} index={i} />
-              </article>
-            )
-          }),
-        )}
+    <div className="case-wrap" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+      <div className="case-carousel">
+        <button className="glass case-arrow" onClick={() => go(active - 1)} aria-label="Previous case study">
+          <ChevronLeft size={19} />
+        </button>
+        <div className="case-stack"
+             onPointerDown={e => { drag.current = { x: e.clientX, moved: false } }}
+             onPointerUp={e => {
+               const d = drag.current
+               if (!d) return
+               const dx = e.clientX - d.x
+               if (Math.abs(dx) > 40) { d.moved = true; go(active + (dx < 0 ? 1 : -1)) }
+             }}>
+          {/* one flat keyed list: nested arrays would be matched by position and remount on every copy shift */}
+          {reps.flatMap((rep) =>
+            caseCards.map((card, i) => {
+              const slot = i + rep * n
+              const p = slot - active
+              const abs = Math.abs(p)
+              return (
+                <article key={`${rep}-${i}`} className="case-card"
+                         aria-hidden={p !== 0}
+                         onClick={() => { if (drag.current?.moved) { drag.current = null; return } go(slot) }}
+                         style={{ ["--p" as string]: p, ["--abs" as string]: Math.min(abs, 3), zIndex: n - Math.min(abs, n),
+                                  pointerEvents: abs > 1 ? "none" : undefined }}>
+                  <CasePoster card={card} index={i} />
+                </article>
+              )
+            }),
+          )}
+        </div>
+        <button className="glass case-arrow" onClick={() => go(active + 1)} aria-label="Next case study">
+          <ChevronRight size={19} />
+        </button>
       </div>
-      <button className="glass case-arrow" onClick={() => onPick(active + 1)} aria-label="Next case study">
-        <ChevronRight size={19} />
-      </button>
+
+      {/* Apple-style progress: the active dot stretches and fills; when it is full the deck moves on. */}
+      <div className={`glass case-dots${hover || stopped ? " is-paused" : ""}`}>
+        <div role="tablist" aria-label="Case studies">
+          {caseCards.map((card, i) => (
+            <button key={card.titleTop} role="tab" aria-selected={i === shown} aria-label={`Case study ${i + 1}`}
+                    className={i === shown ? "dot is-on" : "dot"}
+                    onClick={() => go(active + (i - shown))}>
+              {i === shown && <i key={active} style={{ animationDuration: `${AUTOPLAY_MS}ms` }}
+                                 onAnimationEnd={() => onPick(active + 1)} />}
+            </button>
+          ))}
+        </div>
+        <button className="case-play" onClick={() => setStopped(s => !s)} aria-label={stopped ? "Play case studies" : "Pause case studies"}>
+          {stopped ? <Play size={12} fill="currentColor" /> : <Pause size={12} fill="currentColor" />}
+        </button>
+      </div>
     </div>
   )
 }
@@ -281,11 +307,6 @@ function Portfolio(){
   },[])
 
   useEffect(()=>{document.body.style.overflow=ready?"":"hidden";return()=>{document.body.style.overflow=""}},[ready])
-
-  useEffect(()=>{
-    const t=setTimeout(()=>setCaseIndex(i=>i+1),6500)
-    return()=>clearTimeout(t)
-  },[caseIndex])
 
   return <><SiteLoader done={ready}/><div className="future-site">
     <div className="lg-ambient" aria-hidden><i/><i/><i/></div>

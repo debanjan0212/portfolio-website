@@ -50,7 +50,7 @@
 [data-theme="light"] {
   color-scheme: light;
 
-  --ink-0: 245 245 247;
+  --ink-0: 255 255 255;
   --ink-1: 255 255 255;
   --ink-2: 236 236 240;
   --ink-3: 222 222 228;
@@ -69,10 +69,11 @@
 
   --hairline: 0 0 0;
 
-  --glass-fill: linear-gradient(160deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.46) 55%, rgb(255 255 255 / 0.62));
-  --glass-rim: linear-gradient(140deg, rgb(255 255 255 / 0.95), rgb(0 0 0 / 0.06) 35%, rgb(0 0 0 / 0.04) 65%, rgb(255 255 255 / 0.9));
-  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 2px rgb(0 0 0 / 0.06), 0 24px 60px -28px rgb(0 0 0 / 0.22);
-  --glass-sheen: rgb(255 255 255 / 0.55);
+  /* on pure white, glass is white with a neutral hairline and a soft lift - no grey or warm fill */
+  --glass-fill: linear-gradient(160deg, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.82));
+  --glass-rim: linear-gradient(140deg, rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.06) 50%, rgb(0 0 0 / 0.09));
+  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 18px 50px -24px rgb(0 0 0 / 0.16);
+  --glass-sheen: rgb(0 102 204 / 0.05);
   --grad: linear-gradient(100deg, #0066cc 0%, #7c3aed 45%, #0d9488 80%, #0066cc 100%);
   --name: linear-gradient(180deg, #1d1d1f 40%, rgb(29 29 31 / 0.62));
 }
@@ -374,9 +375,29 @@
 
 .case-carousel{position:relative;display:flex;align-items:center;justify-content:center;gap:18px;margin-top:54px}
 .case-stack{position:relative;flex:1;max-width:1040px;height:660px;perspective:1500px;transform-style:preserve-3d}
-.case-card{position:absolute;top:0;left:50%;width:492px;height:100%;margin-left:-246px;border-radius:22px;overflow:hidden;cursor:pointer;border:1px solid rgba(var(--f-text-rgb), 0.13);background:linear-gradient(163deg,#101722,#080c11 62%);box-shadow:0 30px 80px rgba(0,0,0,.6);transform:translateX(calc(var(--p)*82%)) translateZ(calc(var(--abs)*-320px)) rotateY(calc(var(--p)*-36deg)) scale(calc(1 - var(--abs)*.02));opacity:max(0,calc(1 - var(--abs)*.62));filter:brightness(calc(1 - var(--abs)*.34));transition:transform .85s cubic-bezier(.22,.8,.2,1),opacity .6s ease,filter .6s ease,border-color .6s ease}
+.case-card{position:absolute;top:0;left:50%;width:492px;height:100%;margin-left:-246px;border-radius:22px;overflow:hidden;cursor:pointer;border:1px solid rgba(var(--f-text-rgb), 0.13);background:linear-gradient(163deg,#101722,#080c11 62%);box-shadow:0 30px 80px rgba(0,0,0,.6);transform:translate3d(calc(var(--p)*80%),0,calc(var(--abs)*-280px)) rotateY(calc(var(--p)*-26deg));opacity:max(0,calc(1 - var(--abs)*.55));backface-visibility:hidden;will-change:transform,opacity;transition:transform 1.05s cubic-bezier(.16,1,.3,1),opacity .9s cubic-bezier(.16,1,.3,1),border-color .6s ease}
+/* side cards dim with an overlay: animating opacity stays on the GPU, animating filter does not */
+.case-card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:#05070a;opacity:calc(var(--abs)*.42);pointer-events:none;transition:opacity 1s cubic-bezier(.16,1,.3,1)}
 .case-card[aria-hidden="false"]{border-color:rgba(var(--f-green-rgb), 0.3);cursor:default}
-.case-stack.no-anim .case-card{transition:none}
+.case-stack{touch-action:pan-y;user-select:none}
+/* as a card lands, its content rises in line by line */
+.case-card[aria-hidden="false"] .poster>*{animation:poster-in .9s cubic-bezier(.16,1,.3,1) both}
+.case-card[aria-hidden="false"] .poster>:nth-child(2){animation-delay:.08s}
+.case-card[aria-hidden="false"] .poster>:nth-child(3){animation-delay:.16s}
+.case-card[aria-hidden="false"] .poster>:nth-child(4){animation-delay:.24s}
+.case-card[aria-hidden="false"] .poster>:nth-child(n+5){animation-delay:.32s}
+@keyframes poster-in{from{opacity:0;transform:translate3d(0,16px,0)}to{opacity:1;transform:none}}
+.case-wrap{grid-column:1/-1}
+.case-dots{display:flex;align-items:center;gap:14px;width:max-content;margin:30px auto 0;padding:9px 10px 9px 16px;border-radius:999px}
+.case-dots [role=tablist]{display:flex;align-items:center;gap:9px}
+.case-dots .dot{position:relative;width:8px;height:8px;padding:0;border-radius:999px;overflow:hidden;background:rgba(var(--f-text-rgb),.3);transition:width .7s cubic-bezier(.16,1,.3,1),background .4s ease}
+.case-dots .dot:hover{background:rgba(var(--f-text-rgb),.55)}
+.case-dots .dot.is-on{width:46px;background:rgba(var(--f-text-rgb),.18)}
+.case-dots .dot i{position:absolute;inset:0;border-radius:inherit;background:var(--f-text);transform-origin:left;animation:dot-fill linear forwards}
+.case-dots.is-paused .dot i{animation-play-state:paused}
+@keyframes dot-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.case-play{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgba(var(--f-text-rgb),.1);color:var(--f-text);transition:background .2s}
+.case-play:hover{background:rgba(var(--f-text-rgb),.18)}
 
 /* the poster itself */
 .poster{--a1:#8b5cf6;--a1-rgb:139,92,246;--a2:#3b82f6;--ok:#2dd4bf;--ok-rgb:45,212,191;display:flex;flex-direction:column;height:100%;padding:30px 30px 26px}
@@ -420,7 +441,7 @@
 
 /* Light theme: same structure, inverted palette. The poster cards stay dark
    on purpose - they read as product screenshots either way. */
-[data-theme="light"] .future-site{color-scheme:light;--f-bg:#f5f5f7;--f-bg-rgb:245,245,247;--f-panel:#ffffff;--f-text:#1d1d1f;--f-text-rgb:29,29,31;--f-green-rgb:0,102,204;--f-muted:#6e6e73;--f-green:#0066cc;--f-orange:#7c3aed}
+[data-theme="light"] .future-site{color-scheme:light;--f-bg:#ffffff;--f-bg-rgb:255,255,255;--f-panel:#ffffff;--f-text:#1d1d1f;--f-text-rgb:29,29,31;--f-green-rgb:0,102,204;--f-muted:#6e6e73;--f-green:#0066cc;--f-orange:#7c3aed}
 [data-theme="light"] .case-card{background:linear-gradient(163deg,#101722,#080c11 62%);box-shadow:0 22px 60px rgba(16,24,21,.22);filter:none}
 [data-theme="light"] .poster{--f-text:#eef2ef;--f-muted:#9aa9a7}
 [data-theme="light"] .site-loader{background:#070b0e}
@@ -439,7 +460,7 @@
 .lg-ambient i:nth-child(1){left:-22vmax;top:-30vmax;background:radial-gradient(circle,rgb(64 110 255/.32),transparent 62%);animation:lg-drift-a 34s ease-in-out infinite alternate}
 .lg-ambient i:nth-child(2){right:-26vmax;top:10vh;background:radial-gradient(circle,rgb(150 90 255/.26),transparent 62%);animation:lg-drift-b 41s ease-in-out infinite alternate}
 .lg-ambient i:nth-child(3){left:10vw;bottom:-40vmax;background:radial-gradient(circle,rgb(40 200 190/.16),transparent 62%);animation:lg-drift-c 47s ease-in-out infinite alternate}
-[data-theme="light"] .lg-ambient i{opacity:.35}
+[data-theme="light"] .lg-ambient{display:none}
 @keyframes lg-drift-a{to{transform:translate3d(18vw,22vh,0) scale(1.15)}}
 @keyframes lg-drift-b{to{transform:translate3d(-20vw,30vh,0) scale(.9)}}
 @keyframes lg-drift-c{to{transform:translate3d(24vw,-26vh,0) scale(1.1)}}
