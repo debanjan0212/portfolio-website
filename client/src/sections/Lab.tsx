@@ -59,20 +59,21 @@ function IntentVisual() {
 }
 
 function LoopVisual() {
-  // observe -> decide -> (approve) -> act, round and round
+  // read -> analyse -> decide -> (approve) -> act, round and round
   const ring = "M60 12 A48 48 0 1 1 59.9 12"
   return (
-    <svg className="lab-loop" viewBox="-24 -8 168 136" role="img" aria-label="Observe, decide, act loop with an approval gate">
+    <svg className="lab-loop" viewBox="-32 -8 184 136" role="img" aria-label="Read, analyse, decide, act loop with a human approval gate">
       <path d={ring} />
-      {[[60, 12], [101.6, 84], [18.4, 84]].map(([x, y]) => (
-        <circle key={x} className="lab-loop-node" cx={x} cy={y} r="4" />
+      {[[60, 12], [108, 60], [60, 108], [12, 60]].map(([x, y]) => (
+        <circle key={`${x}-${y}`} className="lab-loop-node" cx={x} cy={y} r="4" />
       ))}
       <circle className="lab-loop-dot" r="2.6">
         <animateMotion dur="6s" repeatCount="indefinite" path={ring} />
       </circle>
-      <text x="60" y="2">observe</text>
-      <text x="118" y="100">decide</text>
-      <text x="2" y="100">act</text>
+      <text x="60" y="2">read</text>
+      <text x="132" y="62">analyse</text>
+      <text x="60" y="122">decide</text>
+      <text x="-6" y="62">act</text>
       <text className="lab-loop-gate" x="60" y="63">human approval</text>
     </svg>
   )

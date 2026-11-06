@@ -49,10 +49,12 @@ export const roles: Role[] = [
     period: "Dec 2025 — Present",
     location: "Bengaluru, India",
     blurb:
-      "Two projects: full-stack observability for Toyota Motors North America, then the backend-agnostic telemetry platform for Hitachi's Operational Agentic AI product.",
+      "Full-stack observability for Toyota Motor North America, then the backend-agnostic telemetry platform for Hitachi's Operational Agentic AI product, which is now onboarded by 5 clients and going multi-cloud across Azure, AWS and GCP.",
     points: [
+      "Onboarded 5 clients onto the OAA platform and drive continuous delivery, security and SRE practices across their environments",
+      "Leading the GCP build of the platform from scratch as OAA becomes cloud-agnostic across Azure, AWS and GCP — a private GKE cluster on a shared VPC, OpenTofu modules and an approval-gated pipeline mirroring the Azure baseline",
       "Delivered a backend-agnostic observability platform for the OAA agentic AI platform — 18 managed microservices and around 8 operational agents, alongside Confluent Kafka, PostgreSQL, Redis and App Gateway",
-      "Built the instrumentation SDK the platform ships with: framework coverage across the stack, end-to-end distributed traces, metrics, and structured logging on a consistent event/action taxonomy",
+      "Built the observability layer of the in-house agent SDK: multi-framework coverage, end-to-end distributed traces, metrics, and structured logging on a consistent event/action taxonomy",
       "Instrumented the platform end to end, including telemetry artifact collection and export, so a run can be followed from the first request through every agent that touched it",
       "OpenTelemetry gateway collector configuration, deployed on AKS — cloud-agnostic by design, so the same approach carries to AWS or GCP with the SDK added",
       "Multi-exporter routing so customers send telemetry to their own vendor backend or the bundled LGTM stack, with no application changes",
@@ -62,7 +64,7 @@ export const roles: Role[] = [
       "Shipped ~180 monitors wired to ServiceNow webhooks and PagerDuty, replacing email-based triage entirely",
       "Removed 5–6 hours of daily manual health-check toil through Python and Bash automation",
     ],
-    stack: ["OpenTelemetry", "Azure AKS", "DataDog", "LGTM", "Kafka", "Helm", "Python"],
+    stack: ["OpenTelemetry", "Azure AKS", "GKE", "OpenTofu", "DataDog", "LGTM", "Kafka", "Python"],
   },
   {
     company: "Signeasy",
@@ -206,7 +208,7 @@ export const projects: Project[] = [
     org: "Hitachi Digital Services",
     period: "2026 — Delivered",
     summary:
-      "A plug-and-play OpenTelemetry architecture for the OAA agentic platform: an instrumentation SDK giving end-to-end traces, metrics and structured logging, behind a gateway collector on AKS. Telemetry routes to any vendor backend or a bundled LGTM stack with no application changes, and the design is cloud-agnostic — the same approach carries to AWS or GCP. I did not build the agents; I made them observable, so the people running them can see what broke and why.",
+      "A plug-and-play OpenTelemetry architecture for the OAA agentic platform: the observability layer of the in-house agent SDK, giving end-to-end traces, metrics and structured logging, behind a gateway collector on AKS. Telemetry routes to any vendor backend or a bundled LGTM stack with no application changes, and the design is cloud-agnostic — the same approach carries to AWS or GCP. I did not build the agents; I made them observable, so the people running them can see what broke and why.",
     metrics: [
       { value: "18", label: "microservices instrumented" },
       { value: "8", label: "operational agents traced" },
@@ -312,12 +314,16 @@ export const lab: LabProject[] = [
     repo: "https://github.com/debanjan0212/intentops",
   },
   {
-    name: "Agent Harness SDK",
-    kicker: "Agent SDK · observe → decide → act",
+    name: "agent-harness-sdk",
+    kicker: "Agent SDK · read → analyse → decide → act",
     summary:
-      "A small SDK for building operational agents: an observe → decide → act loop with tools, guardrails, human approvals and OpenTelemetry MELT signals built in. The model is swappable, DeepSeek by default, and an incident-management bot ships as the reference agent.",
-    proof: [],
-    tags: ["Python", "OpenTelemetry", "Guardrails", "Approvals", "DeepSeek"],
+      "A Python SDK for operational AI agents. Every agent reads with read-only tools, analyses, decides on one action, and acts only after policy written in code and a human approval allow it, with secret redaction, prompt-injection checks and budgets built in. OpenTelemetry traces, metrics, logs and events come out automatically. DeepSeek is the default model, and Incident Commander, a reference incident-management bot, is built on top.",
+    proof: [
+      { value: "6", label: "agent frameworks it plugs into, plus MCP and Harness.io" },
+      { value: "4", label: "steps, with human approval before any change" },
+    ],
+    tags: ["Python", "OpenTelemetry", "DeepSeek", "LangGraph", "MCP", "Helm"],
+    repo: "https://github.com/debanjan0212/agent-harness-sdk",
   },
 ]
 
