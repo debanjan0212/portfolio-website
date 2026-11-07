@@ -468,6 +468,8 @@
 
 /* Floating glass nav pill */
 .lg-nav-wrap{position:fixed;top:14px;left:0;right:0;z-index:60;display:flex;justify-content:center;padding:0 16px;pointer-events:none}
+/* open phone menu sits above the chat bubble and button (z 84-85), which then dim under the backdrop */
+.lg-nav-wrap.menu-open{z-index:90}
 .lg-nav{pointer-events:auto;display:flex;align-items:center;gap:24px;width:min(1080px,100%);height:56px;padding:0 10px 0 22px;border-radius:999px;transition:width .6s cubic-bezier(.2,.8,.2,1),height .6s cubic-bezier(.2,.8,.2,1)}
 .is-scrolled .lg-nav{width:min(980px,100%);height:50px}
 .lg-links{display:flex;gap:26px;margin:0 auto}

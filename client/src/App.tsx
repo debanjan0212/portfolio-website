@@ -70,7 +70,7 @@ function Nav({ theme, onTheme }: { theme: "dark" | "light"; onTheme: () => void 
     scrollTo(href)
   }
 
-  return <header className={scrolled ? "lg-nav-wrap is-scrolled" : "lg-nav-wrap"}>
+  return <header className={`lg-nav-wrap${scrolled ? " is-scrolled" : ""}${open ? " menu-open" : ""}`}>
     <nav className="glass lg-nav" aria-label="Primary">
       <a href="#top" className="future-logo" onClick={e => go(e, "#top")}>debanjan<span>.</span>das</a>
       <div className="lg-links">
