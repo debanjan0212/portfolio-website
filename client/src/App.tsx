@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion"
 import { ArrowUpRight, ChevronLeft, ChevronRight, Menu, Moon, Pause, Play, RotateCcw, Sun, X } from "lucide-react"
 import { profile } from "./data/profile"
 import About from "./sections/About"
@@ -70,10 +70,10 @@ function Nav({ theme, onTheme }: { theme: "dark" | "light"; onTheme: () => void 
     scrollTo(href)
   }
 
-  return <header className={scrolled ? "lg-nav-wrap is-scrolled" : "lg-nav-wrap"}>
+  return <header className={`lg-nav-wrap${scrolled ? " is-scrolled" : ""}${open ? " menu-open" : ""}`}>
     <nav className="glass lg-nav" aria-label="Primary">
       <a href="#top" className="future-logo" onClick={e => go(e, "#top")}>debanjan<span>.</span>das</a>
-      <div className={open ? "lg-links open glass" : "lg-links"}>
+      <div className="lg-links">
         {links.map(([href, label]) => <a key={href} href={href} onClick={e => go(e, href)}>{label}</a>)}
       </div>
       <div className="nav-right">
@@ -81,11 +81,24 @@ function Nav({ theme, onTheme }: { theme: "dark" | "light"; onTheme: () => void 
           {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
         </button>
         <a className="lg-pill lg-pill-solid lg-pill-sm desktop-resume" href="/DebanjanDas-Resume.pdf" download>Résumé</a>
-        <button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
+        <button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open} aria-controls="lg-menu">
           {open ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
     </nav>
+    {/* The phone menu sits beside the nav, not inside it: glass inside glass can't blur the page behind it. */}
+    <AnimatePresence>
+      {open && <motion.div key="scrim" className="lg-scrim" onClick={() => setOpen(false)} aria-hidden
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} />}
+      {open && <motion.div key="menu" className="glass lg-menu" id="lg-menu"
+        initial={{ opacity: 0, y: -10, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.98 }}
+        transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}>
+        {links.map(([href, label], i) => <motion.a key={href} href={href} onClick={e => go(e, href)}
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.04 + i * 0.035, ease: [0.16, 1, 0.3, 1] }}>
+          {label}</motion.a>)}
+        <a className="lg-pill lg-pill-solid lg-menu-resume" href="/DebanjanDas-Resume.pdf" download>Download résumé</a>
+      </motion.div>}
+    </AnimatePresence>
   </header>
 }
 
