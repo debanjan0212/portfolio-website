@@ -4,8 +4,8 @@
 #
 # Every action is pinned to a full commit SHA, not a tag. Tags can be moved:
 # in March 2026 an attacker re-pointed 76 of 77 trivy-action tags at malware
-# (CVE-2026-33634). trivy-action 0.35.0 and Trivy 0.69.3 are the versions the
-# advisory lists as safe. Dependabot proposes updates to these pins.
+# (CVE-2026-33634). A SHA cannot be moved. Dependabot proposes updates to
+# these pins, and the Trivy version is set explicitly rather than "latest".
 name: security
 
 on:
@@ -53,9 +53,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Scan and record
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          version: v0.69.3
+          version: v0.76.2
           scan-type: fs
           scan-ref: .
           scanners: vuln,secret,misconfig
@@ -69,9 +69,9 @@ jobs:
           sarif_file: trivy.sarif
           category: trivy
       - name: Fail on anything high or critical
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          version: v0.69.3
+          version: v0.76.2
           scan-type: fs
           scan-ref: .
           scanners: vuln,secret,misconfig
