@@ -1,24 +1,72 @@
 # debanjan.das — portfolio
 
 Personal site for **Debanjan Das**, Senior Site Reliability Engineer at Hitachi
-Digital Services. A dark, single-canvas React site with an AI assistant that
-answers questions about his work — and, when it cannot, asks him and learns the
-answer permanently.
+Digital Services.
 
 Live: [debanjansre.online](https://debanjansre.online)
 
+One rule shapes the whole page: **nothing on it is fake.** Every animation
+replays a real run of an open-source tool, every status is read live from
+GitHub, and every number links back to where it came from.
+
 ---
 
-## What makes this different from a template portfolio
+## What is on the page
 
-Most portfolio sites are a static CV with animations. Two things here are not:
+| Section | What it shows | Where the truth comes from |
+|---|---|---|
+| Hero | Name, a two-line summary, the three tools with live test status | `data/profile.ts`, GitHub API |
+| Watch them work | Argus, IntentOps and agent-harness-sdk replaying real runs | `data/runs.ts`, recorded from each repo's demo command |
+| Telemetry | The OpenTelemetry pattern, animated, with a backend you can switch | the Hitachi and Toyota work in `data/profile.ts` |
+| Security | Guardrails with links to the code, a guardrail you can try, live scan state, SOC 2 / HIPAA mapping | the three repos, `.github/workflows/security.yml` |
+| Experience, About, Contact | Five roles in plain words, certification, intro video | `data/profile.ts` |
+| Footer | How fast this page loaded on the visitor's own device, and the commit that is live | measured in the browser |
 
-**1. The assistant is grounded, not generative.**
+A **Plain words / Technical** switch rewrites the copy for the reader: plain
+by default so anyone can follow it, technical for engineers.
+
+### How the replays are recorded
+
+`client/src/data/runs.ts` holds the output of these commands, run against the
+public repos with no API key and no cluster. To refresh a replay, run the
+command again and update the file.
+
+| Tool | Command |
+|---|---|
+| Argus | `make demo-pr` (and `ARGUS_AUDIT_LOG=... python -m argus investigate --scenario evals/scenarios/01-bad-deploy.yaml --json` for the call list) |
+| IntentOps | `intentops plan`, `compare`, `check`, `render --cloud all` and `canary` on `examples/payments-api.yaml` |
+| agent-harness-sdk | `python -m incident_commander demo --scenario bad-deploy --approve ask` (answered both ways), `--scenario injection`, `--scenario db-pool` |
+
+The guardrail demo in the Security section runs `client/src/lib/guard.ts`, a
+line-for-line port of `agent_harness_sdk/guardrails.py`. `tests/guard.test.ts`
+pins it to the Python output.
+
+### Found by search engines, AI assistants and link previews
+
+`npm run build` renders the home page to real HTML (`scripts/prerender.mjs`),
+so anything that does not run JavaScript still reads the full page. The same
+step writes schema.org data (person, credential, the three projects) and
+`/llms.txt` from `data/profile.ts`. `robots.txt`, `sitemap.xml`, a canonical
+URL and a favicon are in `client/public/`.
+
+### Things the page works out for itself
+
+- **Light or dark** follows the device until the visitor picks one.
+- **Reduce motion** is respected: nothing loops, slides or blurs, and every
+  replay shows its finished state.
+- **Phone or desktop**: the telemetry diagram has a separate tall layout, the
+  chat button moves into the nav where a floating one would cover content.
+- **Build and scan state** come from the GitHub API through `/api/repos`. If
+  GitHub cannot be reached the page shows dates only and says so.
+
+---
+
+## The assistant
+
+**1. It is grounded, not generative.**
 It retrieves from a curated collection and is instructed to emit
 `NEEDS_DEBANJAN` rather than fill a gap. That marker is checked *before a single
-token reaches the visitor*, so a half-written guess can never be displayed. It
-will not invent an employer, a metric, or a date — the failure mode is silence
-and an email, not a confident lie.
+token reaches the visitor*, so a half-written guess can never be displayed.
 
 **2. It learns from Debanjan, on a loop.**
 
@@ -34,19 +82,23 @@ visitor asks something new
   next visitor   ──→  answered, in his words, no rebuild, no redeploy
 ```
 
-The collection is read per request, so an answer is live the moment it is saved.
-Quiet days send no email at all.
-
 ---
 
 ## Architecture
 
 ```
-client/          React 18 + Vite + Tailwind. One dark canvas, no section
-  src/sections/  backgrounds — a fixed ambient field sits behind everything,
-  src/lib/       so sections blend by rhythm rather than meeting at an edge.
-  src/data/      profile.ts is the single source of truth: the page and the
-                 assistant render from the same object and cannot disagree.
+client/          React 18 + Vite + Tailwind.
+  src/sections/  one file per section; stage/ holds the three replays
+  src/lib/       prefs (theme, voice, motion), replay engine, live data,
+                 page vitals, the guardrail port
+  src/data/      profile.ts is the single source of truth for facts: the page,
+                 the assistant, the schema data and llms.txt all read it.
+                 runs.ts holds the recorded tool runs.
+
+shared/live/     GitHub lookups for build and scan state (used by the
+                 function and its dev twin)
+scripts/         prerender.mjs: static HTML, schema data, llms.txt
+tests/           node:test suites for the live data and the guardrail port
 
 shared/agent/    The whole agent, framework-free and runtime-free:
   llm.ts         provider-agnostic (Gemini / Groq / OpenAI / Anthropic)
@@ -56,7 +108,7 @@ shared/agent/    The whole agent, framework-free and runtime-free:
   digest.ts      the nightly email
   types.ts       Store interface — the only thing storage must satisfy
 
-netlify/functions/  Production: chat, answer, digest (scheduled)
+netlify/functions/  Production: chat, answer, digest (scheduled), repos
 server/             Dev twins of the same, so `npm run dev` runs the real
                     orchestrator rather than a stub
 ```
@@ -104,6 +156,18 @@ cannot access the configured one, so a tier-gated model name never hard-fails.
 Optional, for the nightly digest: `RESEND_API_KEY` and `DIGEST_TO`. Without
 them the digest is skipped and logged; everything else still works.
 
+Recommended, for the live build and scan status: `GITHUB_TOKEN`, a fine-grained
+token with "Public repositories (read-only)" and nothing else. Without it the
+anonymous GitHub limit is shared with everyone on the same address and is
+often used up, in which case the page shows dates only.
+
+```bash
+npm test          # live-data and guardrail tests
+npm run check     # types
+npm run build     # build, prerender, bundle the dev server
+npm run audit     # known vulnerabilities in what ships
+```
+
 Dev-only helpers:
 
 ```bash
@@ -114,9 +178,9 @@ curl localhost:5173/api/debug/state          # what it knows + what's queued
 
 ### Deploying
 
-Push to `main`. Netlify builds automatically. Set `GROQ_API_KEY` (and the two
-Resend variables if you want the email) in **Site configuration → Environment
-variables**, then redeploy with cache cleared — variables only reach functions
+Merge to `main`. Netlify builds automatically. Set `GROQ_API_KEY`,
+`GITHUB_TOKEN` (and the two Resend variables if you want the email) in
+**Site configuration → Environment variables**, then redeploy with cache cleared — variables only reach functions
 on a fresh build. Netlify Blobs needs no setup.
 
 ---
@@ -135,25 +199,25 @@ himself are never overwritten** — his words win over a seed permanently.
 
 ## Design notes
 
-One continuous canvas, one token set, two themes (dark default, light on
-toggle). No section paints its own palette. A fixed ambient layer of slow
-coloured light sits behind everything so the glass has something to refract.
+One continuous canvas, one token set, two themes. No section paints its own
+palette.
 
 - **Liquid glass.** `.glass` and `.panel` are the same material: frosted fill,
-  saturated backdrop blur, a specular rim drawn as a masked gradient border,
-  and a highlight that follows the pointer. Tokens live in `:root` and
-  `[data-theme="light"]` in `index.css`.
-- One cool accent. Violet and teal only appear inside gradients with it.
-  Status colours are reserved and never reused as decoration.
-- Hero: floating glass nav, the intro video framed like a product shot that
-  tilts flat as you scroll, real numbers floated over it as glass chips.
-- Motion: Lenis smooth scroll, staggered blur-in reveals, scroll-driven
-  frame tilt, per-word headline reveals, a pinned storytelling section.
-- The site deliberately animates the same for everyone (`useReducedMotion`
-  returns false). Only the ambient light and gradient shimmer stop under
-  `prefers-reduced-motion`.
+  saturated backdrop blur and a specular rim drawn as a masked gradient border.
+  Tokens live in `:root` and `[data-theme="light"]` in `index.css`.
+- **One accent.** Violet and teal only appear with it, in gradients and as the
+  trace and log signal colours. Status colours are never decoration.
+- **Motion has a job.** There is one load sequence (the intro settles, the
+  three tools come online). After that, things move only to show a real run or
+  to answer the visitor. Motion blur is used where something travels: signal
+  streaks on the telemetry wires, the token on the agent loop, tab changes.
+- **Nothing shifts.** Replay areas reserve their height, fonts are preloaded,
+  and the page measures its own layout shift in the footer.
+- **Fonts are self-hosted** (Geist and Geist Mono via Fontsource). No request
+  leaves the origin.
 
-Bundle: ~377 KB (121 KB gzipped), CSS ~50 KB. Two font families.
+Security headers, scanning and reporting are described in
+[SECURITY.md](SECURITY.md).
 
 ---
 
@@ -184,15 +248,20 @@ lead to contact. The queue already records everything needed.
 notify them once it is answered. The field exists and is stored; only the
 send is missing.
 
-**Content.** Candid photography for About, and a writing section on agentic AI
-and reliability.
+**Write-ups.** One page per case study and a few posts on tracing AI agents
+with OpenTelemetry, collector routing and SLO-gated rollbacks. A single page
+can be found; pages that answer a question get referenced.
+
+**Scan workflows in the tool repos.** The Security section shows a scan result
+for any repo that has a `security` workflow. Add one to argus-sre-agent,
+intentops and agent-harness-sdk and their results appear with no site change.
 
 ---
 
 ## Notes
 
 - The Express server in `server/` is only used in development. On Netlify the
-  functions serve `/api/*`; the build's esbuild step for it is vestigial.
+  functions serve `/api/*`.
 - `.env` and `.agent-data/` are gitignored. No key is ever committed, and the
   browser never sees one — the functions proxy every model call server-side.
 - Port defaults to 5173, not 5000: macOS AirPlay Receiver squats on 5000 and

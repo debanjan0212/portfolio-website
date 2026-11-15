@@ -9,7 +9,7 @@ type Message = { role: "user" | "assistant"; content: string }
 /** Help-desk counters shown before the first question. After that the server suggests. */
 const TOPICS = [
   { icon: Sparkles, label: "Current work", q: "What is he building right now?" },
-  { icon: Code2, label: "Open source", q: "What are Argus and IntentOps?" },
+  { icon: Code2, label: "Open source", q: "What are Argus, IntentOps and agent-harness-sdk?" },
   { icon: Briefcase, label: "Experience", q: "What's the largest migration he has run?" },
   { icon: Layers, label: "Skills", q: "How deep is his OpenTelemetry experience?" },
   { icon: MapPin, label: "Availability", q: "What kind of role is he looking for?" },
@@ -21,15 +21,8 @@ const GREETING = `Hi, I'm mini-${profile.first}! I'm the pocket-sized help desk 
 
 const MOODS: Mood[] = ["wave", "happy", "talk", "think", "calm"]
 
-const NUDGE_KEY = "agent-nudge-seen"
-
-function nudgeSeen() {
-  try {
-    return localStorage.getItem(NUDGE_KEY) === "1"
-  } catch {
-    return false
-  }
-}
+/** Fired by the nav's mini-me button to open or close the help desk. */
+export const CHAT_EVENT = "portfolio:chat"
 
 export default function AgentChat() {
   const [open, setOpen] = useState(false)
@@ -42,7 +35,6 @@ export default function AgentChat() {
   // Follow-ups for the latest reply. The server picks these from what it can
   // actually answer, so staying on the rails always lands well.
   const [suggestions, setSuggestions] = useState<string[]>(OPENERS)
-  const [nudge, setNudge] = useState(false)
   const [mood, setMood] = useState<Mood>("idle")
   const moodTimer = useRef<ReturnType<typeof setTimeout>>()
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -73,35 +65,16 @@ export default function AgentChat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  // Show the nudge once, ever - not once per session. A returning visitor has
-  // already been told the assistant exists; telling them again every visit is
-  // nagging, not helpfulness.
-  useEffect(() => {
-    if (nudgeSeen()) return
-
-    const show = setTimeout(() => setNudge(true), 5200)
-    const hide = setTimeout(() => dismissNudge(), 15200)
-
-    return () => {
-      clearTimeout(show)
-      clearTimeout(hide)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  function dismissNudge() {
-    setNudge(false)
-    try {
-      localStorage.setItem(NUDGE_KEY, "1")
-    } catch {
-      // Blocked storage: worst case it appears again next visit.
-    }
-  }
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false)
+    // the nav carries the launcher on narrower screens and asks for the desk with this event
+    const onAsk = () => setOpen((o) => !o)
     window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
+    window.addEventListener(CHAT_EVENT, onAsk)
+    return () => {
+      window.removeEventListener("keydown", onKey)
+      window.removeEventListener(CHAT_EVENT, onAsk)
+    }
   }, [])
 
   async function send(text: string) {
@@ -179,59 +152,20 @@ export default function AgentChat() {
 
   return (
     <>
-      {/* A one-time nudge: mini-me says hi once, then never again on this browser. */}
-      <AnimatePresence>
-        {nudge && !open && (
-          <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.95 }}
-            transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
-            className="glass fixed bottom-28 right-4 z-[84] max-w-[16rem] rounded-2xl rounded-br-md p-4 text-left sm:right-6"
-          >
-            <button
-              onClick={dismissNudge}
-              aria-label="Dismiss"
-              className="absolute right-2 top-2 rounded-full p-1 text-low transition-colors hover:text-hi"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={() => {
-                dismissNudge()
-                setOpen(true)
-              }}
-              className="block pr-4 text-left"
-            >
-              <p className="text-sm font-medium leading-snug text-hi">Hi! I'm mini-{profile.first}.</p>
-              <p className="mt-1 text-xs leading-relaxed text-mid">Ask me anything about his work. I'm small, but I know my stuff.</p>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* The launcher is mini-me himself, waving from the corner. */}
       <motion.button
-        onClick={() => {
-          setOpen((o) => !o)
-          dismissNudge()
-        }}
+        onClick={() => setOpen((o) => !o)}
         onHoverStart={() => !open && react("wave", 1500)}
-        initial={{ opacity: 0, y: 24, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 2.6, duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-        aria-label={open ? "Close the help desk" : `Ask mini-${profile.first}`}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1.6, duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+        aria-label={open ? "Close the help desk" : `Ask mini-${profile.first} a question`}
+        aria-expanded={open}
         data-testid="button-agent-chat"
-        className="glass group fixed bottom-5 right-4 z-[85] flex items-center gap-3 rounded-full p-1.5 transition-transform duration-300 hover:scale-[1.04] active:scale-[0.98] sm:right-6 sm:pr-5"
+        className="glass chat-fab"
       >
-        <span className="relative grid h-14 w-14 place-items-center overflow-hidden rounded-full bg-accent/25">
-          {open ? <X className="h-5 w-5 text-hi" /> : <MiniMe mood={nudge ? "wave" : mood} size={56} />}
-          {!open && <span className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full bg-ok ring-2 ring-ink-0" aria-hidden />}
-        </span>
-        <span className="hidden text-left sm:block">
-          <span className="block text-sm font-semibold tracking-tight text-hi">{open ? "Close" : "Ask mini-me"}</span>
-          {!open && <span className="block text-[0.7rem] text-low">help desk · online</span>}
-        </span>
+        <span className="chat-fab-face">{open ? <X className="h-5 w-5 text-hi" /> : <MiniMe mood={mood} size={56} />}</span>
+        {!open && <span className="chat-fab-tip">Ask mini-me about my work</span>}
       </motion.button>
 
       <AnimatePresence>
@@ -244,7 +178,7 @@ export default function AgentChat() {
             role="dialog"
             aria-label={`Mini-${profile.first} help desk`}
             /* Near-solid ground: page text bleeding through the transcript is unreadable on a phone. */
-            className="panel fixed inset-x-3 bottom-[5.75rem] z-[85] flex h-[min(36rem,calc(100dvh-8rem))] flex-col overflow-hidden !bg-ink-1/95 sm:inset-x-auto sm:right-6 sm:w-[27rem]"
+            className="chat-panel panel fixed inset-x-3 bottom-3 z-[85] flex h-[min(36rem,calc(100dvh-5.5rem))] flex-col overflow-hidden !bg-ink-1/95 sm:inset-x-auto sm:right-4 sm:w-[27rem]"
           >
             <div className="flex items-center gap-3.5 border-b border-hairline/[0.07] px-5 py-4">
               <span className="relative grid h-16 w-16 shrink-0 place-items-center rounded-full bg-accent/20">
@@ -253,7 +187,7 @@ export default function AgentChat() {
               <div className="min-w-0">
                 <p className="text-[0.95rem] font-semibold tracking-tight text-hi">Mini-{profile.first}</p>
                 <p className="mt-0.5 text-[0.72rem] text-low">Help desk · answers from his real profile</p>
-                <p className="mt-1.5 flex items-center gap-1.5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-ok">
+                <p className="mt-1.5 flex items-center gap-1.5 text-[0.72rem] text-ok">
                   <span className="dot-live" />{busy ? "typing" : "online"}
                 </p>
               </div>
@@ -316,7 +250,7 @@ export default function AgentChat() {
               {/* Follow-ups after every reply. */}
               {!busy && messages.length > 1 && suggestions.length > 0 && (
                 <div className="space-y-1.5 pt-2">
-                  <p className="mono-label pb-1">Or ask</p>
+                  <p className="pb-1 text-xs text-low">Or ask</p>
                   {suggestions.map((s) => (
                     <motion.button
                       key={s}

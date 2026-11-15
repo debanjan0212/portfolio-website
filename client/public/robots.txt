@@ -1,0 +1,7 @@
+# Everyone is welcome, including AI assistants: this is a public profile.
+User-agent: *
+Allow: /
+Disallow: /answer
+Disallow: /api/
+
+Sitemap: https://debanjansre.online/sitemap.xml

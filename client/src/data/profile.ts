@@ -30,6 +30,19 @@ export const profile = {
   tagline: "Reliability for systems that think",
   intro:
     "I build the observability and reliability layer underneath large systems — most recently the telemetry platform for an agentic AI product, and before that full-stack APM instrumentation across Toyota North America.",
+  /** The same person, said twice: once for anyone, once for engineers. */
+  summary: {
+    simple:
+      "I keep big software systems running, and I build AI helpers that fix problems without being allowed to break things.",
+    technical:
+      "I build the observability and reliability layer under large systems, and open-source agents that do SRE work behind hard guardrails.",
+  },
+  work: {
+    simple:
+      "years in. I moved 800+ servers to Kubernetes for telecom companies, set up monitoring across 200+ code repositories for Toyota, and now build the monitoring layer for an AI operations product used by 5 clients.",
+    technical:
+      "years across AWS, Azure and GCP. 800+ servers migrated to private EKS at 99.8% release success, Datadog APM and RUM across 200+ Toyota repositories, and the OpenTelemetry platform for Hitachi's agentic AI product, now onboarded by 5 clients.",
+  },
 }
 
 export type Role = {
@@ -38,6 +51,8 @@ export type Role = {
   period: string
   location: string
   blurb: string
+  /** One sentence anyone can follow. */
+  plain: string
   points: string[]
   stack: string[]
 }
@@ -50,20 +65,22 @@ export const roles: Role[] = [
     location: "Bengaluru, India",
     blurb:
       "Full-stack observability for Toyota Motor North America, then the backend-agnostic telemetry platform for Hitachi's Operational Agentic AI product, which is now onboarded by 5 clients and going multi-cloud across Azure, AWS and GCP.",
+    plain:
+      "I build the monitoring layer for an AI product that helps IT teams find and fix problems, and I am setting the same product up on Google Cloud.",
     points: [
+      "Delivered a backend-agnostic observability platform for the OAA agentic AI platform — 18 managed microservices and around 8 operational agents, alongside Confluent Kafka, PostgreSQL, Redis and App Gateway",
       "Onboarded 5 clients onto the OAA platform and drive continuous delivery, security and SRE practices across their environments",
       "Leading the GCP build of the platform from scratch as OAA becomes cloud-agnostic across Azure, AWS and GCP — a private GKE cluster on a shared VPC, OpenTofu modules and an approval-gated pipeline mirroring the Azure baseline",
+      "Led DataDog APM and RUM instrumentation across 9 Toyota applications spanning 200+ repositories on Lambda, ECS Fargate and EKS Fargate — Java backends and Angular frontends",
       "Run platform engineering and DevOps on private AKS: Gitflow releases (develop, release branches, GA tags), Helm charts with CalVer versions, and GitOps delivery through Argo CD",
       "Worked on the migration from Azure Container Apps to AKS, with clusters, per-environment namespaces, Key Vault, managed identities and private endpoints built in OpenTofu",
       "Maintain CI/CD pipelines that build, test, scan, sign and push images, then write the new tag and digest back to GitOps for Argo CD to deploy, now extending to GCP and AWS",
       "Built pre-merge infrastructure guardrails with tests, including a check that validates secret-store references against the OpenTofu plan, alongside secret-leak and security scanning",
-      "Delivered a backend-agnostic observability platform for the OAA agentic AI platform — 18 managed microservices and around 8 operational agents, alongside Confluent Kafka, PostgreSQL, Redis and App Gateway",
       "Built the observability layer of the in-house agent SDK: multi-framework coverage, end-to-end distributed traces, metrics, and structured logging on a consistent event/action taxonomy",
       "Instrumented the platform end to end, including telemetry artifact collection and export, so a run can be followed from the first request through every agent that touched it",
       "OpenTelemetry gateway collector configuration, deployed on AKS — cloud-agnostic by design, so the same approach carries to AWS or GCP with the SDK added",
       "Multi-exporter routing so customers send telemetry to their own vendor backend or the bundled LGTM stack, with no application changes",
       "Made agent topologies, and the context and intent behind each operational query, visible to the people running the system — so they can see what broke and what is likely to break next",
-      "Led DataDog APM and RUM instrumentation across 9 Toyota applications spanning 200+ repositories on Lambda, ECS Fargate and EKS Fargate — Java backends and Angular frontends",
       "Built an email-to-DataDog ingestion pipeline processing 15,000–18,000 incident emails a day at 1,000 per 8-minute cycle, cutting triage from hours of manual work to near-real-time routing",
       "Shipped ~180 monitors wired to ServiceNow webhooks and PagerDuty, replacing email-based triage entirely",
       "Removed 5–6 hours of daily manual health-check toil through Python and Bash automation",
@@ -77,6 +94,8 @@ export const roles: Role[] = [
     location: "Bengaluru, India",
     blurb:
       "Infrastructure automation and cost work across a digital signature platform running 30+ microservices on AWS.",
+    plain:
+      "I made releases faster and cheaper for a digital-signature product.",
     points: [
       "Cut average Docker image size from 850MB to 320MB (62%) across 30+ microservices using multi-stage builds, Alpine bases and layer caching",
       "Migrated CI/CD to GitHub Actions with parallel jobs and caching — build times from 18 minutes to 9 (50%), and roughly 30% off CodeBuild costs",
@@ -94,6 +113,8 @@ export const roles: Role[] = [
     location: "Bengaluru, India",
     blurb:
       "Order Management System infrastructure for $1B+ revenue telecom clients including Charter Communications, Comcast and Oracle.",
+    plain:
+      "I moved a telecom ordering system from old servers to Kubernetes without stopping it.",
     points: [
       "Migrated 800+ servers from on-premises to private EKS clusters",
       "Executed 200+ production deployments at a 99.8% success rate, handling 50+ releases a week",
@@ -110,6 +131,8 @@ export const roles: Role[] = [
     period: "Dec 2021 — Dec 2022",
     location: "Bengaluru, India",
     blurb: "Built 'Kanryo', a GitOps-based SaaS platform, while mentoring 15 engineers.",
+    plain:
+      "I led a small platform that let teams ship their software through Git.",
     points: [
       "Led development of Kanryo on Kubernetes, Rancher, OpenShift, GitHub Actions and ArgoCD",
       "Cut Jenkins build times from 45 minutes to 20 (56%) through caching and pipeline streamlining",
@@ -123,6 +146,8 @@ export const roles: Role[] = [
     period: "Aug 2018 — Nov 2021",
     location: "Mumbai, Bangalore, Chennai",
     blurb: "Enterprise observability for Royal Mail, plus a Kafka-based big data platform.",
+    plain:
+      "I replaced an old monitoring system for Royal Mail with a modern one.",
     points: [
       "Architected the enterprise-wide ELK migration off legacy Nagios for Royal Mail — 40% lower operational cost, 60% faster incident resolution",
       "Led a 10-member support team at 99.5% SLA compliance",
@@ -340,6 +365,27 @@ export const education = {
     "Published a research paper on emotion recognition using machine learning and neuroscience. Internships at Schneider Electric, TE Connectivity and BEML.",
 }
 
+export type Certification = {
+  name: string
+  issuer: string
+  date: string
+  /** What it shows, in plain words. */
+  shows: string
+  /** Public verification link (Credly). Leave empty until you have it: the link only renders when set. */
+  verifyUrl: string
+}
+
+export const certifications: Certification[] = [
+  {
+    name: "Claude Certified Architect – Foundations",
+    issuer: "Anthropic",
+    date: "November 2026",
+    shows:
+      "Anthropic's exam for architects who design and build production applications with Claude: Claude Code, the Agent SDK, the API and MCP.",
+    verifyUrl: "",
+  },
+]
+
 export const languages = [
   { name: "English", level: "Professional working" },
   { name: "Hindi", level: "Limited working" },
@@ -402,6 +448,7 @@ export function knowledgeBase(): string {
     .map((g) => `${g.label}: ${g.items.join(", ")}`)
     .join("\n")
 
+  const certs = certifications.map((c) => `${c.name}, ${c.issuer} (${c.date}). ${c.shows}`).join("\n")
   const edu = `${education.degree}, ${education.school} (${education.period}). ${education.detail} ${education.extra}`
   const langs = languages.map((l) => `${l.name}: ${l.level}`).join("; ")
 
@@ -411,6 +458,7 @@ export function knowledgeBase(): string {
     "\nSELECTED PROJECTS\n" + proj,
     "\nOPEN-SOURCE BUILDS\n" + labText,
     "\nSKILLS\n" + skills,
+    "\nCERTIFICATIONS\n" + certs,
     "\nEDUCATION\n" + edu,
     "\nLANGUAGES\n" + langs,
   ].join("\n")

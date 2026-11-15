@@ -2,37 +2,56 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#06080e" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#050507" />
+    <meta name="color-scheme" content="dark light" />
 
-    <title>Debanjan Das — Senior Site Reliability Engineer</title>
+    <title>Debanjan Das | Senior SRE: observability, OpenTelemetry and AI agents for operations</title>
     <meta
       name="description"
-      content="Senior Site Reliability Engineer at Hitachi Digital Services. Observability, OpenTelemetry and platform engineering for large systems — including the telemetry layer for an agentic AI platform."
+      content="Senior Site Reliability Engineer in Bengaluru. I build OpenTelemetry observability platforms and open-source AI SRE agents with hard guardrails: Argus, IntentOps and agent-harness-sdk."
     />
+    <meta name="author" content="Debanjan Das" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <link rel="canonical" href="https://debanjansre.online/" />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="Debanjan Das" />
     <meta property="og:url" content="https://debanjansre.online/" />
-    <meta property="og:title" content="Debanjan Das — Senior Site Reliability Engineer" />
+    <meta property="og:title" content="Debanjan Das | Senior Site Reliability Engineer" />
     <meta
       property="og:description"
-      content="Observability, OpenTelemetry and platform engineering for large systems, including the telemetry layer for an agentic AI platform."
+      content="OpenTelemetry observability platforms and open-source AI SRE agents with hard guardrails. Watch Argus, IntentOps and agent-harness-sdk replay real runs."
     />
     <meta property="og:image" content="https://debanjansre.online/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Debanjan Das, Senior Site Reliability Engineer" />
+    <meta property="profile:first_name" content="Debanjan" />
+    <meta property="profile:last_name" content="Das" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Debanjan Das | Senior Site Reliability Engineer" />
+    <meta
+      name="twitter:description"
+      content="OpenTelemetry observability platforms and open-source AI SRE agents with hard guardrails."
+    />
     <meta name="twitter:image" content="https://debanjansre.online/og-image.png" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@300..600&family=Geist+Mono:wght@300..500&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="Plain-text profile for AI assistants" />
+
+    <!-- Sets light or dark before the first paint. Its own file so the Content-Security-Policy needs no inline scripts. -->
+    <script src="/boot.js"></script>
+    <!--jsonld-->
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><!--app--></div>
+    <noscript>
+      <p style="max-width: 40rem; margin: 2rem auto; padding: 0 1.25rem; font-family: system-ui, sans-serif">
+        The replays and live build status on this page need JavaScript. Everything else, including the résumé at /DebanjanDas-Resume.pdf, works without it.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
