@@ -11,7 +11,7 @@ const SECRET_PATTERNS: [RegExp, string][] = [
   [/\b(password|passwd|secret|api[_-]?key|token|x-api-key)\b("?\s*[=:]\s*"?)[^\s"',;}]+/gi, "$1$2<redacted>"],
   [/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]+?-----END [A-Z ]*PRIVATE KEY-----/g, "<private-key>"],
   [/\bpat\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g, "<harness-pat>"],
-  [/\b(?:\d[ -]?){13,16}\b/g, "<card-number>"],
+  [/\b\d(?:[ -]?\d){12,15}\b/g, "<card-number>"],
 ]
 
 const INJECTION =

@@ -19,8 +19,7 @@ const cases: { text: string; safe: string; redactions: number; injection: string
     injection: "ignore previous instructions",
   },
   { text: "charge failed, card 4242-4242-4242-4242, password=hunter2", safe: "charge failed, card <card-number>, password=<redacted>", redactions: 2, injection: null },
-  // the card pattern also takes the space after the number: same as the Python original, kept for fidelity
-  { text: "charge failed for card 4242 4242 4242 4242 user=dev password=hunter2", safe: "charge failed for card <card-number>user=dev password=<redacted>", redactions: 2, injection: null },
+  { text: "charge failed for card 4242 4242 4242 4242 user=dev password=hunter2", safe: "charge failed for card <card-number> user=dev password=<redacted>", redactions: 2, injection: null },
   { text: "Authorization: Bearer abcdefghijklmnopqrstuvwxyz012345", safe: "Authorization: Bearer <token>", redactions: 1, injection: null },
   { text: "key AKIAIOSFODNN7EXAMPLE leaked", safe: "key <aws-access-key> leaked", redactions: 1, injection: null },
   { text: "GET /healthz 200", safe: "GET /healthz 200", redactions: 0, injection: null },
