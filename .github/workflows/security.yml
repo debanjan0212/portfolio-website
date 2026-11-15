@@ -1,0 +1,121 @@
+# The website shows the result of this workflow live (Security section), by
+# reading the latest run named "security" on main from the GitHub API. If a
+# job here fails, the site says so.
+#
+# Every action is pinned to a full commit SHA, not a tag. Tags can be moved:
+# in March 2026 an attacker re-pointed 76 of 77 trivy-action tags at malware
+# (CVE-2026-33634). trivy-action 0.35.0 and Trivy 0.69.3 are the versions the
+# advisory lists as safe. Dependabot proposes updates to these pins.
+name: security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "23 3 * * 1" # Mondays 03:23 UTC: new advisories appear even when the code does not change
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependencies:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      # --ignore-scripts: a compromised package cannot run code during install
+      - run: npm ci --ignore-scripts
+      - name: Known vulnerabilities in what ships to visitors
+        run: npm audit --omit=dev --audit-level=moderate
+      - name: Known vulnerabilities in build tooling
+        run: npm audit --audit-level=high
+
+  trivy:
+    name: Trivy (vulnerabilities, secrets, misconfiguration)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # upload results to the repo's Security tab
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Scan and record
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          version: v0.69.3
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          format: sarif
+          output: trivy.sarif
+          exit-code: "0"
+      - name: Publish to the Security tab
+        if: always() && github.event.pull_request.head.repo.fork != true
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          sarif_file: trivy.sarif
+          category: trivy
+      - name: Fail on anything high or critical
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          version: v0.69.3
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: "1"
+          skip-setup-trivy: true
+
+  codeql:
+    name: CodeQL (static analysis)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: codeql
+
+  build:
+    name: Type-check, build and prerender
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm test
+      - run: npm run build:site
+      - name: The page must be readable without JavaScript
+        run: |
+          grep -q '<h1' dist/public/index.html
+          grep -q 'application/ld+json' dist/public/index.html
+          test -s dist/public/llms.txt
