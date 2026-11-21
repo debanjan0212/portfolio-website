@@ -119,3 +119,10 @@ jobs:
           grep -q '<h1' dist/public/index.html
           grep -q 'application/ld+json' dist/public/index.html
           test -s dist/public/llms.txt
+          test -s dist/public/sitemap.xml
+          # every write-up must exist as its own page, with its own canonical address
+          ls dist/public/notes/*/index.html
+          for f in dist/public/notes/*/index.html; do
+            grep -q '<h1' "$f"
+            grep -q 'rel="canonical" href="https://debanjansre.online/notes/' "$f"
+          done

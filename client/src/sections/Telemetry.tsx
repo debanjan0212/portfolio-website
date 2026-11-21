@@ -190,7 +190,7 @@ export default function Telemetry() {
         </h2>
         <p className="sub">
           {say(
-            "When something breaks at 3am, the system should be able to tell you why. This is the pattern I build so that it can.",
+            "When something breaks at 3am, the system should tell you why. This is the pattern I build so that it can.",
             "The shape of every observability platform I build: instrument against an open standard, normalise in one collector, and make the backend a routing decision instead of a rewrite.",
           )}
         </p>
@@ -232,7 +232,7 @@ export default function Telemetry() {
           <b>{say("Everything reports in", "Instrument once")}</b>
           <p>
             {say(
-              "Every app and every AI agent sends the same three kinds of signal: numbers, written logs, and the path each request took.",
+              "Every app and AI agent sends the same three signals.",
               "Services and the agent SDK emit traces, metrics and structured logs on one consistent event and action taxonomy.",
             )}
           </p>
@@ -241,7 +241,7 @@ export default function Telemetry() {
           <b>{say("One collector tidies it", "Gateway collector")}</b>
           <p>
             {say(
-              "A single collector gathers all of it and labels it the same way, so a request can be followed from start to finish.",
+              "One collector labels it all the same way.",
               "An OpenTelemetry gateway collector on AKS receives, enriches and batches. Nothing in it is tied to one cloud.",
             )}
           </p>
@@ -250,7 +250,7 @@ export default function Telemetry() {
           <b>{say("Send it anywhere", "Multi-exporter routing")}</b>
           <p>
             {say(
-              "Customers keep the monitoring tool they already pay for. Switching tools never means rewriting the apps.",
+              "Customers keep the monitoring tool they already pay for.",
               "Telemetry routes to the customer's own vendor backend or a bundled LGTM stack, with no application changes.",
             )}
           </p>
@@ -262,7 +262,7 @@ export default function Telemetry() {
           <h3>Hitachi Digital Services, agentic AI platform</h3>
           <p>
             {say(
-              "18 services and about 8 AI agents, each run traceable from the first request through every agent that touched it. Now used by 5 clients.",
+              "18 services and about 8 AI agents, every run traceable through each agent that touched it. Used by 5 clients.",
               "18 managed microservices and around 8 operational agents alongside Confluent Kafka, PostgreSQL, Redis and App Gateway. Onboarded by 5 clients and going multi-cloud.",
             )}
           </p>
@@ -271,7 +271,7 @@ export default function Telemetry() {
           <h3>Toyota Motor North America</h3>
           <p>
             {say(
-              "Monitoring across 9 applications and 200+ code repositories, with about 180 alarms wired straight to the on-call tools.",
+              "Monitoring across 9 applications and 200+ code repositories, with about 180 alarms wired to the on-call tools.",
               "Datadog APM and RUM across 9 applications and 200+ repositories on Lambda, ECS Fargate and EKS Fargate, with ~180 monitors into ServiceNow and PagerDuty.",
             )}
           </p>

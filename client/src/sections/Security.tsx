@@ -12,7 +12,7 @@ const rules = [
     Icon: EyeOff,
     title: ["It can look, but not touch", "Read-only tool gate"],
     body: [
-      "Argus can only use tools that are marked read-only. Anything else is blocked and written down.",
+      "Argus only gets read-only tools. Anything else is blocked and logged.",
       "Only MCP tools that declare readOnlyHint, or are explicitly allowlisted, are visible or callable. Blocked calls are recorded.",
     ],
     file: "argus/guardrails.py",
@@ -22,7 +22,7 @@ const rules = [
     Icon: Hand,
     title: ["A person approves every change", "Human-in-the-loop approval"],
     body: [
-      "Before an agent changes anything, it has to ask a human and wait for a yes.",
+      "Before any change, the agent asks a human and waits for a yes.",
       "The harness calls an Approver before any approval-required action runs. A denial is escalated to a person.",
     ],
     file: "agent_harness_sdk/approvals.py",
@@ -32,7 +32,7 @@ const rules = [
     Icon: Lock,
     title: ["Secrets are hidden first", "Secret redaction before the model"],
     body: [
-      "Passwords, keys and card numbers are masked before the AI ever sees the text.",
+      "Passwords, keys and card numbers are masked before the AI sees them.",
       "AWS keys, JWTs, bearer tokens, key=value secrets, private keys and card numbers are redacted from every tool result.",
     ],
     file: "agent_harness_sdk/guardrails.py",
@@ -42,7 +42,7 @@ const rules = [
     Icon: ShieldAlert,
     title: ["It cannot be tricked by what it reads", "Prompt-injection detection"],
     body: [
-      "If a log line tries to give the agent orders, the line is flagged and treated as plain data. A flagged run cannot fix anything on its own.",
+      "A log line that gives orders is flagged. A flagged run cannot change anything.",
       "Instruction-like text in tool output is flagged and marked as data. Any flag turns the proposed remediation into an escalation.",
     ],
     file: "argus/guardrails.py",
@@ -52,7 +52,7 @@ const rules = [
     Icon: Gauge,
     title: ["Hard limits on every fix", "Deterministic change policy"],
     body: [
-      "A fix may at most double the servers or memory, never touches protected areas, and needs to be at least 70% sure. Otherwise a human is called.",
+      "A fix may at most double servers or memory. Below 70% sure, a human is called.",
       "Bounded remediation: max 2x replicas or memory, protected namespaces, minimum confidence 0.7, plus step and tool-call budgets.",
     ],
     file: "argus/guardrails.py",
@@ -62,7 +62,7 @@ const rules = [
     Icon: ShieldCheck,
     title: ["Locked down when deployed", "Hardened workloads by default"],
     body: [
-      "Every app IntentOps deploys runs without admin rights and with a read-only disk. Apps holding personal data can only talk to the services they declared.",
+      "Every app IntentOps deploys runs without admin rights, on a read-only disk.",
       "Rendered workloads run non-root with a read-only root filesystem, no privilege escalation and all capabilities dropped. PII services get restricted egress.",
     ],
     file: "intentops/policy.py",
@@ -123,7 +123,7 @@ function TryIt() {
       <h3>{say("Try to sneak something past it", "Run the guardrail yourself")}</h3>
       <p>
         {say(
-          "Type anything, or pick an example. This is the real filter from my agent toolkit, running in your browser.",
+          "The real filter from my toolkit, running in your browser.",
           "The redaction and injection patterns from agent-harness-sdk, ported line for line and running client-side.",
         )}
       </p>
@@ -163,7 +163,11 @@ function TryIt() {
         </span>
       </div>
       <p className="fine">
-        {say("Nothing you type leaves this page.", "Nothing you type leaves this page.")} Source:{" "}
+        Nothing you type leaves this page. It also misses things:{" "}
+        <a className="link" href="/notes/guardrails-in-code-not-in-the-prompt/">
+          three inputs it gets wrong
+        </a>
+        . Source:{" "}
         <a className="link" href={`${GH}/agent-harness-sdk/blob/main/agent_harness_sdk/guardrails.py`} target="_blank" rel="noreferrer">
           agent_harness_sdk/guardrails.py
         </a>
@@ -182,7 +186,7 @@ function Scans() {
       <h3>{say("Checked by machines, shown live", "Build and scan state, live from GitHub")}</h3>
       <p>
         {say(
-          "I do not type these results in. The page asks GitHub and shows what it says, so a failed check would show up red here too.",
+          "Read from GitHub on every visit. A failed scan shows red here too.",
           "Nothing here is hard-coded. The page reads the latest workflow run of each repo from the GitHub API on every visit.",
         )}
       </p>
@@ -203,19 +207,11 @@ function Scans() {
           )
         })}
       </div>
-      {live.source !== "live" && <p className="fine">GitHub could not be reached just now, so no build state is shown. The links still open each repo.</p>}
+      {live.settled && live.source !== "live" && <p className="fine">GitHub could not be reached just now, so no build state is shown. The links still open each repo.</p>}
       <ul className="checks">
         <li>
           <Check size={15} aria-hidden />
-          <span>{say("This website's scan checks its code, its libraries and its settings on every change.", "This site's security workflow: Trivy (vulnerabilities, secrets, misconfiguration), npm audit and CodeQL, on every push and weekly.")}</span>
-        </li>
-        <li>
-          <Check size={15} aria-hidden />
-          <span>{say("No trackers, no ads, no outside scripts. Even the fonts are served from here.", "No third-party scripts or trackers. Self-hosted fonts, a strict Content-Security-Policy and HSTS.")}</span>
-        </li>
-        <li>
-          <Check size={15} aria-hidden />
-          <span>{say("Each tool's tests replay real incidents, including an attack hidden in the logs.", "Agent evals in CI replay recorded incidents, including a prompt-injection scenario that must be flagged.")}</span>
+          <span>{say("This site: scanned on every change. No trackers, no ads, no outside scripts.", "This site: Trivy, npm audit and CodeQL on every push and weekly. No third-party scripts, a strict Content-Security-Policy and HSTS.")}</span>
         </li>
       </ul>
       {live.source === "live" && !anyScan && <p className="fine">A security scan result appears next to each repo as soon as that repo has a scan workflow on its main branch.</p>}
@@ -235,7 +231,7 @@ export default function Security() {
         </h2>
         <p className="sub">
           {say(
-            "An AI that can change real systems needs rules it cannot argue with. These are the ones built into my tools. Each links to the code that enforces it.",
+            "An AI that can change real systems needs rules it cannot argue with. Each one links to the code that enforces it.",
             "An agent with production access needs guardrails that hold when the model is wrong or manipulated. Each one below links to the code that enforces it.",
           )}
         </p>
@@ -266,7 +262,7 @@ export default function Security() {
         </h3>
         <p>
           {say(
-            "I worked on SOC 2 and HIPAA compliance at Signeasy, so I build with the auditor's questions in mind. This shows which of those questions each guardrail helps answer.",
+            "I worked on SOC 2 and HIPAA compliance at Signeasy. Each guardrail maps to an audit control.",
             "At Signeasy I contributed to SOC 2 and HIPAA compliance through the Vanta integration with AWS. The guardrails are designed against the same controls.",
           )}
         </p>
@@ -297,8 +293,7 @@ export default function Security() {
           </tbody>
         </table>
         <p className="fine">
-          This is a design mapping, not a certificate. SOC 2 and HIPAA are audits of an organisation and how it operates, so no library can be compliant on its own. What a library can do is make those controls easy to
-          prove.
+          A design mapping, not a certificate: SOC 2 and HIPAA audit an organisation, not a library.
         </p>
       </div>
     </section>

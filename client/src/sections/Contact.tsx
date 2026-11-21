@@ -15,8 +15,6 @@ export default function Contact() {
         <br />
         <span className="text-mid">what you're running.</span>
       </h2>
-      <p className="sub">Open to SRE, platform and observability roles, as an engineer or a lead. Especially where the thing being made reliable is an AI system itself.</p>
-
       <a className="pill pill-solid contact-mail" href={`mailto:${profile.email}`}>
         <span>{profile.email}</span>
         <ArrowUpRight size={16} aria-hidden style={{ flex: "none" }} />

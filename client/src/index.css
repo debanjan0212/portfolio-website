@@ -216,6 +216,14 @@
     border-radius: 999px;
     background: rgb(var(--ok));
   }
+  .dot {
+    display: inline-block;
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: rgb(var(--ok));
+  }
   .dot-live::after {
     content: "";
     position: absolute;
@@ -529,36 +537,49 @@
   /* Hero                                                              */
   /* ---------------------------------------------------------------- */
   .hero {
-    padding-top: clamp(6.25rem, 11vw, 9rem);
-    padding-bottom: clamp(2rem, 4vw, 3.5rem);
+    padding-top: clamp(5.75rem, 10vw, 8rem);
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
   }
+  /*
+    Phone: who, résumé, face, then the work, top to bottom.
+    Desktop: words on the left, face on the right, the three tools across the bottom.
+  */
   .hero-grid {
     display: grid;
-    gap: 1.75rem;
-    grid-template-areas: "intro" "built" "act";
+    gap: 1.4rem;
+    grid-template-areas: "intro" "act" "video" "meta" "built";
+  }
+  .hero-grid > * {
+    min-width: 0;
   }
   .hero-intro {
     grid-area: intro;
-    min-width: 0;
-  }
-  .hero-built {
-    grid-area: built;
-    min-width: 0;
   }
   .hero-act {
     grid-area: act;
-    min-width: 0;
   }
-  @media (min-width: 1000px) {
+  .hero-video {
+    grid-area: video;
+  }
+  .hero-meta {
+    grid-area: meta;
+  }
+  .hero-built {
+    grid-area: built;
+  }
+  @media (min-width: 940px) {
     .hero-grid {
-      grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
-      grid-template-areas: "intro built" "act built";
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      grid-template-areas: "intro video" "act video" "meta video" "built built";
       column-gap: clamp(2rem, 5vw, 4.5rem);
-      row-gap: 2rem;
+      row-gap: 1.5rem;
       align-items: start;
     }
-    .hero-built {
+    .hero-video {
       align-self: center;
+    }
+    .hero-built {
+      margin-top: 1.5rem;
     }
   }
   .hero-role {
@@ -566,7 +587,7 @@
     color: rgb(var(--text-mid));
   }
   .hero-name {
-    margin-top: 0.6rem;
+    margin-top: 0.5rem;
     font-size: clamp(2.5rem, 12.4vw, 6.25rem);
     font-weight: 600;
     letter-spacing: -0.05em;
@@ -579,45 +600,37 @@
     /* descenders (j) are clipped by background-clip without this */
     padding-bottom: 0.08em;
   }
-  @media (min-width: 1000px) {
+  @media (min-width: 940px) {
     .hero-name {
-      font-size: clamp(3.4rem, 6.1vw, 5.6rem);
+      font-size: clamp(3.2rem, 6.1vw, 5.6rem);
     }
   }
   .hero-tag {
-    margin-top: 0.9rem;
-    font-size: clamp(1.3rem, 3.4vw, 2rem);
+    margin-top: 0.7rem;
+    font-size: clamp(1.25rem, 3.4vw, 2rem);
     font-weight: 550;
     letter-spacing: -0.03em;
     line-height: 1.15;
+    text-wrap: balance;
   }
   .hero-sum {
-    margin-top: 1.4rem;
+    margin-top: 1.1rem;
     max-width: 36rem;
-    font-size: clamp(1.08rem, 1.7vw, 1.3rem);
+    font-size: clamp(1.05rem, 1.7vw, 1.3rem);
     line-height: 1.45;
     color: rgb(var(--text-hi));
     text-wrap: pretty;
   }
-  .hero-work {
-    margin-top: 0.9rem;
+  /* Employers as one plain sentence: the names carry the weight, the rest stays quiet. */
+  .hero-at {
+    margin-top: 0.8rem;
     max-width: 36rem;
     color: rgb(var(--text-mid));
     text-wrap: pretty;
   }
-  .hero-voice {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.6rem 0.9rem;
-    margin-top: 1.4rem;
-    font-size: 0.85rem;
-    color: rgb(var(--text-low));
-  }
-  @media (max-width: 999px) {
-    .hero-voice > span {
-      display: none;
-    }
+  .hero-at b {
+    font-weight: 550;
+    color: rgb(var(--text-hi));
   }
   .hero-actions {
     display: flex;
@@ -625,18 +638,30 @@
     gap: 0.75rem;
   }
   .hero-actions .pill {
-    flex: 1 1 13rem;
+    flex: 1 1 auto;
     max-width: 100%;
+    padding-inline: 1.1rem;
+  }
+  .hero-actions .pill-solid {
+    flex-grow: 0;
+  }
+  .wide-only {
+    display: none;
   }
   @media (min-width: 560px) {
     .hero-actions .pill {
       flex: 0 0 auto;
     }
+    .wide-only {
+      display: inline;
+    }
+    .narrow-only {
+      display: none;
+    }
   }
   .hero-meta {
     display: grid;
-    gap: 0.7rem;
-    margin-top: 1.4rem;
+    gap: 0.6rem;
     font-size: 0.9rem;
     color: rgb(var(--text-mid));
   }
@@ -646,8 +671,8 @@
     gap: 0.65rem;
     min-width: 0;
   }
-  .hero-meta .dot-live {
-    margin-top: 0.55em;
+  .hero-meta .dot {
+    margin: 0.55em 0.3rem 0 0.3rem;
   }
   .hero-meta svg {
     flex: none;
@@ -669,31 +694,39 @@
   }
   .built-head {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.65rem 0.9rem 0.75rem;
+    gap: 0.5rem 0.75rem;
+    padding: 0.5rem 0.6rem 0.6rem 0.9rem;
   }
   .built-head h2 {
     font-size: 0.95rem;
     font-weight: 550;
     letter-spacing: -0.01em;
   }
-  .built-live {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.78rem;
-    color: rgb(var(--text-low));
-    white-space: nowrap;
+  /* from this width the same switch is in the nav, so one is enough */
+  @media (min-width: 1180px) {
+    .built-head .voice {
+      display: none;
+    }
+  }
+  .built-rows {
+    display: grid;
+    gap: 2px;
+  }
+  @media (min-width: 1000px) {
+    .built-rows {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
   .built-row {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
+    align-items: start;
     gap: 0.9rem;
     width: 100%;
-    padding: 0.95rem 0.9rem;
+    padding: 0.9rem;
     border: 0;
     border-radius: 1.2rem;
     background: transparent;
@@ -702,9 +735,6 @@
     color: inherit;
     cursor: pointer;
     transition: background-color 0.25s ease;
-  }
-  .built-row + .built-row {
-    margin-top: 2px;
   }
   .built-row:hover {
     background: rgb(var(--hairline) / 0.06);
@@ -723,15 +753,13 @@
     color: rgb(var(--accent));
   }
   .built-name {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.1rem 0.6rem;
+    display: block;
     font-size: 1.05rem;
     font-weight: 550;
     letter-spacing: -0.015em;
   }
   .built-what {
+    display: block;
     margin-top: 0.15rem;
     font-size: 0.9rem;
     line-height: 1.4;
@@ -742,23 +770,27 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.15rem 0.9rem;
+    min-height: 1.3rem;
     margin-top: 0.4rem;
     font-size: 0.8rem;
     color: rgb(var(--text-low));
   }
   .built-go {
+    margin-top: 0.8rem;
     color: rgb(var(--text-low));
     transition:
       transform 0.25s var(--ease),
       color 0.25s ease;
   }
-  .built-foot {
-    margin: 0.4rem 0.9rem 0.5rem;
-    padding-top: 0.8rem;
+  .built-live {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0.3rem 0.9rem 0.4rem;
+    padding-top: 0.7rem;
     border-top: 1px solid rgb(var(--hairline) / 0.08);
-    font-size: 0.85rem;
-    color: rgb(var(--text-mid));
-    text-wrap: pretty;
+    font-size: 0.8rem;
+    color: rgb(var(--text-low));
   }
 
   /*
@@ -2406,19 +2438,8 @@
   }
 
   /* ---------------------------------------------------------------- */
-  /* About and credentials                                             */
+  /* Intro video and credentials                                       */
   /* ---------------------------------------------------------------- */
-  .about {
-    display: grid;
-    gap: 1.75rem;
-  }
-  @media (min-width: 900px) {
-    .about {
-      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-      gap: clamp(2rem, 5vw, 4rem);
-      align-items: center;
-    }
-  }
   .video {
     position: relative;
     aspect-ratio: 16 / 9;
@@ -2466,18 +2487,16 @@
     background: #fff;
     color: #0a0a0e;
   }
-  .about-text p {
-    font-size: 1.08rem;
-    color: rgb(var(--text-mid));
-    text-wrap: pretty;
-  }
-  .about-text p + p {
-    margin-top: 0.9rem;
-  }
   .creds {
     display: grid;
     gap: 0.75rem;
-    margin-top: 1.6rem;
+    margin-top: 2rem;
+    scroll-margin-top: 6rem;
+  }
+  @media (min-width: 820px) {
+    .creds {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
   .cred {
     display: grid;
@@ -2511,6 +2530,256 @@
     font-size: 0.9rem;
     color: rgb(var(--text-mid));
     text-wrap: pretty;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Write-ups: the list on the home page                              */
+  /* ---------------------------------------------------------------- */
+  .posts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .post {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid rgb(var(--hairline) / 0.1);
+    color: inherit;
+    text-decoration: none;
+  }
+  .posts li:last-child .post {
+    border-bottom: 1px solid rgb(var(--hairline) / 0.1);
+  }
+  .post-kind {
+    font-size: 0.85rem;
+    color: rgb(var(--text-low));
+  }
+  .post-title {
+    font-size: clamp(1.25rem, 2.6vw, 1.65rem);
+    font-weight: 550;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  .post-title svg {
+    display: inline;
+    vertical-align: -1px;
+    color: rgb(var(--text-low));
+    transition:
+      transform 0.25s var(--ease),
+      color 0.25s ease;
+  }
+  .post:hover .post-title svg {
+    transform: translate(2px, -2px);
+    color: rgb(var(--accent));
+  }
+  .post-sum {
+    max-width: 44rem;
+    color: rgb(var(--text-mid));
+    text-wrap: pretty;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* A write-up: one quiet reading column                              */
+  /* ---------------------------------------------------------------- */
+  .note {
+    max-width: 46rem;
+    padding-top: clamp(6.5rem, 12vw, 9rem);
+    padding-bottom: clamp(3rem, 7vw, 5rem);
+  }
+  .note-kind {
+    font-size: 0.9rem;
+    color: rgb(var(--accent));
+  }
+  .note-head h1 {
+    margin-top: 0.7rem;
+    font-size: clamp(2rem, 6vw, 3.1rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+  .note-sum {
+    margin-top: 1.1rem;
+    font-size: clamp(1.08rem, 2vw, 1.25rem);
+    line-height: 1.5;
+    color: rgb(var(--text-mid));
+    text-wrap: pretty;
+  }
+  .note-by {
+    margin-top: 1.1rem;
+    padding-bottom: 1.6rem;
+    border-bottom: 1px solid rgb(var(--hairline) / 0.1);
+    font-size: 0.88rem;
+    color: rgb(var(--text-low));
+  }
+  .note-by a {
+    color: rgb(var(--text-hi));
+    text-decoration: none;
+  }
+  .note-by a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .note-body {
+    font-size: 1.06rem;
+    line-height: 1.7;
+  }
+  .note-body > * {
+    margin-top: 1.25rem;
+  }
+  .note-body > h2 {
+    margin-top: 2.75rem;
+    font-size: clamp(1.35rem, 3vw, 1.7rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+  .note-body > h2 + * {
+    margin-top: 0.9rem;
+  }
+  .note-body p,
+  .note-body li {
+    color: rgb(var(--text-mid));
+    text-wrap: pretty;
+  }
+  .note-body strong {
+    font-weight: 600;
+    color: rgb(var(--text-hi));
+  }
+  .note-body ul {
+    display: grid;
+    gap: 0.7rem;
+    padding: 0;
+    list-style: none;
+  }
+  .note-body ul li {
+    padding-left: 1.1rem;
+    border-left: 2px solid rgb(var(--accent) / 0.4);
+  }
+  .note-body :not(pre) > code {
+    padding: 0.1em 0.35em;
+    border-radius: 0.4em;
+    background: rgb(var(--hairline) / 0.08);
+    font-size: 0.86em;
+    color: rgb(var(--text-hi));
+    overflow-wrap: anywhere;
+  }
+  .note-aside {
+    padding: 0.9rem 1.1rem;
+    border-radius: 1rem;
+    background: rgb(var(--accent) / 0.08);
+    font-size: 0.98rem;
+  }
+  .note-code {
+    margin-inline: 0;
+  }
+  .note-code figcaption {
+    font-size: 0.82rem;
+    color: rgb(var(--text-low));
+  }
+  .note-code pre {
+    margin: 0.45rem 0 0;
+    padding: 1rem 1.1rem;
+    border-radius: 1rem;
+    font-size: 0.84rem;
+    line-height: 1.65;
+    color: rgb(var(--text-hi));
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .note-table {
+    overflow-x: auto;
+  }
+  .note-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .note-table th,
+  .note-table td {
+    padding: 0.7rem 0.9rem 0.7rem 0;
+    border-top: 1px solid rgb(var(--hairline) / 0.1);
+    text-align: left;
+    vertical-align: top;
+    color: rgb(var(--text-mid));
+  }
+  .note-table thead th {
+    border-top: 0;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: rgb(var(--text-low));
+  }
+  .note-table tbody th {
+    width: 11rem;
+    font-weight: 550;
+    color: rgb(var(--text-hi));
+  }
+  .note-table td:first-child {
+    white-space: nowrap;
+    color: rgb(var(--text-hi));
+  }
+  @media (max-width: 560px) {
+    /* on a phone each row becomes a small stack, so nothing scrolls sideways */
+    .note-table tr {
+      display: grid;
+      padding: 0.7rem 0;
+      border-top: 1px solid rgb(var(--hairline) / 0.1);
+    }
+    .note-table thead {
+      display: none;
+    }
+    .note-table th,
+    .note-table td {
+      padding: 0.1rem 0;
+      border: 0;
+    }
+    .note-table tbody th {
+      width: auto;
+    }
+    .note-table td:first-child {
+      white-space: normal;
+    }
+  }
+  .note-foot {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgb(var(--hairline) / 0.1);
+  }
+  .note-next {
+    display: grid;
+    gap: 0.2rem;
+    font-size: 1.15rem;
+    font-weight: 550;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    color: rgb(var(--text-hi));
+    text-decoration: none;
+  }
+  .note-next span {
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: rgb(var(--text-low));
+  }
+  .note-next:hover {
+    color: rgb(var(--accent));
+  }
+  .note-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.92rem;
+    color: rgb(var(--text-mid));
+    text-decoration: none;
+  }
+  .note-back:hover {
+    color: rgb(var(--text-hi));
   }
 
   /* ---------------------------------------------------------------- */

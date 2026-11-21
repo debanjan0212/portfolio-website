@@ -37,12 +37,8 @@ export const profile = {
     technical:
       "I build the observability and reliability layer under large systems, and open-source agents that do SRE work behind hard guardrails.",
   },
-  work: {
-    simple:
-      "years in. I moved 800+ servers to Kubernetes for telecom companies, set up monitoring across 200+ code repositories for Toyota, and now build the monitoring layer for an AI operations product used by 5 clients.",
-    technical:
-      "years across AWS, Azure and GCP. 800+ servers migrated to private EKS at 99.8% release success, Datadog APM and RUM across 200+ Toyota repositories, and the OpenTelemetry platform for Hitachi's agentic AI product, now onboarded by 5 clients.",
-  },
+  /** The first-screen employer row, newest first. Short names, as people say them. */
+  employers: ["Hitachi", "Signeasy", "TransUnion", "TCS", "Capgemini"],
 }
 
 export type Role = {
@@ -69,9 +65,9 @@ export const roles: Role[] = [
       "I build the monitoring layer for an AI product that helps IT teams find and fix problems, and I am setting the same product up on Google Cloud.",
     points: [
       "Delivered a backend-agnostic observability platform for the OAA agentic AI platform — 18 managed microservices and around 8 operational agents, alongside Confluent Kafka, PostgreSQL, Redis and App Gateway",
+      "Led DataDog APM and RUM instrumentation across 9 Toyota applications spanning 200+ repositories on Lambda, ECS Fargate and EKS Fargate — Java backends and Angular frontends",
       "Onboarded 5 clients onto the OAA platform and drive continuous delivery, security and SRE practices across their environments",
       "Leading the GCP build of the platform from scratch as OAA becomes cloud-agnostic across Azure, AWS and GCP — a private GKE cluster on a shared VPC, OpenTofu modules and an approval-gated pipeline mirroring the Azure baseline",
-      "Led DataDog APM and RUM instrumentation across 9 Toyota applications spanning 200+ repositories on Lambda, ECS Fargate and EKS Fargate — Java backends and Angular frontends",
       "Run platform engineering and DevOps on private AKS: Gitflow releases (develop, release branches, GA tags), Helm charts with CalVer versions, and GitOps delivery through Argo CD",
       "Worked on the migration from Azure Container Apps to AKS, with clusters, per-environment namespaces, Key Vault, managed identities and private endpoints built in OpenTofu",
       "Maintain CI/CD pipelines that build, test, scan, sign and push images, then write the new tag and digest back to GitOps for Argo CD to deploy, now extending to GCP and AWS",
@@ -381,7 +377,7 @@ export const certifications: Certification[] = [
     issuer: "Anthropic",
     date: "November 2026",
     shows:
-      "Anthropic's exam for architects who design and build production applications with Claude: Claude Code, the Agent SDK, the API and MCP.",
+      "Anthropic's exam for architects who build production applications with Claude: Claude Code, the Agent SDK, the API and MCP.",
     verifyUrl: "",
   },
 ]

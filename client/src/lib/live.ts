@@ -17,18 +17,27 @@ function load(): Promise<LivePayload> {
   return pending
 }
 
-/** Live repo state. Starts from the snapshot so nothing on the page waits or jumps. */
+/**
+ * Live repo state. Starts from the snapshot so nothing on the page waits or jumps.
+ * `settled` turns true once GitHub has answered or failed: until then the page
+ * is still asking, which is not the same as "could not be reached".
+ */
 export function useLive() {
   const [data, setData] = useState<LivePayload>(SNAPSHOT)
+  const [settled, setSettled] = useState(false)
   useEffect(() => {
     let alive = true
-    load().then((d) => alive && setData(d))
+    load().then((d) => {
+      if (!alive) return
+      setData(d)
+      setSettled(true)
+    })
     return () => {
       alive = false
     }
   }, [])
   const repo = (name: RepoName): RepoLive => data.repos.find((r) => r.name === name) ?? SNAPSHOT.repos.find((r) => r.name === name)!
-  return { ...data, repo }
+  return { ...data, repo, settled }
 }
 
 /** The current time, but only once the page is live in a browser. Null in the prerendered HTML. */

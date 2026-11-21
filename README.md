@@ -15,11 +15,12 @@ GitHub, and every number links back to where it came from.
 
 | Section | What it shows | Where the truth comes from |
 |---|---|---|
-| Hero | Name, a two-line summary, the three tools with live test status | `data/profile.ts`, GitHub API |
+| First screen | Name, one-line summary, employers, résumé, the intro video, and the three tools with live test status | `data/profile.ts`, GitHub API |
 | Watch them work | Argus, IntentOps and agent-harness-sdk replaying real runs | `data/runs.ts`, recorded from each repo's demo command |
 | Telemetry | The OpenTelemetry pattern, animated, with a backend you can switch | the Hitachi and Toyota work in `data/profile.ts` |
 | Security | Guardrails with links to the code, a guardrail you can try, live scan state, SOC 2 / HIPAA mapping | the three repos, `.github/workflows/security.yml` |
-| Experience, About, Contact | Five roles in plain words, certification, intro video | `data/profile.ts` |
+| Write-ups | A lab postmortem and a design note, each on its own page under `/notes/` | `data/notes.ts`, checkable in the tool repos |
+| Experience, Contact | Five roles in one plain line each (details open on request), certification, degree | `data/profile.ts` |
 | Footer | How fast this page loaded on the visitor's own device, and the commit that is live | measured in the browser |
 
 A **Plain words / Technical** switch rewrites the copy for the reader: plain
@@ -43,11 +44,12 @@ pins it to the Python output.
 
 ### Found by search engines, AI assistants and link previews
 
-`npm run build` renders the home page to real HTML (`scripts/prerender.mjs`),
-so anything that does not run JavaScript still reads the full page. The same
-step writes schema.org data (person, credential, the three projects) and
-`/llms.txt` from `data/profile.ts`. `robots.txt`, `sitemap.xml`, a canonical
-URL and a favicon are in `client/public/`.
+`npm run build` renders the home page and every write-up to real HTML
+(`scripts/prerender.mjs`), each with its own title, description and canonical
+URL, so anything that does not run JavaScript still reads the full page. The
+same step writes schema.org data (person, credential, the three projects, one
+article per write-up), `/sitemap.xml` and `/llms.txt` from `data/profile.ts`
+and `data/notes.ts`. `robots.txt` and a favicon are in `client/public/`.
 
 ### Things the page works out for itself
 
@@ -94,10 +96,12 @@ client/          React 18 + Vite + Tailwind.
   src/data/      profile.ts is the single source of truth for facts: the page,
                  the assistant, the schema data and llms.txt all read it.
                  runs.ts holds the recorded tool runs.
+                 notes.ts holds the write-ups.
+  src/pages/     Note.tsx renders one write-up at /notes/<slug>/
 
 shared/live/     GitHub lookups for build and scan state (used by the
                  function and its dev twin)
-scripts/         prerender.mjs: static HTML, schema data, llms.txt
+scripts/         prerender.mjs: static HTML per page, schema data, sitemap, llms.txt
 tests/           node:test suites for the live data and the guardrail port
 
 shared/agent/    The whole agent, framework-free and runtime-free:
@@ -190,6 +194,11 @@ on a fresh build. Netlify Blobs needs no setup.
 Everything factual lives in **`client/src/data/profile.ts`** — roles, projects,
 skills, what he is looking for. The page and the assistant both read it, so
 they can never drift apart.
+
+Write-ups live in **`client/src/data/notes.ts`**. Adding an entry there adds the
+page, the link on the home page, the sitemap entry and the llms.txt line. One
+rule: every number, command and code reference must be checkable in the linked
+repository, and lab work is labelled as lab work.
 
 The assistant's curated answers live in **`shared/agent/seed.ts`**. Editing an
 answer there updates the stored one on the next run. **Answers Debanjan gave

@@ -87,9 +87,9 @@ export const SNAPSHOT: LivePayload = {
   source: "snapshot",
   fetchedAt: "2026-11-16T00:00:00Z",
   repos: [
-    { name: "argus-sre-agent", url: `https://github.com/${OWNER}/argus-sre-agent`, pushedAt: "2026-11-07T00:00:00Z", stars: null, ci: null, security: null },
-    { name: "intentops", url: `https://github.com/${OWNER}/intentops`, pushedAt: "2026-11-07T00:00:00Z", stars: null, ci: null, security: null },
-    { name: "agent-harness-sdk", url: `https://github.com/${OWNER}/agent-harness-sdk`, pushedAt: "2026-11-07T00:00:00Z", stars: null, ci: null, security: null },
+    { name: "argus-sre-agent", url: `https://github.com/${OWNER}/argus-sre-agent`, pushedAt: "2026-11-16T06:07:00Z", stars: null, ci: null, security: null },
+    { name: "intentops", url: `https://github.com/${OWNER}/intentops`, pushedAt: "2026-11-16T06:07:00Z", stars: null, ci: null, security: null },
+    { name: "agent-harness-sdk", url: `https://github.com/${OWNER}/agent-harness-sdk`, pushedAt: "2026-11-16T06:07:00Z", stars: null, ci: null, security: null },
     { name: "portfolio-website", url: `https://github.com/${OWNER}/portfolio-website`, pushedAt: null, stars: null, ci: null, security: null },
   ],
 }

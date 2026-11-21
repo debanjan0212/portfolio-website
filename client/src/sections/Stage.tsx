@@ -29,7 +29,7 @@ const copy: Copy[] = [
     Glyph: ArgusGlyph,
     title: ["An AI on-call engineer that cannot touch production", "Argus: an AI SRE agent over MCP"],
     body: [
-      "When an alarm goes off, Argus checks the systems the way an on-call engineer would, works out what broke, and writes up the fix. It only ever reads. The fix goes out as a change request that a person has to accept.",
+      "When an alarm goes off, Argus checks the systems like an on-call engineer and works out what broke. It only reads. A person has to accept the fix.",
       "An alert fires. Argus investigates through read-only MCP tools over Prometheus, Loki, Tempo and Kubernetes, finds the root cause and proposes the fix as a GitOps pull request. A rule-based runbook mode takes over when the model is down.",
     ],
     does: [
@@ -46,7 +46,7 @@ const copy: Copy[] = [
     Glyph: IntentGlyph,
     title: ["Describe the app once. Run it on any cloud.", "IntentOps: an intent-driven platform agent"],
     body: [
-      "You write down what the app needs: how reliable, how busy, how much you can spend. IntentOps turns that into the server setup, the alarms and a price for each cloud. When a new version misbehaves, it pulls it back by itself.",
+      "You write down what the app needs: how reliable, how busy, how much you can spend. IntentOps turns that into the server setup, the alarms and a price for each cloud.",
       "One intent file in, a deterministic compiler out: capacity plan, error budget and multi-window burn-rate alerts, policy checks, cost per cloud, and plain manifests for EKS, GKE, AKS, bare metal or kind. Canaries are gated on the SLO.",
     ],
     does: [
@@ -63,7 +63,7 @@ const copy: Copy[] = [
     Glyph: HarnessGlyph,
     title: ["A toolkit for AI agents that ask before they act", "agent-harness-sdk: read, analyse, decide, act"],
     body: [
-      "A starting kit for building AI agents you can trust with real systems. Every agent built on it looks first, decides on one action, and has to get a yes from a person before it changes anything. It records everything it does.",
+      "A starting kit for AI agents that work on real systems. Every agent built on it looks first, decides on one action, and needs a yes from a person before it changes anything.",
       "A Python SDK for operational agents: read-only tools, one decided action, policy in code and human approval before any change, with secret redaction, injection checks and budgets built in. Works alone or inside LangChain, LangGraph, CrewAI, LlamaIndex, the OpenAI Agents SDK or any MCP client.",
     ],
     does: [
@@ -93,8 +93,8 @@ export default function Stage({ tool, onTool }: { tool: ToolId; onTool: (t: Tool
         </h2>
         <p className="sub">
           {say(
-            "Three open-source tools I built. What you see below is not a mock-up: each one replays a real run, recorded from the project's own demo command.",
-            "Three open-source projects. Each panel replays a real run recorded from the repo's own demo command, with no API key and no cluster. The command is shown so you can repeat it.",
+            "Three open-source tools I built. Each panel replays a real run from the project's own demo command.",
+            "Three open-source projects. Each panel replays a real run recorded from the repo's own demo command. The command is shown, so you can repeat it.",
           )}
         </p>
       </div>

@@ -1,13 +1,57 @@
 import { renderToString } from "react-dom/server"
 import App from "./App"
 import { certifications, education, knowledgeBase, lab, looking, profile, roles } from "./data/profile"
+import { notePath, notes } from "./data/notes"
 
-/** The home page as HTML, exactly as the browser will first render it. */
-export function render(): string {
-  return renderToString(<App />)
+/** One page as HTML, exactly as the browser will first render it. */
+export function render(path = "/"): string {
+  return renderToString(<App path={path} />)
 }
 
 const SITE = `https://${profile.site}`
+
+export type Page = { path: string; title: string; description: string; ogType: "profile" | "article"; jsonLd: object }
+
+/** Every page that is written out as real HTML at build time: the portfolio, then each write-up. */
+export function pages(): Page[] {
+  return [
+    { path: "/", title: "", description: "", ogType: "profile", jsonLd: jsonLd()[0] },
+    ...notes.map((n) => ({
+      path: notePath(n),
+      title: `${n.title} | ${profile.name}`,
+      description: n.summary,
+      ogType: "article" as const,
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        headline: n.title,
+        description: n.summary,
+        url: `${SITE}${notePath(n)}`,
+        mainEntityOfPage: `${SITE}${notePath(n)}`,
+        datePublished: n.date,
+        dateModified: n.date,
+        inLanguage: "en",
+        image: `${SITE}/og-image.png`,
+        author: { "@type": "Person", "@id": `${SITE}/#person`, name: profile.name, url: `${SITE}/` },
+        about: { "@type": "SoftwareSourceCode", name: n.repo.label, codeRepository: n.repo.url },
+        isPartOf: { "@id": `${SITE}/#website` },
+      },
+    })),
+  ]
+}
+
+/** /sitemap.xml, from the same list, so a new write-up cannot be forgotten. */
+export function sitemap(): string {
+  const urls = [
+    { loc: `${SITE}/`, freq: "weekly", priority: "1.0" },
+    ...notes.map((n) => ({ loc: `${SITE}${notePath(n)}`, freq: "monthly", priority: "0.8", lastmod: n.date })),
+    { loc: `${SITE}/DebanjanDas-Resume.pdf`, freq: "monthly", priority: "0.6" },
+  ]
+  const body = urls
+    .map((u) => `  <url>\n    <loc>${u.loc}</loc>${"lastmod" in u ? `\n    <lastmod>${u.lastmod}</lastmod>` : ""}\n    <changefreq>${u.freq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`)
+    .join("\n")
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`
+}
 
 /** schema.org data, so search engines, AI assistants and job boards read the same facts the page shows. */
 export function jsonLd(): object[] {
@@ -49,6 +93,7 @@ export function jsonLd(): object[] {
       skills: "OpenTelemetry, Kubernetes, AWS, Azure, GCP, Terraform, OpenTofu, Argo CD, Datadog, Prometheus, Grafana, Python",
     },
     seeks: { "@type": "Demand", name: looking.roles.join("; ") },
+    subjectOf: notes.map((n) => ({ "@type": "TechArticle", headline: n.title, url: `${SITE}${notePath(n)}`, datePublished: n.date })),
   }
 
   const site = {
@@ -96,6 +141,9 @@ export function llmsTxt(): string {
     "",
     "## Open-source projects",
     ...lab.map((p) => `- [${p.name}](${p.repo}): ${p.kicker}. ${p.summary}`),
+    "",
+    "## Write-ups",
+    ...notes.map((n) => `- [${n.title}](${SITE}${notePath(n)}): ${n.kind}. ${n.summary}`),
     "",
     "## Experience",
     ...roles.map((r) => `- ${r.company}, ${r.title} (${r.period}). ${r.blurb}`),
