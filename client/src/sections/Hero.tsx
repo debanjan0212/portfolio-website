@@ -2,11 +2,12 @@ import { Fragment } from "react"
 import { ArrowDown, ArrowRight, BadgeCheck, Download } from "lucide-react"
 import { certifications, profile } from "@/data/profile"
 import { useSay, VoiceSwitch } from "@/lib/prefs"
-import { ago, useLive, useNow, type RepoName, type Run } from "@/lib/live"
+import { ago, useLive, useNow, type RepoName } from "@/lib/live"
 import { ArgusGlyph, HarnessGlyph, IntentGlyph } from "@/components/Glyphs"
 import IntroVideo from "@/components/IntroVideo"
 import type { ToolId } from "@/App"
 
+/** One short line each: the section right below explains them properly. */
 const tools: {
   id: ToolId
   repo: RepoName
@@ -15,48 +16,18 @@ const tools: {
   simple: string
   technical: string
 }[] = [
-  {
-    id: "argus",
-    repo: "argus-sre-agent",
-    name: "Argus",
-    Glyph: ArgusGlyph,
-    simple: "An AI on-call engineer. It finds what broke and suggests the fix.",
-    technical: "AI SRE agent over MCP: read-only investigation, root cause, and the fix as a GitOps pull request.",
-  },
-  {
-    id: "intentops",
-    repo: "intentops",
-    name: "IntentOps",
-    Glyph: IntentGlyph,
-    simple: "Describe an app in one small file. It plans servers, alarms and cost on any cloud.",
-    technical: "Intent-driven platform agent: capacity, SLO burn-rate alerts, policy, cost per cloud, SLO-gated canary.",
-  },
-  {
-    id: "harness",
-    repo: "agent-harness-sdk",
-    name: "agent-harness-sdk",
-    Glyph: HarnessGlyph,
-    simple: "A toolkit for building AI agents that have to ask before they act.",
-    technical: "Python SDK: read, analyse, decide, act. Policy in code, human approval, OpenTelemetry built in.",
-  },
+  { id: "argus", repo: "argus-sre-agent", name: "Argus", Glyph: ArgusGlyph, simple: "An AI on-call engineer", technical: "AI SRE agent over MCP" },
+  { id: "intentops", repo: "intentops", name: "IntentOps", Glyph: IntentGlyph, simple: "Plans servers, alarms and cost", technical: "Intent to capacity, SLOs, cost, canary" },
+  { id: "harness", repo: "agent-harness-sdk", name: "agent-harness-sdk", Glyph: HarnessGlyph, simple: "AI agents that ask before they act", technical: "Agent SDK: policy in code, approval" },
 ]
-
-export function RunState({ run, what }: { run: Run | null; what: string }) {
-  if (!run || run.state === "unknown") return null
-  return (
-    <span className={`state is-${run.state}`}>
-      <i />
-      {what} {run.state}
-    </span>
-  )
-}
 
 const step = (i: number) => ({ "--i": i }) as React.CSSProperties
 
 /**
- * The first screen answers four questions in order: who, how they look and
- * sound, where they have worked, and what they built. The résumé is one tap
- * away on every screen size.
+ * The first screen answers, in order: who, where they have worked, what they
+ * are certified in, and what they built. A phone shows a small portrait beside
+ * the role and keeps the intro video just below the tools; a wide screen has
+ * room for the video itself. The résumé is one tap away on both.
  */
 export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void }) {
   const say = useSay()
@@ -70,7 +41,10 @@ export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void 
       <div className="hero-grid">
         <div className="hero-intro">
           <p className="hero-role settle" style={step(0)}>
-            {profile.role}, {profile.location.split(",")[0]}
+            <img className="hero-face" src="/portrait-192.webp" alt="" width={44} height={44} decoding="async" />
+            <span>
+              {profile.role}, {profile.location.split(",")[0]}
+            </span>
           </p>
           <h1 id="name" className="hero-name settle" style={step(1)}>
             {profile.name}
@@ -90,10 +64,19 @@ export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void 
               </Fragment>
             ))}
           </p>
+          <a className="hero-cert settle" style={step(5)} href="#credentials">
+            <BadgeCheck size={20} aria-hidden />
+            <span>
+              <b>{cert.name}</b>
+              <small>
+                {cert.issuer}, {cert.date}
+              </small>
+            </span>
+          </a>
         </div>
 
-        <div className="hero-actions hero-act settle" style={step(5)}>
-          {/* a phone gets the short label, so both buttons share one row and the photo stays on the first screen */}
+        <div className="hero-actions hero-act settle" style={step(6)}>
+          {/* a phone gets the short label, so both buttons share one row */}
           <a className="pill pill-solid" href="/DebanjanDas-Resume.pdf" download aria-label="Download résumé">
             <Download size={16} aria-hidden />
             <span className="wide-only">Download résumé</span>
@@ -107,40 +90,39 @@ export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void 
           </a>
         </div>
 
-        <IntroVideo className="hero-video settle" style={step(3)} />
-
-        <div className="hero-meta settle" style={step(6)}>
-          <p>
-            <span className="dot" />
-            <span>Open to senior and staff SRE, platform and AI-infrastructure roles</span>
-          </p>
-          <p>
-            <BadgeCheck size={17} aria-hidden />
-            <a href="#credentials">
-              {cert.name}, {cert.issuer}
-            </a>
-          </p>
-        </div>
-
         <aside className="glass built hero-built settle" style={step(7)} aria-labelledby="built-title">
-          <div className="built-head">
-            <h2 id="built-title">What I built</h2>
-            <VoiceSwitch />
-          </div>
+          <h2 id="built-title" className="built-head">
+            What I built
+          </h2>
           <div className="built-rows">
             {tools.map((t, i) => {
               const repo = live.repo(t.repo)
               const pushed = ago(repo.pushedAt, now)
+              const ci = repo.ci && repo.ci.state !== "unknown" ? repo.ci.state : null
               return (
                 <button key={t.id} className="built-row online" style={step(i)} onClick={() => onOpenTool(t.id)}>
                   <span className="built-glyph">
                     <t.Glyph />
                   </span>
-                  <span>
-                    <span className="built-name">{t.name}</span>
+                  <span className="built-text">
+                    {/* a phone shows the short status beside the name; wider screens get the full status line */}
+                    <span className="built-top">
+                      <span className="built-name">{t.name}</span>
+                      {ci && (
+                        <span className={`state is-${ci}`}>
+                          <i />
+                          {ci}
+                        </span>
+                      )}
+                    </span>
                     <span className="built-what">{say(t.simple, t.technical)}</span>
                     <span className="built-status">
-                      <RunState run={repo.ci} what="tests" />
+                      {ci && (
+                        <span className={`state is-${ci}`}>
+                          <i />
+                          tests {ci}
+                        </span>
+                      )}
                       {pushed && <span>updated {pushed}</span>}
                     </span>
                   </span>
@@ -151,10 +133,20 @@ export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void 
             })}
           </div>
           {/* always rendered, so nothing moves when the live data arrives; the dot pulses only when it is live */}
-          <p className="built-live">
-            <span className={live.source === "live" ? "dot-live" : "dot"} /> Test status and dates come from GitHub
-          </p>
+          <div className="built-foot">
+            <p className="built-live">
+              <span className={live.source === "live" ? "dot-live" : "dot"} /> Test status and dates come from GitHub
+            </p>
+            <VoiceSwitch />
+          </div>
         </aside>
+
+        <IntroVideo className="hero-video settle" style={step(3)} />
+
+        <p className="hero-meta settle" style={step(8)}>
+          <span className="dot" />
+          <span>Open to senior and staff SRE, platform and AI-infrastructure roles</span>
+        </p>
       </div>
     </section>
   )

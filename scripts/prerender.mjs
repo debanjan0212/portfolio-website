@@ -31,8 +31,8 @@ const assets = await readdir(path.join(out, "assets"))
 const fonts = ["geist-latin-wght-normal", "geist-mono-latin-wght-normal"].map((name) => assets.find((f) => f.startsWith(name) && f.endsWith(".woff2"))).filter(Boolean)
 if (fonts.length !== 2) throw new Error("prerender: could not find the Geist font files to preload")
 const fontLinks = fonts.map((f) => `    <link rel="preload" href="/assets/${f}" as="font" type="font/woff2" crossorigin />`).join("\n")
-// The intro photo is the largest thing on the home page's first screen.
-const photoLink = `    <link rel="preload" as="image" href="/intro-poster-1280.webp" imagesrcset="/intro-poster-720.webp 720w, /intro-poster-1280.webp 1280w" imagesizes="(min-width: 940px) 34rem, 100vw" fetchpriority="high" />`
+// On a wide screen the intro photo is the largest thing on the home page's first screen. On a phone it sits below the tools, so it is not rushed there.
+const photoLink = `    <link rel="preload" as="image" media="(min-width: 940px)" href="/intro-poster-1280.webp" imagesrcset="/intro-poster-720.webp 720w, /intro-poster-1280.webp 1280w" imagesizes="34rem" fetchpriority="high" />`
 
 const attr = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
 

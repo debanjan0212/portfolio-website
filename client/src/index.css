@@ -537,17 +537,17 @@
   /* Hero                                                              */
   /* ---------------------------------------------------------------- */
   .hero {
-    padding-top: clamp(5.75rem, 10vw, 8rem);
+    padding-top: clamp(5.25rem, 10vw, 8rem);
     padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
   }
   /*
-    Phone: who, résumé, face, then the work, top to bottom.
-    Desktop: words on the left, face on the right, the three tools across the bottom.
+    Phone: who, where, certified in what, résumé, the three tools, then the video.
+    Desktop: words on the left, the video on the right, the three tools across the bottom.
   */
   .hero-grid {
     display: grid;
-    gap: 1.4rem;
-    grid-template-areas: "intro" "act" "video" "meta" "built";
+    gap: 1.15rem;
+    grid-template-areas: "intro" "act" "built" "video" "meta";
   }
   .hero-grid > * {
     min-width: 0;
@@ -572,7 +572,7 @@
       grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
       grid-template-areas: "intro video" "act video" "meta video" "built built";
       column-gap: clamp(2rem, 5vw, 4.5rem);
-      row-gap: 1.5rem;
+      row-gap: 1.4rem;
       align-items: start;
     }
     .hero-video {
@@ -583,8 +583,26 @@
     }
   }
   .hero-role {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
     font-size: 0.95rem;
+    line-height: 1.3;
     color: rgb(var(--text-mid));
+  }
+  /* the small portrait stands in for the video on screens too narrow to show both */
+  .hero-face {
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    object-fit: cover;
+    box-shadow: 0 0 0 1px rgb(var(--hairline) / 0.14);
+  }
+  @media (min-width: 940px) {
+    .hero-face {
+      display: none;
+    }
   }
   .hero-name {
     margin-top: 0.5rem;
@@ -606,7 +624,7 @@
     }
   }
   .hero-tag {
-    margin-top: 0.7rem;
+    margin-top: 0.6rem;
     font-size: clamp(1.25rem, 3.4vw, 2rem);
     font-weight: 550;
     letter-spacing: -0.03em;
@@ -614,7 +632,7 @@
     text-wrap: balance;
   }
   .hero-sum {
-    margin-top: 1.1rem;
+    margin-top: 0.9rem;
     max-width: 36rem;
     font-size: clamp(1.05rem, 1.7vw, 1.3rem);
     line-height: 1.45;
@@ -623,7 +641,7 @@
   }
   /* Employers as one plain sentence: the names carry the weight, the rest stays quiet. */
   .hero-at {
-    margin-top: 0.8rem;
+    margin-top: 0.7rem;
     max-width: 36rem;
     color: rgb(var(--text-mid));
     text-wrap: pretty;
@@ -631,6 +649,50 @@
   .hero-at b {
     font-weight: 550;
     color: rgb(var(--text-hi));
+  }
+  /* The certification, as a badge you can tap through to the details. */
+  .hero-cert {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    max-width: 100%;
+    margin-top: 0.8rem;
+    padding: 0.4rem 0.95rem 0.4rem 0.7rem;
+    border: 1px solid rgb(var(--accent) / 0.24);
+    border-radius: 0.95rem;
+    background: rgb(var(--accent) / 0.09);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.25s ease;
+  }
+  .hero-cert:hover {
+    border-color: rgb(var(--accent) / 0.5);
+  }
+  .hero-cert svg {
+    flex: none;
+    color: rgb(var(--accent));
+  }
+  .hero-cert > span {
+    display: grid;
+    min-width: 0;
+    line-height: 1.25;
+  }
+  .hero-cert b {
+    font-size: 0.92rem;
+    font-weight: 550;
+    color: rgb(var(--text-hi));
+  }
+  .hero-cert small {
+    font-size: 0.78rem;
+    color: rgb(var(--text-low));
+  }
+  @media (min-width: 560px) {
+    .hero-cert > span {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0 0.6rem;
+    }
   }
   .hero-actions {
     display: flex;
@@ -660,56 +722,26 @@
     }
   }
   .hero-meta {
-    display: grid;
-    gap: 0.6rem;
-    font-size: 0.9rem;
-    color: rgb(var(--text-mid));
-  }
-  .hero-meta > * {
     display: flex;
     align-items: flex-start;
     gap: 0.65rem;
-    min-width: 0;
+    font-size: 0.9rem;
+    color: rgb(var(--text-mid));
   }
   .hero-meta .dot {
     margin: 0.55em 0.3rem 0 0.3rem;
   }
-  .hero-meta svg {
-    flex: none;
-    margin-top: 0.2em;
-    color: rgb(var(--accent));
-  }
-  .hero-meta a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .hero-meta a:hover {
-    color: rgb(var(--text-hi));
-  }
 
   /* "What I built": a live list, laid out like a service status board. */
   .built {
-    padding: 0.6rem;
-    border-radius: 1.75rem;
+    padding: 0.5rem;
+    border-radius: 1.5rem;
   }
   .built-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem 0.75rem;
-    padding: 0.5rem 0.6rem 0.6rem 0.9rem;
-  }
-  .built-head h2 {
-    font-size: 0.95rem;
+    padding: 0.25rem 0.75rem 0.1rem;
+    font-size: 0.9rem;
     font-weight: 550;
     letter-spacing: -0.01em;
-  }
-  /* from this width the same switch is in the nav, so one is enough */
-  @media (min-width: 1180px) {
-    .built-head .voice {
-      display: none;
-    }
   }
   .built-rows {
     display: grid;
@@ -722,13 +754,13 @@
   }
   .built-row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: start;
-    gap: 0.9rem;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.75rem;
     width: 100%;
-    padding: 0.9rem;
+    padding: 0.45rem 0.75rem;
     border: 0;
-    border-radius: 1.2rem;
+    border-radius: 1.1rem;
     background: transparent;
     text-align: left;
     text-decoration: none;
@@ -746,51 +778,100 @@
   .built-glyph {
     display: grid;
     place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 0.9rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.8rem;
     background: rgb(var(--accent) / 0.12);
     color: rgb(var(--accent));
   }
+  .built-text {
+    display: grid;
+    min-width: 0;
+  }
+  .built-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 0.6rem;
+  }
   .built-name {
-    display: block;
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 550;
     letter-spacing: -0.015em;
   }
+  .built-top .state {
+    font-size: 0.78rem;
+  }
   .built-what {
-    display: block;
-    margin-top: 0.15rem;
-    font-size: 0.9rem;
-    line-height: 1.4;
+    font-size: 0.88rem;
+    line-height: 1.35;
     color: rgb(var(--text-mid));
-    text-wrap: pretty;
   }
   .built-status {
-    display: flex;
+    display: none;
     flex-wrap: wrap;
     gap: 0.15rem 0.9rem;
     min-height: 1.3rem;
-    margin-top: 0.4rem;
+    margin-top: 0.35rem;
     font-size: 0.8rem;
     color: rgb(var(--text-low));
   }
   .built-go {
-    margin-top: 0.8rem;
+    display: none;
+    margin-top: 0.15rem;
     color: rgb(var(--text-low));
     transition:
       transform 0.25s var(--ease),
       color 0.25s ease;
   }
+  @media (min-width: 560px) {
+    .built-row {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 0.9rem;
+      padding: 0.85rem 0.9rem;
+    }
+    .built-glyph {
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 0.9rem;
+    }
+    .built-top .state {
+      display: none;
+    }
+    .built-status {
+      display: flex;
+    }
+    .built-name {
+      font-size: 1.05rem;
+    }
+    .built-go {
+      display: block;
+    }
+  }
+  .built-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
+    margin: 0.35rem 0.75rem 0.35rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgb(var(--hairline) / 0.08);
+  }
   .built-live {
     display: flex;
     align-items: center;
     gap: 0.55rem;
-    margin: 0.3rem 0.9rem 0.4rem;
-    padding-top: 0.7rem;
-    border-top: 1px solid rgb(var(--hairline) / 0.08);
     font-size: 0.8rem;
     color: rgb(var(--text-low));
+  }
+  /* from this width the same switch is in the nav, so one is enough */
+  @media (min-width: 1180px) {
+    .built-foot .voice {
+      display: none;
+    }
   }
 
   /*

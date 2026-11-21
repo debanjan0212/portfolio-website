@@ -5,9 +5,10 @@ import { profile } from "@/data/profile"
 /**
  * The intro video, as a still photo until it is asked for.
  *
- * The photo is the largest thing on the first screen, so it is loaded early
- * and in two sizes. The video file itself (1 to 4 MB) is only fetched on click,
- * and the click is what allows it to play with sound.
+ * On a wide screen the photo is the largest thing on the first screen, so the
+ * page preloads it there (see scripts/prerender.mjs). It comes in two sizes.
+ * The video file itself (1 to 4 MB) is only fetched on click, and the click is
+ * what allows it to play with sound.
  */
 export default function IntroVideo({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
   const [src, setSrc] = useState("")
@@ -25,7 +26,6 @@ export default function IntroVideo({ className = "", style }: { className?: stri
         width={1280}
         height={720}
         decoding="async"
-        {...{ fetchpriority: "high" }}
       />
       {src ? (
         <video src={src} playsInline autoPlay controls aria-label={`A short introduction from ${profile.first}`} />

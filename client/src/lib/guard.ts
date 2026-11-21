@@ -11,8 +11,27 @@ const SECRET_PATTERNS: [RegExp, string][] = [
   [/\b(password|passwd|secret|api[_-]?key|token|x-api-key)\b("?\s*[=:]\s*"?)[^\s"',;}]+/gi, "$1$2<redacted>"],
   [/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]+?-----END [A-Z ]*PRIVATE KEY-----/g, "<private-key>"],
   [/\bpat\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g, "<harness-pat>"],
-  [/\b\d(?:[ -]?\d){12,15}\b/g, "<card-number>"],
+  // scheme://user:password@host, as in a database or broker connection string; the user name stays readable
+  [/\b([a-z][a-z0-9+.-]*:\/\/[^\s/:@]*):[^\s/@]+@/gi, "$1:<redacted>@"],
 ]
+
+// 13 to 16 digits with single spaces or dashes between them. Only a candidate:
+// millisecond timestamps and order ids have this shape too, so the checksum decides.
+const CARD = /\b\d(?:[ -]?\d){12,15}\b/g
+
+/** The checksum every payment card number passes. About one random number in ten passes it by chance. */
+export function luhnOk(digits: string): boolean {
+  let total = 0
+  for (let i = 0; i < digits.length; i++) {
+    let d = Number(digits[digits.length - 1 - i])
+    if (i % 2 === 1) {
+      d *= 2
+      if (d > 9) d -= 9
+    }
+    total += d
+  }
+  return total % 10 === 0
+}
 
 const INJECTION =
   /(ignore (all |any )?(previous|prior|above) (instructions|prompts)|you are now|system (prompt|override)|disregard .{0,30}(rules|instructions)|reveal .{0,20}(prompt|secrets?)|kubectl (delete|exec|apply)|rm -rf|drop table|curl [^ ]+ \| ?(sh|bash))/i
@@ -36,6 +55,11 @@ export function guard(text: string): Guarded {
       return repl.replace(/\$(\d)/g, (_, n) => groups[Number(n) - 1] ?? "")
     })
   }
+  safe = safe.replace(CARD, (match) => {
+    if (!luhnOk(match.replace(/[ -]/g, ""))) return match
+    redactions++
+    return "<card-number>"
+  })
   const m = INJECTION.exec(text)
   return { safe, redactions, injection: m ? m[0] : null }
 }
