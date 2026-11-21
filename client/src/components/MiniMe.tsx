@@ -78,7 +78,7 @@ export default function MiniMe({ mood = "idle", size = 56, className = "" }: { m
           <motion.g animate={look} transition={{ duration: 0.4 }}>
             {[40.5, 59.5].map((cx) => (
               <g key={cx}>
-                <motion.ellipse cx={cx} cy="44" rx="2.3" animate={{ ry: eyeRy }} transition={{ duration: 0.09 }} fill="#1a1310" />
+                <motion.ellipse cx={cx} cy="44" rx="2.3" ry={2.6} initial={false} animate={{ ry: eyeRy }} transition={{ duration: 0.09 }} fill="#1a1310" />
                 {!blink && <circle cx={cx + 0.8} cy="43" r="0.6" fill="#fff" opacity="0.9" />}
               </g>
             ))}
@@ -108,6 +108,8 @@ export default function MiniMe({ mood = "idle", size = 56, className = "" }: { m
               cx="50"
               cy="59.6"
               rx="3.6"
+              ry={0.9}
+              initial={false}
               fill="#6b3226"
               animate={mood === "talk" ? { ry: [0.9, 2.6, 1.2, 2.2, 0.9] } : { ry: 0.9 }}
               transition={mood === "talk" ? { duration: 0.7, repeat: Infinity } : { duration: 0.2 }}

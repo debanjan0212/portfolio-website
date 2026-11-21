@@ -1,0 +1,9 @@
+{
+  "name": "Debanjan Das, Senior Site Reliability Engineer",
+  "short_name": "Debanjan Das",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#050507",
+  "theme_color": "#050507",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

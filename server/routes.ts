@@ -5,6 +5,7 @@ import { buildAndSendDigest } from "../shared/agent/digest";
 import { fileStore } from "../shared/agent/store-file";
 import { seedCollection } from "../shared/agent/seed";
 import { resolveConfigs } from "../shared/agent/llm";
+import { fetchAll } from "../shared/live/github";
 
 /**
  * Dev twins of the Netlify functions. Same orchestrator, same digest builder -
@@ -177,6 +178,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Anything else under /api answers JSON, so the client never receives Vite's
   // HTML fallback and tries to render it as a reply.
+  // Dev twin of netlify/functions/repos.mts: live build and scan state from GitHub.
+  app.get("/api/repos", async (_req, res) => {
+    res.json(await fetchAll(fetch as never, process.env.GITHUB_TOKEN));
+  });
+
   app.all("/api/*", (_req, res) => {
     res.status(404).json({ error: "Not found." });
   });
