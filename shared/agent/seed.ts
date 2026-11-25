@@ -93,7 +93,7 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
   },
   {
     q: "What compliance or security work has he done?",
-    a: "He contributed to SOC2 and HIPAA compliance at Signeasy using Vanta integrated with AWS for vulnerability management and audit readiness, led an OS migration from CentOS and RHEL to AlmaLinux at TransUnion for security compliance and end-of-life risk, and established ITIL processes via ServiceNow at Capgemini.",
+    a: "He led SOC 2 and HIPAA compliance at Signeasy together with the admin and IT teams. He kept controls and evidence in sync for the auditors and raised issues in the tools they used, Vanta integrated with AWS for vulnerability management and audit readiness. He also led an OS migration from CentOS and RHEL to AlmaLinux at TransUnion for security compliance and end-of-life risk, and established ITIL processes via ServiceNow at Capgemini.",
     tags: ["soc2", "hipaa", "compliance", "security", "itil"],
   },
   {
@@ -233,7 +233,7 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
   },
   {
     q: "What did he do at Signeasy?",
-    a: "A year, January to December 2025, on infrastructure automation and cost for a digital signature platform running 30+ microservices on AWS. He cut average Docker image size from 850MB to 320MB, moved CI/CD to GitHub Actions and took build times from 18 minutes to 9, migrated 30+ services from raw Kubernetes manifests to standardised Helm charts, contributed to SOC2 and HIPAA compliance through Vanta, and ran the annual DR exercise failing data flow from us-east-1 over to us-west-2.",
+    a: "A year, January to December 2025, on infrastructure automation and cost for a digital signature platform running 30+ microservices on AWS. He cut average Docker image size from 850MB to 320MB, moved CI/CD to GitHub Actions and took build times from 18 minutes to 9, migrated 30+ services from raw Kubernetes manifests to standardised Helm charts, led SOC 2 and HIPAA compliance with the admin and IT teams through Vanta, and ran the annual DR exercise failing data flow from us-east-1 over to us-west-2.",
     tags: ["signeasy", "aws", "cost", "docker", "soc2", "hipaa", "dr"],
   },
   {
@@ -321,7 +321,7 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
   },
   {
     q: "Has he worked in a regulated or compliance-heavy environment?",
-    a: "Yes. SOC2 and HIPAA at Signeasy through the Vanta integration with AWS, ITIL incident, change and problem management at Capgemini through ServiceNow, and telecom port-in and port-out operations at TransUnion, which carry regulatory obligations of their own. He has also done RBAC and access-control work as part of it.",
+    a: "Yes. SOC 2 and HIPAA at Signeasy, which he led with the admin and IT teams through Vanta with AWS, ITIL incident, change and problem management at Capgemini through ServiceNow, and telecom port-in and port-out operations at TransUnion, which carry regulatory obligations of their own. He has also done RBAC and access-control work as part of it.",
     tags: ["compliance", "soc2", "hipaa", "itil", "regulated", "rbac"],
   },
   {

@@ -14,7 +14,8 @@ export default function Footer() {
   const builtText = Number.isNaN(built.getTime()) ? "" : built.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })
 
   return (
-    <footer className="shell foot">
+    <footer className="foot">
+      <div className="shell">
       <div className="foot-live">
         <h2>This page, measured on your device</h2>
         <dl className="foot-nums">
@@ -41,7 +42,7 @@ export default function Footer() {
       </div>
       <div className="foot-row">
         <span suppressHydrationWarning>
-          © {new Date().getFullYear()} {profile.name}, {profile.location}
+          © {new Date().getFullYear()} {profile.name}, {profile.location}. {profile.tagline}.
         </span>
         <nav aria-label="Footer">
           <a href={profile.linkedin} target="_blank" rel="noreferrer">
@@ -58,6 +59,11 @@ export default function Footer() {
           </a>
         </nav>
       </div>
+      </div>
+      {/* the last thing on the page is the name, edge to edge */}
+      <p className="wordmark" aria-hidden>
+        {profile.name}
+      </p>
     </footer>
   )
 }

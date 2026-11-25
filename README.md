@@ -15,12 +15,14 @@ GitHub, and every number links back to where it came from.
 
 | Section | What it shows | Where the truth comes from |
 |---|---|---|
-| First screen | Name, one-line summary, employers, résumé, the intro video, and the three tools with live test status | `data/profile.ts`, GitHub API |
+| First screen | Name edge to edge with the portrait in front, role, location, employers and the certification in the corners, one glass dock (résumé, wording switch), then the three tools as a status board with live test status | `data/profile.ts`, GitHub API |
+| One sentence and the intro | The summary as one large sentence, then the intro photo edge to edge; the video loads on click | `data/profile.ts` |
 | Watch them work | Argus, IntentOps and agent-harness-sdk replaying real runs | `data/runs.ts`, recorded from each repo's demo command |
-| Telemetry | The OpenTelemetry pattern, animated, with a backend you can switch | the Hitachi and Toyota work in `data/profile.ts` |
+| Telemetry | The OpenTelemetry pattern as a diagram pinned beside three chapters (on wide screens each chapter lights its part), a backend you can switch, and the work numbers in a footnoted table | `sections/Telemetry.tsx` |
 | Security | Guardrails with links to the code, a guardrail you can try, live scan state, SOC 2 / HIPAA mapping | the three repos, `.github/workflows/security.yml` |
 | Write-ups | A lab postmortem and a design note, each on its own page under `/notes/` | `data/notes.ts`, checkable in the tool repos |
-| Experience, Contact | Five roles in one plain line each (details open on request), certification, degree | `data/profile.ts` |
+| Experience | Five roles in one plain line each (details open on request), certification with its Credly link, degree | `data/profile.ts` |
+| Contact | One strip: email and résumé. The footer ends on the name edge to edge | `data/profile.ts` |
 | Footer | How fast this page loaded on the visitor's own device, and the commit that is live | measured in the browser |
 
 A **Plain words / Technical** switch rewrites the copy for the reader: plain

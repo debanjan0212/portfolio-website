@@ -20,7 +20,12 @@ type Copy = {
   never: [string, string]
   repo: string
   run: string
+  /** One number per tool, and how it was measured, so it can be checked. */
+  metric: { value: string; label: [string, string]; how: string; href?: string }
 }
+
+const RENDERED = intentops.render.filesPerTarget * intentops.render.targets.length
+
 
 const copy: Copy[] = [
   {
@@ -39,6 +44,12 @@ const copy: Copy[] = [
     never: ["Never changes the live system. Every fix goes through Git and a human review.", "Never writes to the cluster. Tool gate, change limits, secret redaction and injection checks are enforced in code."],
     repo: argus.repo,
     run: argus.command,
+    metric: {
+      value: String(argus.stats.toolCalls),
+      label: ["checks from the alarm to the proposed fix, none of them able to change anything", "read-only tool calls from alert to proposed fix"],
+      how: `Recorded bad-deploy scenario in runbook mode: ${argus.stats.seconds} s on a laptop, ${argus.stats.blockedCalls} calls blocked.`,
+      href: argus.source,
+    },
   },
   {
     id: "intentops",
@@ -56,6 +67,12 @@ const copy: Copy[] = [
     never: ["The AI never writes the config. It fills in a form, and tested code does the rest.", "The model never writes YAML. It fills a typed schema; plans and release decisions never depend on it."],
     repo: intentops.repo,
     run: "make demo",
+    metric: {
+      value: String(RENDERED),
+      label: [`deployment files written from one ${intentops.intent.length}-line description of the app`, `manifests rendered from one ${intentops.intent.length}-line intent file`],
+      how: `${intentops.render.filesPerTarget} for each of ${intentops.render.targets.length} targets: ${intentops.render.targets.join(", ")}. From intentops render --cloud all on the example app.`,
+      href: intentops.source,
+    },
   },
   {
     id: "harness",
@@ -73,6 +90,12 @@ const copy: Copy[] = [
     never: ["Its rules live in code, not in the AI's instructions, so it cannot be talked out of them.", "Guardrails run in code, never in the prompt: they hold when the model is wrong or manipulated."],
     repo: harness.repo,
     run: "python -m incident_commander demo --scenario bad-deploy --approve ask",
+    metric: {
+      value: "38",
+      label: ["automatic tests that run on every change", "tests on every push, Python 3.11 to 3.15"],
+      how: "GitHub Actions on main, 23 November 2026: 38 passed and 1 skipped, on each of five Python versions.",
+      href: "https://github.com/debanjan0212/agent-harness-sdk/actions/runs/45264428184",
+    },
   },
 ]
 
@@ -140,6 +163,18 @@ export default function Stage({ tool, onTool }: { tool: ToolId; onTool: (t: Tool
                   <span>{say(c.never[0], c.never[1])}</span>
                 </li>
               </ul>
+              <div className="metric">
+                <p className="metric-value">{c.metric.value}</p>
+                <p className="metric-label">{say(c.metric.label[0], c.metric.label[1])}</p>
+                <p className="metric-how">
+                  {c.metric.how}{" "}
+                  {c.metric.href && (
+                    <a className="link" href={c.metric.href} target="_blank" rel="noreferrer">
+                      Check it
+                    </a>
+                  )}
+                </p>
+              </div>
               <div className="stage-links">
                 <a className="link" href={c.repo} target="_blank" rel="noreferrer">
                   {say("See the code on GitHub", "Source on GitHub")}
