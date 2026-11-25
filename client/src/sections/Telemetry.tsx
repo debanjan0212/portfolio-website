@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { usePrefs, useSay } from "@/lib/prefs"
 import { useInView } from "@/lib/useInView"
 
@@ -111,21 +111,26 @@ function Diagram({ vertical, on, voice }: { vertical: boolean; on: Set<BackendId
         </defs>
       )}
 
+      {/* every part carries the name of the chapter that explains it: is-src/is-in, is-col, is-out/is-dst */}
       {inWires.map((d) => (
-        <path key={d} className="fwire" d={d} />
+        <path key={d} className="fwire is-in" d={d} />
       ))}
       {outWires.map((d, i) => (
-        <path key={d} className={`fwire${on.has(BACKENDS[i].id) ? "" : " is-off"}`} d={d} />
+        <path key={d} className={`fwire is-out${on.has(BACKENDS[i].id) ? "" : " is-off"}`} d={d} />
       ))}
 
-      {inWires.map((d, i) => SIGNALS.map((sig, k) => <Signal key={`${i}-${sig.id}`} d={d} color={sig.color} dur={2.4 + i * 0.25} delay={-(k * 0.8 + i * 0.37)} />))}
-      {outWires.map((d, i) => (on.has(BACKENDS[i].id) ? SIGNALS.map((sig, k) => <Signal key={`${BACKENDS[i].id}-${sig.id}`} d={d} color={sig.color} dur={2.2 + i * 0.2} delay={-(k * 0.73 + i * 0.29)} />) : null))}
+      <g className="part-in">
+        {inWires.map((d, i) => SIGNALS.map((sig, k) => <Signal key={`${i}-${sig.id}`} d={d} color={sig.color} dur={2.4 + i * 0.25} delay={-(k * 0.8 + i * 0.37)} />))}
+      </g>
+      <g className="part-out">
+        {outWires.map((d, i) => (on.has(BACKENDS[i].id) ? SIGNALS.map((sig, k) => <Signal key={`${BACKENDS[i].id}-${sig.id}`} d={d} color={sig.color} dur={2.2 + i * 0.2} delay={-(k * 0.73 + i * 0.29)} />) : null))}
+      </g>
 
       {L.src.map((r, i) => (
-        <Node key={SOURCES[i].id} r={r} title={SOURCES[i][voice][0]} sub={SOURCES[i][voice][1]} />
+        <Node key={SOURCES[i].id} r={r} title={SOURCES[i][voice][0]} sub={SOURCES[i][voice][1]} cls="is-src" />
       ))}
 
-      <g className="fnode is-core">
+      <g className="fnode is-core is-col">
         <rect x={c.x} y={c.y} width={c.w} height={c.h} rx={20} />
         <text x={c.x + c.w / 2} y={c.y + 28} textAnchor="middle">
           OpenTelemetry Collector
@@ -135,7 +140,7 @@ function Diagram({ vertical, on, voice }: { vertical: boolean; on: Set<BackendId
         </text>
       </g>
       {inner.map((r, i) => (
-        <g className="fnode" key={stagesText[i]}>
+        <g className="fnode is-col" key={stagesText[i]}>
           <rect x={r.x} y={r.y} width={r.w} height={r.h} rx={10} />
           {vertical && voice === "simple" && i === 1 ? (
             <>
@@ -155,9 +160,69 @@ function Diagram({ vertical, on, voice }: { vertical: boolean; on: Set<BackendId
       ))}
 
       {L.out.map((r, i) => (
-        <Node key={BACKENDS[i].id} r={r} title={BACKENDS[i].name} sub={BACKENDS[i].sub} cls={on.has(BACKENDS[i].id) ? "is-on" : "is-off"} />
+        <Node key={BACKENDS[i].id} r={r} title={BACKENDS[i].name} sub={BACKENDS[i].sub} cls={`is-dst ${on.has(BACKENDS[i].id) ? "is-on" : "is-off"}`} />
       ))}
     </svg>
+  )
+}
+
+/** The three chapters that scroll past the pinned diagram, each lighting its own part of it. */
+const CHAPTERS: { title: [string, string]; body: [string, string] }[] = [
+  {
+    title: ["Everything reports in", "Instrument once"],
+    body: [
+      "Every app and AI agent sends the same three signals: where a request went, how busy things are, and what happened, in words.",
+      "Services and the agent SDK emit traces, metrics and structured logs on one consistent event and action taxonomy.",
+    ],
+  },
+  {
+    title: ["One collector tidies it", "Gateway collector"],
+    body: [
+      "One collector labels it all the same way, so a request can be followed from the first app to the last agent that touched it.",
+      "An OpenTelemetry gateway collector on AKS receives, enriches and batches. Nothing in it is tied to one cloud.",
+    ],
+  },
+  {
+    title: ["Send it anywhere", "Multi-exporter routing"],
+    body: [
+      "Customers keep the monitoring tool they already pay for. Switching tools changes the collector, not the apps.",
+      "Telemetry routes to the customer's own vendor backend or a bundled LGTM stack, with no application changes.",
+    ],
+  },
+]
+
+/** The work numbers, each with a footnote saying where it comes from. */
+function Numbers() {
+  const say = useSay()
+  const rows: { label: [string, string]; value: string; note: number }[] = [
+    { label: ["Services on the agentic AI platform", "Managed microservices"], value: "18", note: 1 },
+    { label: ["AI agents, every run traceable", "Operational agents traced end to end"], value: "about 8", note: 1 },
+    { label: ["Client companies onboarded", "Clients onboarded"], value: "5", note: 1 },
+    { label: ["Toyota applications monitored", "Applications with APM and RUM"], value: "9", note: 2 },
+    { label: ["Code repositories covered", "Repositories instrumented"], value: "200+", note: 2 },
+    { label: ["Alarms wired to the on-call tools", "Monitors into ServiceNow and PagerDuty"], value: "about 180", note: 2 },
+  ]
+  return (
+    <div className="numbers">
+      <h3>{say("Where I have built this", "Where this pattern runs")}</h3>
+      <table>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.label[1]}>
+              <th scope="row">{say(r.label[0], r.label[1])}</th>
+              <td>
+                {r.value}
+                <sup>{r.note}</sup>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <ol className="footnotes">
+        <li>The OAA agentic AI platform, Hitachi Digital Services. Used by client teams, so it is private and there is no public link.</li>
+        <li>Toyota Motor North America, Datadog APM and RUM, Hitachi Digital Services. Also private.</li>
+      </ol>
+    </div>
   )
 }
 
@@ -167,6 +232,21 @@ export default function Telemetry() {
   const [ref, inView] = useInView<HTMLDivElement>("0px", 0.15)
   const [on, setOn] = useState<Set<BackendId>>(() => new Set<BackendId>(["lgtm"]))
   const [switches, setSwitches] = useState(0)
+  // which chapter is crossing the middle of the screen; it decides which part of the diagram is lit
+  const [stage, setStage] = useState(0)
+  const chapters = useRef<(HTMLLIElement | null)[]>([])
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) setStage(Number((e.target as HTMLElement).dataset.i))
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    )
+    chapters.current.forEach((el) => el && io.observe(el))
+    return () => io.disconnect()
+  }, [])
 
   const toggle = (id: BackendId) => {
     setOn((prev) => {
@@ -182,6 +262,25 @@ export default function Telemetry() {
 
   const names = BACKENDS.filter((b) => on.has(b.id)).map((b) => b.name)
 
+  const picker = (
+    <div className="flow-pick" role="group" aria-label="Where to send the telemetry">
+      <span>{say("Send it to", "Export to")}</span>
+      {BACKENDS.map((b) => (
+        <button key={b.id} aria-pressed={on.has(b.id)} onClick={() => toggle(b.id)}>
+          {b.name}
+        </button>
+      ))}
+    </div>
+  )
+  const swap = (
+    <p className="flow-swap" aria-live="polite">
+      {say("Going to", "Exporting to")} <b>{names.join(", ")}</b>.{" "}
+      {switches === 0
+        ? say("Tap another tool and watch what changes.", "Toggle a backend and watch what changes.")
+        : say("You just switched monitoring tools. Changes needed in the apps: none.", "Backend changed. Application code changed: 0 lines. Only the collector's exporters moved.")}
+    </p>
+  )
+
   return (
     <section id="telemetry" className="sec shell" aria-labelledby="telemetry-title">
       <div className="sec-head">
@@ -196,93 +295,53 @@ export default function Telemetry() {
         </p>
       </div>
 
-      <div ref={ref} className={`flow${inView ? " is-live" : ""}`}>
-        <div className="flow-top">
-          <div className="flow-pick" role="group" aria-label="Where to send the telemetry">
-            <span>{say("Send it to", "Export to")}</span>
-            {BACKENDS.map((b) => (
-              <button key={b.id} aria-pressed={on.has(b.id)} onClick={() => toggle(b.id)}>
-                {b.name}
-              </button>
-            ))}
+      {/*
+        Wide screens: the diagram is pinned on the left while three chapters scroll past on the right,
+        and only the part the current chapter talks about is lit and moving.
+        Narrow screens: the diagram, then the chapters underneath, everything lit.
+      */}
+      <div ref={ref} className={`dissect${inView ? " is-live" : ""}`} data-stage={stage}>
+        <div className="dissect-pin">
+          <div className="flow-top">
+            <div className="dissect-narrow">{picker}</div>
+            <div className="legend">
+              {SIGNALS.map((s) => (
+                <span key={s.id}>
+                  <i style={{ background: s.color }} />
+                  {s[voice]}
+                </span>
+              ))}
+            </div>
           </div>
-          <div className="legend">
-            {SIGNALS.map((s) => (
-              <span key={s.id}>
-                <i style={{ background: s.color }} />
-                {s[voice]}
-              </span>
-            ))}
-          </div>
+          <Diagram vertical={false} on={on} voice={voice} />
+          <Diagram vertical on={on} voice={voice} />
+          <div className="dissect-narrow">{swap}</div>
         </div>
 
-        <Diagram vertical={false} on={on} voice={voice} />
-        <Diagram vertical on={on} voice={voice} />
-
-        <p className="well flow-swap" aria-live="polite">
-          {say("Going to", "Exporting to")} <b>{names.join(", ")}</b>.{" "}
-          {switches === 0
-            ? say("Tap another tool above and watch what changes.", "Toggle a backend above and watch what changes.")
-            : say("You just switched monitoring tools. Changes needed in the apps: none.", "Backend changed. Application code changed: 0 lines. Only the collector's exporters moved.")}
-        </p>
+        <ol className="dissect-chapters">
+          {CHAPTERS.map((c, i) => (
+            <li
+              key={c.title[1]}
+              data-i={i}
+              ref={(el) => {
+                chapters.current[i] = el
+              }}
+              className={stage === i ? "is-on" : undefined}
+            >
+              <h3>{say(c.title[0], c.title[1])}</h3>
+              <p>{say(c.body[0], c.body[1])}</p>
+              {i === 2 && (
+                <div className="dissect-wide">
+                  {picker}
+                  {swap}
+                </div>
+              )}
+            </li>
+          ))}
+        </ol>
       </div>
 
-      <ol className="flow-notes">
-        <li>
-          <b>{say("Everything reports in", "Instrument once")}</b>
-          <p>
-            {say(
-              "Every app and AI agent sends the same three signals.",
-              "Services and the agent SDK emit traces, metrics and structured logs on one consistent event and action taxonomy.",
-            )}
-          </p>
-        </li>
-        <li>
-          <b>{say("One collector tidies it", "Gateway collector")}</b>
-          <p>
-            {say(
-              "One collector labels it all the same way.",
-              "An OpenTelemetry gateway collector on AKS receives, enriches and batches. Nothing in it is tied to one cloud.",
-            )}
-          </p>
-        </li>
-        <li>
-          <b>{say("Send it anywhere", "Multi-exporter routing")}</b>
-          <p>
-            {say(
-              "Customers keep the monitoring tool they already pay for.",
-              "Telemetry routes to the customer's own vendor backend or a bundled LGTM stack, with no application changes.",
-            )}
-          </p>
-        </li>
-      </ol>
-
-      <div className="proof-row">
-        <div>
-          <h3>Hitachi Digital Services, agentic AI platform</h3>
-          <p>
-            {say(
-              "18 services and about 8 AI agents, every run traceable through each agent that touched it. Used by 5 clients.",
-              "18 managed microservices and around 8 operational agents alongside Confluent Kafka, PostgreSQL, Redis and App Gateway. Onboarded by 5 clients and going multi-cloud.",
-            )}
-          </p>
-        </div>
-        <div>
-          <h3>Toyota Motor North America</h3>
-          <p>
-            {say(
-              "Monitoring across 9 applications and 200+ code repositories, with about 180 alarms wired to the on-call tools.",
-              "Datadog APM and RUM across 9 applications and 200+ repositories on Lambda, ECS Fargate and EKS Fargate, with ~180 monitors into ServiceNow and PagerDuty.",
-            )}
-          </p>
-        </div>
-      </div>
-      <p className="fine proof-note">
-        {say(
-          "These numbers are from my project work at Hitachi Digital Services. Both platforms are private, so they cannot be linked here. They match my résumé.",
-          "Figures from client engagements at Hitachi Digital Services, 2026. Both platforms are private, so there is no public source to link. They match the résumé.",
-        )}
-      </p>
+      <Numbers />
     </section>
   )
 }

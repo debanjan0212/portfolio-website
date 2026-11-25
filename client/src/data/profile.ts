@@ -378,7 +378,7 @@ export const certifications: Certification[] = [
     date: "November 2026",
     shows:
       "Anthropic's exam for architects who build production applications with Claude: Claude Code, the Agent SDK, the API and MCP.",
-    verifyUrl: "",
+    verifyUrl: "https://www.credly.com/badges/2fcfdf13-ee2f-4322-a6d2-f6b85671812f/public_url",
   },
 ]
 

@@ -4,6 +4,7 @@ import { PrefsProvider, usePrefs } from "./lib/prefs"
 import { noteForPath } from "./data/notes"
 import Nav from "./components/Nav"
 import Hero from "./sections/Hero"
+import Intro from "./sections/Intro"
 import Stage from "./sections/Stage"
 import Telemetry from "./sections/Telemetry"
 import Security from "./sections/Security"
@@ -32,6 +33,7 @@ function Portfolio() {
       <Nav home />
       <main id="top">
         <Hero onOpenTool={openTool} />
+        <Intro />
         <Stage tool={tool} onTool={setTool} />
         <Telemetry />
         <Security />

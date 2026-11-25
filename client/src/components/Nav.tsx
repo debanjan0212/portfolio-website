@@ -59,7 +59,6 @@ export default function Nav({ home }: { home: boolean }) {
             ))}
           </div>
           <div className="nav-right">
-            {home && <VoiceSwitch className="nav-voice" />}
             {home && (
               <button className="nav-chat" onClick={() => window.dispatchEvent(new Event(CHAT_EVENT))} aria-label="Ask mini-me a question about my work">
                 <MiniMe size={40} />
