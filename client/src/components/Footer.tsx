@@ -15,10 +15,8 @@ export default function Footer() {
 
   return (
     <footer className="shell foot">
-      <div className="glass foot-live">
-        <h2>
-          <span className="dot-live" /> This page, measured on your device
-        </h2>
+      <div className="foot-live">
+        <h2>This page, measured on your device</h2>
         <dl className="foot-nums">
           <div>
             <dt>Main content shown in</dt>

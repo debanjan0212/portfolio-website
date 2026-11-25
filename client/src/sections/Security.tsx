@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { Check, EyeOff, FileSearch, Gauge, Hand, Lock, ShieldAlert, ShieldCheck } from "lucide-react"
+import { Check, Lock, ShieldAlert } from "lucide-react"
 import { usePrefs, useSay } from "@/lib/prefs"
 import { guard } from "@/lib/guard"
 import { useLive, type RepoName, type Run } from "@/lib/live"
@@ -9,7 +9,6 @@ const GH = "https://github.com/debanjan0212"
 /** Every rule here is enforced in code in the repo it links to. Nothing is a promise in a prompt. */
 const rules = [
   {
-    Icon: EyeOff,
     title: ["It can look, but not touch", "Read-only tool gate"],
     body: [
       "Argus only gets read-only tools. Anything else is blocked and logged.",
@@ -19,7 +18,6 @@ const rules = [
     href: `${GH}/argus-sre-agent/blob/main/argus/guardrails.py`,
   },
   {
-    Icon: Hand,
     title: ["A person approves every change", "Human-in-the-loop approval"],
     body: [
       "Before any change, the agent asks a human and waits for a yes.",
@@ -29,7 +27,6 @@ const rules = [
     href: `${GH}/agent-harness-sdk/blob/main/agent_harness_sdk/approvals.py`,
   },
   {
-    Icon: Lock,
     title: ["Secrets are hidden first", "Secret redaction before the model"],
     body: [
       "Passwords, keys and card numbers are masked before the AI sees them.",
@@ -39,7 +36,6 @@ const rules = [
     href: `${GH}/agent-harness-sdk/blob/main/agent_harness_sdk/guardrails.py`,
   },
   {
-    Icon: ShieldAlert,
     title: ["It cannot be tricked by what it reads", "Prompt-injection detection"],
     body: [
       "A log line that gives orders is flagged. A flagged run cannot change anything.",
@@ -49,7 +45,6 @@ const rules = [
     href: `${GH}/argus-sre-agent/blob/main/argus/guardrails.py`,
   },
   {
-    Icon: Gauge,
     title: ["Hard limits on every fix", "Deterministic change policy"],
     body: [
       "A fix may at most double servers or memory. Below 70% sure, a human is called.",
@@ -59,7 +54,6 @@ const rules = [
     href: `${GH}/argus-sre-agent/blob/main/argus/guardrails.py`,
   },
   {
-    Icon: ShieldCheck,
     title: ["Locked down when deployed", "Hardened workloads by default"],
     body: [
       "Every app IntentOps deploys runs without admin rights, on a read-only disk.",
@@ -120,11 +114,11 @@ function TryIt() {
   })
 
   return (
-    <div className="glass box">
+    <div className="box">
       <h3>{say("Try to sneak something past it", "Run the guardrail yourself")}</h3>
       <p>
         {say(
-          "The real filter from my toolkit, running in your browser.",
+          "The same filter as in my agent toolkit, running in your browser.",
           "The redaction and injection patterns from agent-harness-sdk, ported line for line and running client-side.",
         )}
       </p>
@@ -183,7 +177,7 @@ function Scans() {
   const anyScan = repos.some((r) => live.repo(r.name).security)
 
   return (
-    <div className="glass box">
+    <div className="box">
       <h3>{say("Checked by machines, shown live", "Build and scan state, live from GitHub")}</h3>
       <p>
         {say(
@@ -232,7 +226,7 @@ export default function Security() {
         </h2>
         <p className="sub">
           {say(
-            "An AI that can change real systems needs rules it cannot argue with. Each one links to the code that enforces it.",
+            "An AI that can change production systems needs rules it cannot argue with. Each one links to the code that enforces it.",
             "An agent with production access needs guardrails that hold when the model is wrong or manipulated. Each one below links to the code that enforces it.",
           )}
         </p>
@@ -240,8 +234,7 @@ export default function Security() {
 
       <ul className="rules">
         {rules.map((r) => (
-          <li className="glass rule" key={r.title[0]}>
-            <r.Icon size={22} aria-hidden />
+          <li className="rule" key={r.title[0]}>
             <h3>{say(r.title[0], r.title[1])}</h3>
             <p>{say(r.body[0], r.body[1])}</p>
             <a className="link" href={r.href} target="_blank" rel="noreferrer">
@@ -256,9 +249,8 @@ export default function Security() {
         <Scans />
       </div>
 
-      <div className="glass box" style={{ marginTop: "1.25rem" }}>
+      <div className="box" style={{ marginTop: "1.25rem" }}>
         <h3>
-          <FileSearch size={19} style={{ display: "inline", verticalAlign: "-3px", marginRight: "0.5rem", color: "rgb(var(--accent))" }} aria-hidden />
           {say("How this lines up with SOC 2 and HIPAA", "Mapping to SOC 2 and HIPAA controls")}
         </h3>
         <p>

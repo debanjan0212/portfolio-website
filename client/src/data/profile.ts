@@ -56,8 +56,8 @@ export type Role = {
 export const roles: Role[] = [
   {
     company: "Hitachi Digital Services",
-    title: "Senior Site Reliability Engineer — SRE Transformation",
-    period: "Dec 2025 — Present",
+    title: "Senior Site Reliability Engineer, SRE Transformation",
+    period: "Dec 2025 – Present",
     location: "Bengaluru, India",
     blurb:
       "Full-stack observability for Toyota Motor North America, then the backend-agnostic telemetry platform for Hitachi's Operational Agentic AI product, which is now onboarded by 5 clients and going multi-cloud across Azure, AWS and GCP.",
@@ -85,8 +85,8 @@ export const roles: Role[] = [
   },
   {
     company: "Signeasy",
-    title: "Senior Site Reliability Engineer — Infrastructure Automation & Cost",
-    period: "Jan 2025 — Dec 2025",
+    title: "Senior Site Reliability Engineer, Infrastructure Automation & Cost",
+    period: "Jan 2025 – Dec 2025",
     location: "Bengaluru, India",
     blurb:
       "Infrastructure automation and cost work across a digital signature platform running 30+ microservices on AWS.",
@@ -104,8 +104,8 @@ export const roles: Role[] = [
   },
   {
     company: "TransUnion (Neustar)",
-    title: "Developer — SRE & Network Infrastructure",
-    period: "Dec 2022 — Jan 2025",
+    title: "Developer, SRE & Network Infrastructure",
+    period: "Dec 2022 – Jan 2025",
     location: "Bengaluru, India",
     blurb:
       "Order Management System infrastructure for $1B+ revenue telecom clients including Charter Communications, Comcast and Oracle.",
@@ -123,8 +123,8 @@ export const roles: Role[] = [
   },
   {
     company: "Tata Consultancy Services",
-    title: "System Engineer — Platform Automation",
-    period: "Dec 2021 — Dec 2022",
+    title: "System Engineer, Platform Automation",
+    period: "Dec 2021 – Dec 2022",
     location: "Bengaluru, India",
     blurb: "Built 'Kanryo', a GitOps-based SaaS platform, while mentoring 15 engineers.",
     plain:
@@ -138,8 +138,8 @@ export const roles: Role[] = [
   },
   {
     company: "Capgemini",
-    title: "Associate Consultant — Infrastructure & Observability",
-    period: "Aug 2018 — Nov 2021",
+    title: "Associate Consultant, Infrastructure & Observability",
+    period: "Aug 2018 – Nov 2021",
     location: "Mumbai, Bangalore, Chennai",
     blurb: "Enterprise observability for Royal Mail, plus a Kafka-based big data platform.",
     plain:
@@ -242,7 +242,7 @@ export const projects: Project[] = [
     featured: true,
   },
   {
-    title: "Toyota TMNA — full-stack APM & RUM instrumentation",
+    title: "Toyota TMNA, full-stack APM & RUM instrumentation",
     org: "Hitachi Digital Services",
     period: "2025 — 2026",
     summary:
@@ -316,7 +316,7 @@ export type LabProject = {
 export const lab: LabProject[] = [
   {
     name: "Argus",
-    kicker: "AI SRE agent · MCP",
+    kicker: "AI SRE agent over MCP",
     summary:
       "An alert fires. Argus investigates through MCP tools over Prometheus, Loki, Tempo and Kubernetes, finds the root cause and proposes the fix as a GitOps pull request. It never writes to the cluster. Guardrails cover read-only tool gating, change limits, secret redaction and prompt-injection detection, and a rule-based runbook mode takes over when the LLM is down.",
     proof: [
@@ -340,7 +340,7 @@ export const lab: LabProject[] = [
   },
   {
     name: "agent-harness-sdk",
-    kicker: "Agent SDK · read → analyse → decide → act",
+    kicker: "Agent SDK: read, analyse, decide, act",
     summary:
       "A Python SDK for operational AI agents. Every agent reads with read-only tools, analyses, decides on one action, and acts only after policy written in code and a human approval allow it, with secret redaction, prompt-injection checks and budgets built in. OpenTelemetry traces, metrics, logs and events come out automatically. DeepSeek is the default model, and Incident Commander, a reference incident-management bot, is built on top.",
     proof: [

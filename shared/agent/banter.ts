@@ -28,7 +28,7 @@ const IDENTITY =
 export const isIdentity = (text: string) => IDENTITY.test(text) && text.trim().split(/\s+/).length <= 8
 
 export const IDENTITY_REPLY = [
-  "I'm mini-Debanjan, an AI help desk Debanjan built for this site. I'm not him, just a pocket-sized version that only answers from his real profile. For the full-size one, email itsme.deb1995@gmail.com.",
+  "I'm mini-Debanjan, an AI help desk Debanjan built for this site. I'm not him, just a pocket-sized version that only answers from his profile. For the full-size one, email itsme.deb1995@gmail.com.",
   "Honest answer: I'm a bot. Debanjan built me so you can ask about his work any time, even at 3am when he's asleep and his alerts aren't. Want to try me?",
 ]
 
@@ -65,7 +65,7 @@ const TALK: Record<TalkKind, string[]> = {
   greet: [
     "Hi! I'm mini-Debanjan, the pocket-sized help desk. The full-size one is busy keeping systems up, so ask me anything about his work:",
     "Hello! Mini-Debanjan here. Smaller than the original, same facts. What would you like to know?",
-    "Hey there! I answer questions about Debanjan's work from his real profile. Where shall we start?",
+    "Hey there! I answer questions about Debanjan's work from his profile. Where shall we start?",
   ],
   namaste: ["Namaste! I'm mini-Debanjan. Ask me anything about his work, or pick one of these:"],
   timeofday: ["{greeting} to you too! I'm mini-Debanjan. What would you like to know about his work?"],

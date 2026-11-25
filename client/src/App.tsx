@@ -29,7 +29,6 @@ function Portfolio() {
 
   return (
     <div className="site">
-      <div className="ambient" aria-hidden />
       <Nav home />
       <main id="top">
         <Hero onOpenTool={openTool} />

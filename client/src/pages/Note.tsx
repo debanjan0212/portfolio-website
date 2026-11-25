@@ -1,4 +1,3 @@
-import { ArrowLeft, ArrowUpRight } from "lucide-react"
 import type { Block, Note as NoteData } from "@/data/notes"
 import { notePath, notes } from "@/data/notes"
 import { profile } from "@/data/profile"
@@ -91,16 +90,14 @@ export default function Note({ note }: { note: NoteData }) {
 
   return (
     <div className="site">
-      <div className="ambient" aria-hidden />
       <Nav home={false} />
       <main className="shell note">
         <article>
           <header className="note-head">
-            <p className="note-kind">{note.kind}</p>
             <h1>{note.title}</h1>
             <p className="note-sum">{note.summary}</p>
             <p className="note-by">
-              <a href="/">{profile.name}</a>, <time dateTime={note.date}>{longDate(note.date)}</time>, {note.minutes} minute read
+              {note.kind} by <a href="/">{profile.name}</a>, <time dateTime={note.date}>{longDate(note.date)}</time>. {note.minutes} minute read.
             </p>
           </header>
           <div className="note-body">
@@ -112,7 +109,7 @@ export default function Note({ note }: { note: NoteData }) {
 
         <footer className="note-foot">
           <a className="glass pill pill-glass" href={note.repo.url} target="_blank" rel="noreferrer">
-            {note.repo.label} on GitHub <ArrowUpRight size={15} aria-hidden />
+            {note.repo.label} on GitHub
           </a>
           {others.map((n) => (
             <a key={n.slug} className="note-next" href={notePath(n)}>
@@ -121,7 +118,7 @@ export default function Note({ note }: { note: NoteData }) {
             </a>
           ))}
           <a className="note-back" href="/">
-            <ArrowLeft size={15} aria-hidden /> Back to the portfolio
+            Back to the portfolio
           </a>
         </footer>
       </main>

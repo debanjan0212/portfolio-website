@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowUp, Briefcase, Code2, Layers, Mail, MapPin, Sparkles, X } from "lucide-react"
+import { ArrowUp, Briefcase, Code2, Hammer, Layers, Mail, MapPin, X } from "lucide-react"
 import { knowledgeBase, profile } from "@/data/profile"
 import MiniMe, { type Mood } from "./MiniMe"
 
@@ -8,7 +8,7 @@ type Message = { role: "user" | "assistant"; content: string }
 
 /** Help-desk counters shown before the first question. After that the server suggests. */
 const TOPICS = [
-  { icon: Sparkles, label: "Current work", q: "What is he building right now?" },
+  { icon: Hammer, label: "Current work", q: "What is he building right now?" },
   { icon: Code2, label: "Open source", q: "What are Argus, IntentOps and agent-harness-sdk?" },
   { icon: Briefcase, label: "Experience", q: "What's the largest migration he has run?" },
   { icon: Layers, label: "Skills", q: "How deep is his OpenTelemetry experience?" },
@@ -17,7 +17,7 @@ const TOPICS = [
 ]
 const OPENERS = TOPICS.map((t) => t.q)
 
-const GREETING = `Hi, I'm mini-${profile.first}! I'm the pocket-sized help desk for ${profile.first}'s work. I only answer from his real profile, so no made-up stories. Pick a counter below or just ask.`
+const GREETING = `Hi, I'm mini-${profile.first}! I'm the pocket-sized help desk for ${profile.first}'s work. I only answer from his profile, so no made-up stories. Pick a counter below or just ask.`
 
 const MOODS: Mood[] = ["wave", "happy", "talk", "think", "calm"]
 
@@ -186,9 +186,9 @@ export default function AgentChat() {
               </span>
               <div className="min-w-0">
                 <p className="text-[0.95rem] font-semibold tracking-tight text-hi">Mini-{profile.first}</p>
-                <p className="mt-0.5 text-[0.72rem] text-low">Help desk · answers from his real profile</p>
-                <p className="mt-1.5 flex items-center gap-1.5 text-[0.72rem] text-ok">
-                  <span className="dot-live" />{busy ? "typing" : "online"}
+                <p className="mt-0.5 text-[0.72rem] text-low">Answers only from his profile and work history.</p>
+                <p className="mt-1.5 h-4 text-[0.72rem] text-low" aria-live="polite">
+                  {busy ? "typing" : ""}
                 </p>
               </div>
               <button

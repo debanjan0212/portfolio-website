@@ -60,7 +60,7 @@ export default function ArgusReplay({ active }: { active: boolean }) {
             <b>0</b> writes to the cluster
           </span>
           <span>
-            the real run took <b>{argus.stats.seconds}s</b>
+            the recorded run took <b>{argus.stats.seconds}s</b>
           </span>
           <span>
             passes <b>{argus.evals.passed} of {argus.evals.total}</b> recorded incidents
