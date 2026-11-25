@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ArrowUpRight, BadgeCheck, GraduationCap } from "lucide-react"
+import { BadgeCheck, GraduationCap } from "lucide-react"
 import { certifications, education, roles } from "@/data/profile"
 import { useSay } from "@/lib/prefs"
 
@@ -12,7 +12,7 @@ export default function Experience() {
     <section id="experience" className="sec shell" aria-labelledby="experience-title">
       <div className="sec-head">
         <h2 id="experience-title" className="h2">
-          {say("Where I have done this for real", "Experience")}
+          {say("Where I have done this", "Experience")}
         </h2>
         <p className="sub">
           {say(
@@ -56,7 +56,7 @@ export default function Experience() {
 
       <div id="credentials" className="creds">
         {certifications.map((c) => (
-          <div className="glass cred" key={c.name}>
+          <div className="cred" key={c.name}>
             <span className="cred-badge">
               <BadgeCheck size={22} aria-hidden />
             </span>
@@ -69,14 +69,14 @@ export default function Experience() {
               {c.verifyUrl && (
                 <p>
                   <a className="link" href={c.verifyUrl} target="_blank" rel="noreferrer">
-                    Verify this credential <ArrowUpRight size={13} style={{ display: "inline", verticalAlign: "-2px" }} aria-hidden />
+                    Verify this credential
                   </a>
                 </p>
               )}
             </div>
           </div>
         ))}
-        <div className="glass cred">
+        <div className="cred">
           <span className="cred-badge">
             <GraduationCap size={22} aria-hidden />
           </span>

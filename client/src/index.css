@@ -47,7 +47,6 @@
   --glass-sheen: rgb(255 255 255 / 0.1);
   --well: rgb(0 0 0 / 0.32);
   --grad: linear-gradient(100deg, #8ab4ff 0%, #c4b5fd 42%, #7ee7d8 80%, #8ab4ff 100%);
-  --name: linear-gradient(180deg, #ffffff 35%, rgb(255 255 255 / 0.58));
 
   --font-sans: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -88,7 +87,6 @@
   --glass-sheen: rgb(0 102 204 / 0.05);
   --well: rgb(0 0 0 / 0.035);
   --grad: linear-gradient(100deg, #0059c2 0%, #6d35e0 45%, #0b8577 80%, #0059c2 100%);
-  --name: linear-gradient(180deg, #1d1d1f 40%, rgb(29 29 31 / 0.66));
 }
 
 @layer base {
@@ -224,14 +222,6 @@
     border-radius: 999px;
     background: rgb(var(--ok));
   }
-  .dot-live::after {
-    content: "";
-    position: absolute;
-    inset: -4px;
-    border-radius: 999px;
-    border: 1px solid rgb(var(--ok) / 0.45);
-    animation: ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
-  }
 
   .shell {
     width: 100%;
@@ -261,13 +251,6 @@
     font-size: clamp(1rem, 1.5vw, 1.125rem);
     color: rgb(var(--text-mid));
     text-wrap: pretty;
-  }
-  .grad {
-    background: var(--grad);
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
   }
 
   .pill {
@@ -382,20 +365,6 @@
     position: relative;
     isolation: isolate;
     min-height: 100vh;
-  }
-  /* Soft, still light behind everything. It does not move: the work does. */
-  .ambient {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(60rem 38rem at 12% -6%, rgb(var(--accent) / 0.16), transparent 62%),
-      radial-gradient(48rem 34rem at 96% 14%, rgb(var(--sig-trace) / 0.12), transparent 60%),
-      radial-gradient(52rem 36rem at 50% 108%, rgb(var(--sig-log) / 0.07), transparent 60%);
-  }
-  [data-theme="light"] .ambient {
-    opacity: 0.55;
   }
 
   /* ---------------------------------------------------------------- */
@@ -611,12 +580,7 @@
     letter-spacing: -0.05em;
     line-height: 0.95;
     white-space: nowrap;
-    background: var(--name);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    /* descenders (j) are clipped by background-clip without this */
-    padding-bottom: 0.08em;
+    color: rgb(var(--text-hi));
   }
   @media (min-width: 940px) {
     .hero-name {
@@ -732,122 +696,79 @@
     margin: 0.55em 0.3rem 0 0.3rem;
   }
 
-  /* "What I built": a live list, laid out like a service status board. */
-  .built {
-    padding: 0.5rem;
-    border-radius: 1.5rem;
-  }
+  /*
+    "What I built": a status board. One row per tool with hairlines between,
+    no cards. Phone: name and status on one line, what it does below.
+    Wider: name, what it does and status in three columns.
+  */
   .built-head {
-    padding: 0.25rem 0.75rem 0.1rem;
+    padding-bottom: 0.5rem;
     font-size: 0.9rem;
     font-weight: 550;
-    letter-spacing: -0.01em;
+    color: rgb(var(--text-mid));
   }
   .built-rows {
     display: grid;
-    gap: 2px;
-  }
-  @media (min-width: 1000px) {
-    .built-rows {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+    border-top: 1px solid rgb(var(--hairline) / 0.12);
   }
   .built-row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "name status" "what what";
+    align-items: baseline;
+    gap: 0.1rem 1rem;
     width: 100%;
-    padding: 0.45rem 0.75rem;
+    padding: 0.65rem 0;
     border: 0;
-    border-radius: 1.1rem;
+    border-bottom: 1px solid rgb(var(--hairline) / 0.12);
     background: transparent;
     text-align: left;
-    text-decoration: none;
     color: inherit;
     cursor: pointer;
-    transition: background-color 0.25s ease;
-  }
-  .built-row:hover {
-    background: rgb(var(--hairline) / 0.06);
-  }
-  .built-row:hover .built-go {
-    transform: translateX(3px);
-    color: rgb(var(--text-hi));
-  }
-  .built-glyph {
-    display: grid;
-    place-items: center;
-    width: 2.4rem;
-    height: 2.4rem;
-    border-radius: 0.8rem;
-    background: rgb(var(--accent) / 0.12);
-    color: rgb(var(--accent));
-  }
-  .built-text {
-    display: grid;
-    min-width: 0;
-  }
-  .built-top {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0 0.6rem;
   }
   .built-name {
+    grid-area: name;
     font-size: 1rem;
     font-weight: 550;
     letter-spacing: -0.015em;
+    transition: color 0.2s ease;
   }
-  .built-top .state {
-    font-size: 0.78rem;
+  .built-row:hover .built-name,
+  .built-row:focus-visible .built-name {
+    color: rgb(var(--accent));
   }
   .built-what {
-    font-size: 0.88rem;
-    line-height: 1.35;
+    grid-area: what;
+    font-size: 0.9rem;
+    line-height: 1.4;
     color: rgb(var(--text-mid));
   }
   .built-status {
-    display: none;
-    flex-wrap: wrap;
-    gap: 0.15rem 0.9rem;
-    min-height: 1.3rem;
-    margin-top: 0.35rem;
+    grid-area: status;
+    display: flex;
+    gap: 1.25rem;
     font-size: 0.8rem;
     color: rgb(var(--text-low));
+    white-space: nowrap;
   }
-  .built-go {
+  .built-when {
     display: none;
-    margin-top: 0.15rem;
-    color: rgb(var(--text-low));
-    transition:
-      transform 0.25s var(--ease),
-      color 0.25s ease;
   }
-  @media (min-width: 560px) {
+  @media (min-width: 760px) {
     .built-row {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      align-items: start;
-      gap: 0.9rem;
-      padding: 0.85rem 0.9rem;
-    }
-    .built-glyph {
-      width: 2.75rem;
-      height: 2.75rem;
-      border-radius: 0.9rem;
-    }
-    .built-top .state {
-      display: none;
-    }
-    .built-status {
-      display: flex;
+      grid-template-columns: 11rem minmax(0, 1fr) auto;
+      grid-template-areas: "name what status";
+      gap: 1.5rem;
+      padding: 0.85rem 0;
     }
     .built-name {
       font-size: 1.05rem;
     }
-    .built-go {
-      display: block;
+    .built-what {
+      font-size: 0.95rem;
+    }
+    .built-when {
+      display: inline;
     }
   }
   .built-foot {
@@ -856,14 +777,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.6rem 1rem;
-    margin: 0.35rem 0.75rem 0.35rem;
-    padding-top: 0.65rem;
-    border-top: 1px solid rgb(var(--hairline) / 0.08);
+    padding-top: 0.75rem;
   }
   .built-live {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
     font-size: 0.8rem;
     color: rgb(var(--text-low));
   }
@@ -1301,9 +1217,19 @@
     color: rgb(var(--text-mid));
   }
   .acard li {
+    position: relative;
     padding-left: 0.9rem;
-    border-left: 2px solid rgb(var(--hairline) / 0.14);
     overflow-wrap: anywhere;
+  }
+  .acard li::before {
+    content: "";
+    position: absolute;
+    left: 0.1rem;
+    top: 0.62em;
+    width: 0.28rem;
+    height: 0.28rem;
+    border-radius: 99px;
+    background: rgb(var(--text-low));
   }
   .diff {
     margin-top: 0.75rem;
@@ -1917,8 +1843,8 @@
   /* Telemetry flow                                                    */
   /* ---------------------------------------------------------------- */
   .flow {
-    padding: clamp(1rem, 2.5vw, 1.75rem);
-    border-radius: 1.75rem;
+    padding-top: clamp(1rem, 2.5vw, 1.5rem);
+    border-top: 1px solid rgb(var(--hairline) / 0.12);
   }
   .flow-top {
     display: flex;
@@ -2154,7 +2080,7 @@
   /* ---------------------------------------------------------------- */
   .rules {
     display: grid;
-    gap: 0.75rem;
+    gap: 1.25rem 2rem;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -2172,15 +2098,11 @@
   .rule {
     display: flex;
     flex-direction: column;
-    padding: 1.1rem 1.2rem 1.15rem;
-    border-radius: 1.25rem;
+    padding: 1rem 0 0.4rem;
+    border-top: 1px solid rgb(var(--hairline) / 0.12);
     min-width: 0;
   }
-  .rule svg {
-    color: rgb(var(--accent));
-  }
   .rule h3 {
-    margin-top: 0.7rem;
     font-size: 1.05rem;
     font-weight: 550;
     letter-spacing: -0.015em;
@@ -2202,7 +2124,7 @@
 
   .sec-split {
     display: grid;
-    gap: 1.25rem;
+    gap: 2.5rem 3rem;
     margin-top: clamp(1.5rem, 3vw, 2.25rem);
   }
   @media (min-width: 1000px) {
@@ -2212,8 +2134,8 @@
     }
   }
   .box {
-    padding: clamp(1.1rem, 2.5vw, 1.6rem);
-    border-radius: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgb(var(--hairline) / 0.12);
     min-width: 0;
   }
   .box h3 {
@@ -2496,8 +2418,8 @@
     color: rgb(var(--text-mid));
   }
   .job-points li {
-    padding-left: 1rem;
-    border-left: 2px solid rgb(var(--accent) / 0.4);
+    position: relative;
+    padding-left: 1.1rem;
     text-wrap: pretty;
   }
   .job-more {
@@ -2570,7 +2492,7 @@
   }
   .creds {
     display: grid;
-    gap: 0.75rem;
+    gap: 1.25rem 3rem;
     margin-top: 2rem;
     scroll-margin-top: 6rem;
   }
@@ -2583,16 +2505,11 @@
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 0.9rem;
-    padding: 1rem 1.1rem;
-    border-radius: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(var(--hairline) / 0.12);
   }
   .cred-badge {
-    display: grid;
-    place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 0.9rem;
-    background: rgb(var(--accent) / 0.12);
+    padding-top: 0.1rem;
     color: rgb(var(--accent));
   }
   .cred h3 {
@@ -2633,6 +2550,7 @@
     border-bottom: 1px solid rgb(var(--hairline) / 0.1);
   }
   .post-kind {
+    margin-top: 0.15rem;
     font-size: 0.85rem;
     color: rgb(var(--text-low));
   }
@@ -2642,18 +2560,6 @@
     letter-spacing: -0.025em;
     line-height: 1.2;
     text-wrap: balance;
-  }
-  .post-title svg {
-    display: inline;
-    vertical-align: -1px;
-    color: rgb(var(--text-low));
-    transition:
-      transform 0.25s var(--ease),
-      color 0.25s ease;
-  }
-  .post:hover .post-title svg {
-    transform: translate(2px, -2px);
-    color: rgb(var(--accent));
   }
   .post-sum {
     max-width: 44rem;
@@ -2668,10 +2574,6 @@
     max-width: 46rem;
     padding-top: clamp(6.5rem, 12vw, 9rem);
     padding-bottom: clamp(3rem, 7vw, 5rem);
-  }
-  .note-kind {
-    font-size: 0.9rem;
-    color: rgb(var(--accent));
   }
   .note-head h1 {
     margin-top: 0.7rem;
@@ -2736,8 +2638,8 @@
     list-style: none;
   }
   .note-body ul li {
+    position: relative;
     padding-left: 1.1rem;
-    border-left: 2px solid rgb(var(--accent) / 0.4);
   }
   .note-body :not(pre) > code {
     padding: 0.1em 0.35em;
@@ -2935,8 +2837,20 @@
     color: rgb(var(--text-hi));
   }
   .contact-open li {
-    padding-left: 1rem;
-    border-left: 2px solid rgb(var(--accent) / 0.4);
+    position: relative;
+    padding-left: 1.1rem;
+  }
+  .job-points li::before,
+  .contact-open li::before,
+  .note-body ul li::before {
+    content: "";
+    position: absolute;
+    left: 0.15rem;
+    top: 0.68em;
+    width: 0.32rem;
+    height: 0.32rem;
+    border-radius: 99px;
+    background: rgb(var(--text-low));
   }
 
   .foot {
@@ -3044,8 +2958,8 @@
   .foot-live {
     display: grid;
     gap: 0.35rem 2rem;
-    padding: 1.1rem 1.25rem;
-    border-radius: 1.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid rgb(var(--hairline) / 0.12);
     font-size: 0.85rem;
     color: rgb(var(--text-mid));
   }

@@ -196,7 +196,7 @@ export default function Telemetry() {
         </p>
       </div>
 
-      <div ref={ref} className={`glass flow${inView ? " is-live" : ""}`}>
+      <div ref={ref} className={`flow${inView ? " is-live" : ""}`}>
         <div className="flow-top">
           <div className="flow-pick" role="group" aria-label="Where to send the telemetry">
             <span>{say("Send it to", "Export to")}</span>
@@ -277,6 +277,12 @@ export default function Telemetry() {
           </p>
         </div>
       </div>
+      <p className="fine proof-note">
+        {say(
+          "These numbers are from my project work at Hitachi Digital Services. Both platforms are private, so they cannot be linked here. They match my résumé.",
+          "Figures from client engagements at Hitachi Digital Services, 2026. Both platforms are private, so there is no public source to link. They match the résumé.",
+        )}
+      </p>
     </section>
   )
 }

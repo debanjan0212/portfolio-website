@@ -1,4 +1,3 @@
-import { ArrowUpRight } from "lucide-react"
 import { notePath, notes } from "@/data/notes"
 import { longDate } from "@/pages/Note"
 
@@ -16,13 +15,11 @@ export default function Writing() {
         {notes.map((n) => (
           <li key={n.slug}>
             <a className="post" href={notePath(n)}>
-              <span className="post-kind">
-                {n.kind}, <time dateTime={n.date}>{longDate(n.date, "short")}</time>, {n.minutes} min read
-              </span>
-              <span className="post-title">
-                {n.title} <ArrowUpRight size={18} aria-hidden />
-              </span>
+              <span className="post-title">{n.title}</span>
               <span className="post-sum">{n.teaser}</span>
+              <span className="post-kind">
+                {n.kind}, <time dateTime={n.date}>{longDate(n.date, "short")}</time>. {n.minutes} min read.
+              </span>
             </a>
           </li>
         ))}

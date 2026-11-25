@@ -1,6 +1,6 @@
 import { useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ArrowUpRight, Check, X } from "lucide-react"
+import { Check, X } from "lucide-react"
 import { argus, harness, intentops } from "@/data/runs"
 import { useSay } from "@/lib/prefs"
 import { useInView } from "@/lib/useInView"
@@ -33,7 +33,7 @@ const copy: Copy[] = [
       "An alert fires. Argus investigates through read-only MCP tools over Prometheus, Loki, Tempo and Kubernetes, finds the root cause and proposes the fix as a GitOps pull request. A rule-based runbook mode takes over when the model is down.",
     ],
     does: [
-      ["Finds the real cause, even when it is two services away from the alarm.", "Traces the degradation down the service graph instead of stopping at the alerting service."],
+      ["Finds the cause, even when it is two services away from the alarm.", "Traces the degradation down the service graph instead of stopping at the alerting service."],
       ["Passes all 5 recorded incidents in its own test suite, on every change.", "5 of 5 recorded incidents pass the agent evals in CI, over real MCP."],
     ],
     never: ["Never changes the live system. Every fix goes through Git and a human review.", "Never writes to the cluster. Tool gate, change limits, secret redaction and injection checks are enforced in code."],
@@ -63,11 +63,11 @@ const copy: Copy[] = [
     Glyph: HarnessGlyph,
     title: ["A toolkit for AI agents that ask before they act", "agent-harness-sdk: read, analyse, decide, act"],
     body: [
-      "A starting kit for AI agents that work on real systems. Every agent built on it looks first, decides on one action, and needs a yes from a person before it changes anything.",
+      "A starting kit for AI agents that work on production systems. Every agent built on it looks first, decides on one action, and needs a yes from a person before it changes anything.",
       "A Python SDK for operational agents: read-only tools, one decided action, policy in code and human approval before any change, with secret redaction, injection checks and budgets built in. Works alone or inside LangChain, LangGraph, CrewAI, LlamaIndex, the OpenAI Agents SDK or any MCP client.",
     ],
     does: [
-      ["You are the human in the loop here. Approve or deny the rollback and see what happens.", "The approval gate below is interactive: both answers replay real output from the demo."],
+      ["You are the human in the loop here. Approve or deny the rollback and see what happens.", "The approval gate below is interactive: both answers replay recorded output from the demo."],
       ["Knows its limits. When there is no safe fix, it calls a person instead of guessing.", "Escalates with evidence when no bounded action is safe, as in the db-pool scenario."],
     ],
     never: ["Its rules live in code, not in the AI's instructions, so it cannot be talked out of them.", "Guardrails run in code, never in the prompt: they hold when the model is wrong or manipulated."],
@@ -93,8 +93,8 @@ export default function Stage({ tool, onTool }: { tool: ToolId; onTool: (t: Tool
         </h2>
         <p className="sub">
           {say(
-            "Three open-source tools I built. Each panel replays a real run from the project's own demo command.",
-            "Three open-source projects. Each panel replays a real run recorded from the repo's own demo command. The command is shown, so you can repeat it.",
+            "Three open-source tools I built. Each panel replays a run recorded from the project's own demo command.",
+            "Three open-source projects. Each panel replays a run recorded from the repo's own demo command. The command is shown, so you can repeat it.",
           )}
         </p>
       </div>
@@ -142,7 +142,7 @@ export default function Stage({ tool, onTool }: { tool: ToolId; onTool: (t: Tool
               </ul>
               <div className="stage-links">
                 <a className="link" href={c.repo} target="_blank" rel="noreferrer">
-                  {say("See the code on GitHub", "Source on GitHub")} <ArrowUpRight size={14} style={{ display: "inline", verticalAlign: "-2px" }} aria-hidden />
+                  {say("See the code on GitHub", "Source on GitHub")}
                 </a>
               </div>
             </div>

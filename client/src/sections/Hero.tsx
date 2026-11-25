@@ -1,9 +1,8 @@
 import { Fragment } from "react"
-import { ArrowDown, ArrowRight, BadgeCheck, Download } from "lucide-react"
+import { BadgeCheck, Download } from "lucide-react"
 import { certifications, profile } from "@/data/profile"
 import { useSay, VoiceSwitch } from "@/lib/prefs"
 import { ago, useLive, useNow, type RepoName } from "@/lib/live"
-import { ArgusGlyph, HarnessGlyph, IntentGlyph } from "@/components/Glyphs"
 import IntroVideo from "@/components/IntroVideo"
 import type { ToolId } from "@/App"
 
@@ -12,13 +11,12 @@ const tools: {
   id: ToolId
   repo: RepoName
   name: string
-  Glyph: typeof ArgusGlyph
   simple: string
   technical: string
 }[] = [
-  { id: "argus", repo: "argus-sre-agent", name: "Argus", Glyph: ArgusGlyph, simple: "An AI on-call engineer", technical: "AI SRE agent over MCP" },
-  { id: "intentops", repo: "intentops", name: "IntentOps", Glyph: IntentGlyph, simple: "Plans servers, alarms and cost", technical: "Intent to capacity, SLOs, cost, canary" },
-  { id: "harness", repo: "agent-harness-sdk", name: "agent-harness-sdk", Glyph: HarnessGlyph, simple: "AI agents that ask before they act", technical: "Agent SDK: policy in code, approval" },
+  { id: "argus", repo: "argus-sre-agent", name: "Argus", simple: "An AI on-call engineer", technical: "AI SRE agent over MCP" },
+  { id: "intentops", repo: "intentops", name: "IntentOps", simple: "Plans servers, alarms and cost", technical: "Intent to capacity, SLOs, cost, canary" },
+  { id: "harness", repo: "agent-harness-sdk", name: "agent-harness-sdk", simple: "AI agents that ask before they act", technical: "Agent SDK: policy in code, approval" },
 ]
 
 const step = (i: number) => ({ "--i": i }) as React.CSSProperties
@@ -50,7 +48,7 @@ export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void 
             {profile.name}
           </h1>
           <p className="hero-tag settle" style={step(2)}>
-            <span className="grad">{profile.tagline}.</span>
+            {profile.tagline}.
           </p>
           <p className="hero-sum settle" style={step(3)}>
             {say(profile.summary.simple, profile.summary.technical)}
@@ -86,11 +84,11 @@ export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void 
             <span>
               Watch the tools<span className="wide-only"> work</span>
             </span>
-            <ArrowDown size={16} aria-hidden />
           </a>
         </div>
 
-        <aside className="glass built hero-built settle" style={step(7)} aria-labelledby="built-title">
+        {/* a status board, not three cards: one row per tool, the whole row is the button */}
+        <section className="built hero-built settle" style={step(7)} aria-labelledby="built-title">
           <h2 id="built-title" className="built-head">
             What I built
           </h2>
@@ -101,45 +99,28 @@ export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void 
               const ci = repo.ci && repo.ci.state !== "unknown" ? repo.ci.state : null
               return (
                 <button key={t.id} className="built-row online" style={step(i)} onClick={() => onOpenTool(t.id)}>
-                  <span className="built-glyph">
-                    <t.Glyph />
+                  <span className="built-name">{t.name}</span>
+                  <span className="built-what">{say(t.simple, t.technical)}</span>
+                  <span className="built-status">
+                    {ci && (
+                      <span className={`state is-${ci}`}>
+                        <i />
+                        <span className="wide-only">tests&nbsp;</span>
+                        {ci}
+                      </span>
+                    )}
+                    {pushed && <span className="built-when">updated {pushed}</span>}
                   </span>
-                  <span className="built-text">
-                    {/* a phone shows the short status beside the name; wider screens get the full status line */}
-                    <span className="built-top">
-                      <span className="built-name">{t.name}</span>
-                      {ci && (
-                        <span className={`state is-${ci}`}>
-                          <i />
-                          {ci}
-                        </span>
-                      )}
-                    </span>
-                    <span className="built-what">{say(t.simple, t.technical)}</span>
-                    <span className="built-status">
-                      {ci && (
-                        <span className={`state is-${ci}`}>
-                          <i />
-                          tests {ci}
-                        </span>
-                      )}
-                      {pushed && <span>updated {pushed}</span>}
-                    </span>
-                  </span>
-                  <ArrowRight className="built-go" size={18} aria-hidden />
                   <span className="sr-only">Watch {t.name} work</span>
                 </button>
               )
             })}
           </div>
-          {/* always rendered, so nothing moves when the live data arrives; the dot pulses only when it is live */}
           <div className="built-foot">
-            <p className="built-live">
-              <span className={live.source === "live" ? "dot-live" : "dot"} /> Test status and dates come from GitHub
-            </p>
+            <p className="built-live">Test status and dates come from GitHub on every visit.</p>
             <VoiceSwitch />
           </div>
-        </aside>
+        </section>
 
         <IntroVideo className="hero-video settle" style={step(3)} />
 

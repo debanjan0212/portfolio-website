@@ -1,4 +1,3 @@
-import { ArrowUpRight } from "lucide-react"
 import { looking, profile } from "@/data/profile"
 
 const links = [
@@ -17,7 +16,6 @@ export default function Contact() {
       </h2>
       <a className="pill pill-solid contact-mail" href={`mailto:${profile.email}`}>
         <span>{profile.email}</span>
-        <ArrowUpRight size={16} aria-hidden style={{ flex: "none" }} />
       </a>
 
       <div className="contact-grid">
@@ -27,10 +25,7 @@ export default function Contact() {
             {links.map((l) => (
               <a key={l.label} href={l.href} target={l.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer">
                 <span>{l.label}</span>
-                <span>
-                  {l.value}
-                  <ArrowUpRight size={14} aria-hidden style={{ flex: "none" }} />
-                </span>
+                <span>{l.value}</span>
               </a>
             ))}
           </div>

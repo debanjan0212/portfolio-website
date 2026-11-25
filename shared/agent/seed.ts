@@ -153,7 +153,7 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
   },
   {
     q: "How does he think about SLOs and error budgets?",
-    a: "As a decision-making tool, not a dashboard. An SLO is only real if burning the budget actually changes what ships — otherwise it's a number nobody looks at. He defines SLIs with the teams who own the service, aligns SLO targets with them, and uses budget burn as the gate on the next release.",
+    a: "As a decision-making tool, not a dashboard. An SLO only matters if burning the budget actually changes what ships — otherwise it's a number nobody looks at. He defines SLIs with the teams who own the service, aligns SLO targets with them, and uses budget burn as the gate on the next release.",
     tags: ["slo", "sli", "error budget", "reliability", "sla"],
   },
   {
@@ -341,7 +341,7 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
   },
   {
     q: "What is the site itself built with?",
-    a: "React, Vite and TypeScript with Tailwind, Framer Motion for the movement and Lenis for the scroll, deployed on Netlify with serverless functions behind this assistant. Which is a bit off-brand for an SRE, but he wanted the thing you are talking to now to be a real system rather than a widget.",
+    a: "React, Vite and TypeScript with Tailwind and Framer Motion. Every page is rendered to plain HTML at build time, so it reads fine without JavaScript, and it is deployed on Netlify with serverless functions behind this assistant and the GitHub status. Security scans run on every change. Which is a bit much for a portfolio, but he wanted the thing you are talking to now to be a working system rather than a widget.",
     tags: ["site", "portfolio", "stack", "meta", "react", "netlify"],
   },
 ]

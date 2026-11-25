@@ -142,7 +142,7 @@ export default function IntentReplay({ active }: { active: boolean }) {
           </span>
           <strong>
             {verdict.verdict}
-            {voice === "technical" && ` · z=${verdict.z}`}
+            {voice === "technical" && `, z = ${verdict.z}`}
           </strong>
           {voice === "simple" ? (
             <span>

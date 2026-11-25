@@ -41,14 +41,14 @@ export const notes: Note[] = [
     title: "The alarm was on the frontend. The bad release was in checkout.",
     teaser: "A lab incident, call by call, and the gaps in my own tool that it exposed. Two are now fixed.",
     summary:
-      "A lab incident from my Argus demo shop, written the way I would write a real one: the timeline, the eleven checks the agent made, the one-line fix, and the gaps in my own tool that this run exposed. Two of them are now fixed.",
+      "A lab incident from my Argus demo shop, written the way I would write one at work: the timeline, the eleven checks the agent made, the one-line fix, and the gaps in my own tool that this run exposed. Two of them are now fixed.",
     date: "2026-11-22",
     minutes: 5,
     repo: { label: "argus-sre-agent", url: ARGUS },
     blocks: [
       {
         t: "p",
-        text: `This is a lab incident, not a production one. The data is the \`bad-deploy\` scenario that ships in the [Argus repo](${ARGUS}), replayed through the real MCP protocol with the model switched off. I use the postmortem format because it is how I would write this at work, and because you can run it yourself and check every line.`,
+        text: `This is a lab incident, not a production one. The data is the \`bad-deploy\` scenario that ships in the [Argus repo](${ARGUS}), replayed over MCP, the same protocol a live run uses, with the model switched off. I use the postmortem format because it is how I would write this at work, and because you can run it yourself and check every line.`,
       },
       {
         t: "code",
@@ -72,7 +72,7 @@ make demo-pr   # same incident, ending in a rollback commit in a throwaway Git r
         rows: [
           ["Alert", "`HighErrorRate` on frontend: 5xx above 5% for 5 minutes, severity page"],
           ["What users saw", "18% of frontend requests failing. Normal is 0.2%."],
-          ["Real cause", "checkout release `argus-demo/shop:1.4.0` throws `KeyError: 'currency'` on `POST /checkout`"],
+          ["Actual cause", "checkout release `argus-demo/shop:1.4.0` throws `KeyError: 'currency'` on `POST /checkout`"],
           ["Where the alarm pointed", "frontend, one service above the cause"],
           ["Proposed fix", "roll checkout back to `1.3.2`: one line, on a Git branch"],
           ["Alert to proposal", "under one second, 11 read-only tool calls"],
@@ -123,7 +123,7 @@ make demo-pr   # same incident, ending in a rollback commit in a throwaway Git r
       { t: "h", text: "Root cause" },
       {
         t: "p",
-        text: "Release `1.4.0` of checkout throws `KeyError: 'currency'` on about a third of `POST /checkout` requests. Frontend calls checkout, so users see the failure on frontend and that is where the alarm fires. In the demo shop the bug is deliberate: the `1.4.0` image is built with a `RELEASE_BUG` flag that fails roughly 30% of requests, so there is something real to find.",
+        text: "Release `1.4.0` of checkout throws `KeyError: 'currency'` on about a third of `POST /checkout` requests. Frontend calls checkout, so users see the failure on frontend and that is where the alarm fires. In the demo shop the bug is deliberate: the `1.4.0` image is built with a `RELEASE_BUG` flag that fails roughly 30% of requests, so there is a bug to find.",
       },
 
       { t: "h", text: "The fix" },
@@ -163,7 +163,7 @@ make demo-pr   # same incident, ending in a rollback commit in a throwaway Git r
           `**A recent release won too easily. Fixed.** The rule was "a release in the last 60 minutes plus degraded signals", and it ran before the database-pool rule. Adding an unrelated release 30 minutes before the repo's \`db-pool-exhaustion\` scenario made runbook mode blame the release at 0.9 and propose a rollback, although the top log line was a connection-pool timeout. [Pull request #8](${ARGUS}/pull/8) changes this: when both show up, Argus reports both at 0.5 and escalates to a person.`,
           `**The report claimed more than was checked. Fixed.** It said "the last revision with healthy signals", but the code takes the previous revision without looking at how it behaved. In [#8](${ARGUS}/pull/8) it says "the previous revision".`,
           "**Nothing confirms the recovery.** After the merge, Argus does not go back and check that the error rate came down.",
-          "**The timing is flattering.** Under a second is against recorded data on a laptop. Real queries to Prometheus, Loki and Tempo take longer.",
+          "**The timing is flattering.** Under a second is against recorded data on a laptop. Queries to a running Prometheus, Loki and Tempo take longer.",
         ],
       },
 
@@ -275,7 +275,7 @@ INCIDENT INC-0DBAC7  SEV1  ESCALATED`,
       },
       {
         t: "p",
-        text: `The first two are fixed in [pull request #6](${HARNESS}/pull/6), with tests for what must not change: a port number, an \`@\` later in a path, a real card next to a timestamp. The checksum is not perfect. About one random number in ten passes it by chance.`,
+        text: `The first two are fixed in [pull request #6](${HARNESS}/pull/6), with tests for what must not change: a port number, an \`@\` later in a path, a valid card number next to a timestamp. The checksum is not perfect. About one random number in ten passes it by chance.`,
       },
       {
         t: "p",
