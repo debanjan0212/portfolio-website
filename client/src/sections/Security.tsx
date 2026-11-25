@@ -255,8 +255,8 @@ export default function Security() {
         </h3>
         <p>
           {say(
-            "I worked on SOC 2 and HIPAA compliance at Signeasy. Each guardrail maps to an audit control.",
-            "At Signeasy I contributed to SOC 2 and HIPAA compliance through the Vanta integration with AWS. The guardrails are designed against the same controls.",
+            "At Signeasy I led SOC 2 and HIPAA compliance with the admin and IT teams. Each guardrail maps to an audit control.",
+            "At Signeasy I led SOC 2 and HIPAA compliance with the admin and IT teams: I kept controls and evidence in sync for the auditors and raised issues in the tools we used, Vanta with AWS. The guardrails are designed against the same controls.",
           )}
         </p>
         <table className="controls">

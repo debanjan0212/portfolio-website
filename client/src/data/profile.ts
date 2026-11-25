@@ -96,7 +96,7 @@ export const roles: Role[] = [
       "Cut average Docker image size from 850MB to 320MB (62%) across 30+ microservices using multi-stage builds, Alpine bases and layer caching",
       "Migrated CI/CD to GitHub Actions with parallel jobs and caching — build times from 18 minutes to 9 (50%), and roughly 30% off CodeBuild costs",
       "Moved 30+ services from raw Kubernetes manifests to standardised Helm charts, improving release consistency and rollback reliability",
-      "Contributed to SOC2 and HIPAA compliance via Vanta integration with AWS",
+      "Led SOC 2 and HIPAA compliance with the admin and IT teams, keeping controls and evidence in sync for auditors through Vanta with AWS",
       "Ran the annual DR exercise, failing data flow over from us-east-1 to us-west-2 with scripted procedures",
       "Part of a 3-person team targeting a 25% AWS reduction through Kong API Gateway migration and rightsizing",
     ],
