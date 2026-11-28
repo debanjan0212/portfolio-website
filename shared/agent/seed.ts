@@ -128,8 +128,8 @@ const seeds: { q: string; a: string; tags?: string[] }[] = [
   },
   {
     q: "What certifications does he have?",
-    a: "I don't have a certification list on file. Ask him at itsme.deb1995@gmail.com — and in fairness, migrating 800+ servers to EKS is a more convincing credential than most exams.",
-    tags: ["certification", "certified", "aws certified", "cka", "credentials"],
+    a: "Two, both from Anthropic in November 2026: Claude Certified Architect – Foundations and Claude Certified Developer – Foundations. Each has a Credly link in the Experience section so you can check it.",
+    tags: ["certification", "certified", "aws certified", "cka", "credentials", "claude", "anthropic", "architect", "developer", "credly"],
   },
   {
     q: "Does he know Terraform or OpenTofu?",
