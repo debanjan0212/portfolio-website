@@ -32,6 +32,14 @@ export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void 
   const live = useLive()
   const now = useNow()
   const cert = certifications[0]
+  // One cert: show it and link to Credly. More than one: count them and jump to the list below.
+  const many = certifications.length > 1
+  const certTitle = many ? `${certifications.length} Claude certifications` : cert.name
+  const certLine = many
+    ? `${certifications.map((c) => c.short).join(" and ")}, ${cert.issuer}, ${cert.date}`
+    : `${cert.issuer}, ${cert.date}`
+  const certHref = many ? "#credentials" : cert.verifyUrl || "#credentials"
+  const certExternal = !many && !!cert.verifyUrl
   const last = profile.employers.length - 1
   const [first, ...rest] = profile.name.split(" ")
 
@@ -87,14 +95,19 @@ export default function Hero({ onOpenTool }: { onOpenTool: (id: ToolId) => void 
         <a
           className="hero-corner is-br hero-cert settle"
           style={step(4)}
-          href={cert.verifyUrl || "#credentials"}
-          {...(cert.verifyUrl ? { target: "_blank", rel: "noreferrer", "aria-label": `${cert.name}, ${cert.issuer}. Verify on Credly` } : {})}
+          href={certHref}
+          aria-label={
+            many
+              ? `${certifications.map((c) => c.name).join(" and ")}, ${cert.issuer}. See credentials`
+              : `${cert.name}, ${cert.issuer}${certExternal ? ". Verify on Credly" : ""}`
+          }
+          {...(certExternal ? { target: "_blank", rel: "noreferrer" } : {})}
         >
           <BadgeCheck size={18} aria-hidden />
           <span>
-            <b>{cert.name}</b>
+            <b>{certTitle}</b>
             <br />
-            {cert.issuer}, {cert.date}
+            {certLine}
           </span>
         </a>
       </section>

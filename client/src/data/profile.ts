@@ -363,6 +363,8 @@ export const education = {
 
 export type Certification = {
   name: string
+  /** One word for the hero line, e.g. "Architect". */
+  short: string
   issuer: string
   date: string
   /** What it shows, in plain words. */
@@ -374,11 +376,21 @@ export type Certification = {
 export const certifications: Certification[] = [
   {
     name: "Claude Certified Architect – Foundations",
+    short: "Architect",
     issuer: "Anthropic",
     date: "November 2026",
     shows:
       "Anthropic's exam for architects who build production applications with Claude: Claude Code, the Agent SDK, the API and MCP.",
     verifyUrl: "https://www.credly.com/badges/2fcfdf13-ee2f-4322-a6d2-f6b85671812f/public_url",
+  },
+  {
+    name: "Claude Certified Developer – Foundations",
+    short: "Developer",
+    issuer: "Anthropic",
+    date: "November 2026",
+    shows:
+      "Anthropic's proctored exam for developers who build and ship production apps and agents on Claude: the Claude API, Claude Code, custom tools and MCP servers.",
+    verifyUrl: "https://www.credly.com/badges/7bf2d066-a7bc-4115-8940-fbb500aff496/public_url",
   },
 ]
 

@@ -21,7 +21,7 @@ GitHub, and every number links back to where it came from.
 | Telemetry | The OpenTelemetry pattern as a diagram pinned beside three chapters (on wide screens each chapter lights its part), a backend you can switch, and the work numbers in a footnoted table | `sections/Telemetry.tsx` |
 | Security | Guardrails with links to the code, a guardrail you can try, live scan state, SOC 2 / HIPAA mapping | the three repos, `.github/workflows/security.yml` |
 | Write-ups | A lab postmortem and a design note, each on its own page under `/notes/` | `data/notes.ts`, checkable in the tool repos |
-| Experience | Five roles in one plain line each (details open on request), certification with its Credly link, degree | `data/profile.ts` |
+| Experience | Five roles in one plain line each (details open on request), certifications with their Credly links, degree | `data/profile.ts` |
 | Contact | One strip: email and résumé. The footer ends on the name edge to edge | `data/profile.ts` |
 | Footer | How fast this page loaded on the visitor's own device, and the commit that is live | measured in the browser |
 
